@@ -4,6 +4,9 @@ from AbstractState import State
 class IntroState(State):
     " A "
 
+    def __init__(self):
+        super().__init__("Intro")
+
     def on_init(self):
         print("Application started.")
 
@@ -15,3 +18,9 @@ class IntroState(State):
 
     def on_exit(self):
         print("Intro state exited")
+
+    def on_update(self, elapsed):
+        print("Updated")
+
+    def on_render(self):
+        print("Rendering")
