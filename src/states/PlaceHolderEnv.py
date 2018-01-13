@@ -1,11 +1,11 @@
 " Andy "
 from .AbstractState import State
 
-class IntroState(State):
+class PlaceHolder(State):
     " A "
 
     def __init__(self):
-        super().__init__("Intro", "IntroGroup")
+        super().__init__("PlaceHolder", "Environments")
 
         self.total_time = 0
 
@@ -23,10 +23,10 @@ class IntroState(State):
 
     def on_update(self, elapsed):
         self.total_time += elapsed
-        print("Intro state: " + str(self.total_time))
+        print("PlaceHolder: " + str(self.total_time))
 
-        if self.total_time > 100:
-            self.parent.change_state("Enviromnents")
+        if self.total_time > 1000:
+            self.parent.change_state("Menu")
 
     def on_render(self, screen):
         print("Rendering")

@@ -8,6 +8,8 @@ from .StateRegistry import StateRegistry
 from ..stategroups.StateGroup import StateGroup
 from ..states.IntroState import IntroState
 from ..ml.environments.rawplot.MainState import MainState as RawPlotState
+from ..states.MainMenu import MainMenu
+from ..states.PlaceHolderEnv import PlaceHolder
 
 class StateAppRunner():
     _instance = None
@@ -21,11 +23,12 @@ class StateAppRunner():
         StateRegistry.instance().register_group(StateGroup("MasterState"))
         StateRegistry.instance().register_group(StateGroup("IntroGroup"))
         StateRegistry.instance().register_group(StateGroup("Menu"))
-        StateRegistry.instance().register_group(StateGroup("Enviromnents"))
+        StateRegistry.instance().register_group(StateGroup("Environments"))
         IntroState()
-        RawPlotState()
+        MainMenu()
+        PlaceHolder()
 
-        print(StateRegistry.instance().get_state("Rawplot").parent.name)
+        # print(StateRegistry.instance().get_state("Rawplot").parent.name)
 
         self.closed = False
         self.now = None
@@ -45,6 +48,9 @@ class StateAppRunner():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.close()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                StateRegistry.instance().get_group("MasterState").on_mouse_down(pos)
 
     def update(self, elapsed):
         StateRegistry.instance().get_group("MasterState").on_update(elapsed)
