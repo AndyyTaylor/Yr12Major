@@ -11,6 +11,7 @@ class StateGroup(State):
         self.state_stack = []
         self.children = {}  # should this be array and get instance from registry?
         self.parent = False
+        self.default = None
 
         StateRegistry.instance().register_group(self)
         if parent:
@@ -23,6 +24,8 @@ class StateGroup(State):
         print("created")
 
     def add_child(self, child):
+        if not self.children:
+            self.default = child
         self.children[child.name] = child
 
     def change_state(self, name):
@@ -48,10 +51,7 @@ class StateGroup(State):
 
     def reset_stack(self):
         print("Resetting Stack")
-        for key, val in self.children.items():
-            print("Set stack to " + key)
-            self.state_stack.append(val)
-            return
+        self.state_stack.append(self.default)
 
     def get_current_state(self):
         if not self.state_stack:
@@ -82,6 +82,9 @@ class StateGroup(State):
             state.on_update(elapsed)
         return
 
-    def on_render(self):
+    def on_render(self, screen):
         " Called on render "
+        state = self.get_current_state()
+        if state:
+            state.on_render(screen)
         return

@@ -1,4 +1,4 @@
-" Intro "
+" Andy "
 from .AbstractState import State
 
 class IntroState(State):
@@ -28,5 +28,5 @@ class IntroState(State):
         if self.total_time > 100:
             self.parent.change_state("Menu")
 
-    def on_render(self):
+    def on_render(self, screen):
         print("Rendering")

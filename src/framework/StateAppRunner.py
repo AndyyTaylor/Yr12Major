@@ -7,6 +7,7 @@ from .. import config
 from .StateRegistry import StateRegistry
 from ..stategroups.StateGroup import StateGroup
 from ..states.IntroState import IntroState
+from ..states.MainMenu import MainMenu
 
 class StateAppRunner():
     _instance = None
@@ -22,6 +23,7 @@ class StateAppRunner():
         StateRegistry.instance().register_group(StateGroup("Menu"))
         StateRegistry.instance().register_group(StateGroup("Game"))
         IntroState()
+        MainMenu()
 
         print(StateRegistry.instance().get_state("Intro").parent.name)
 
@@ -49,6 +51,8 @@ class StateAppRunner():
 
     def render(self):
         self.screen.fill(config.WHITE)
+
+        StateRegistry.instance().get_group("MasterState").on_render(self.screen)
 
         pygame.display.update()
 
