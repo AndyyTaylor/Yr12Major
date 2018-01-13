@@ -1,6 +1,7 @@
 " Congig "
 
 WHITE = (255, 255, 255)
+RED = (255, 0, 0)
 
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 600

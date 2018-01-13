@@ -82,6 +82,9 @@ class StateGroup(State):
             state.on_update(elapsed)
         return
 
-    def on_render(self):
+    def on_render(self, screen):
         " Called on render "
+        state = self.get_current_state()
+        if state:
+            state.on_render(screen)
         return
