@@ -1,11 +1,14 @@
 " Andy "
 import abc
 
+from ..framework.StateRegistry import StateRegistry
+
 class State(metaclass=abc.ABCMeta):
     " The abstract class that all states inherit "
 
-    def __init__(self, name):
+    def __init__(self, name, parent):
         self.name = name
+        self.parent = StateRegistry.instance().register(self, parent)
 
     @abc.abstractmethod
     def on_init(self):
