@@ -26,7 +26,7 @@ class IntroState(State):
         print("Intro state: " + str(self.total_time))
 
         if self.total_time > 100:
-            self.parent.change_state("Game")
+            self.parent.change_state("Menu")
 
     def on_render(self):
         print("Rendering")

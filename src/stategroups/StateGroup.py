@@ -26,7 +26,6 @@ class StateGroup(State):
         self.children[child.name] = child
 
     def change_state(self, name):
-        print(self.name + " changing to " + name)
         if self.state_stack:
             self.state_stack.pop().on_exit()
 
