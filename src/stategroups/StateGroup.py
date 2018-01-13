@@ -88,3 +88,9 @@ class StateGroup(State):
         if state:
             state.on_render(screen)
         return
+
+    def on_mouse_down(self, pos):
+        state = self.get_current_state()
+        if state:
+            state.on_mouse_down(pos)
+            

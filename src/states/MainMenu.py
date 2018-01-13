@@ -16,7 +16,7 @@ class MainMenu(State):
             Button(100, 100, 400, 400,
                    config.BLACK, config.WHITE,
                    "Begin", config.BLACK,
-                   lambda: self.parent.change_state("IntroGroup"))
+                   lambda: self.parent.change_state("Environments"))
         ]
 
     def on_init(self):
@@ -41,3 +41,6 @@ class MainMenu(State):
     def on_render(self, screen):
         for elem in self.elements:
             elem.on_render(screen)
+
+    def on_mouse_down(self, pos):
+        self.elements[0].on_click()

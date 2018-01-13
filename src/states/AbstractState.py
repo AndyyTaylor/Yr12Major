@@ -39,3 +39,8 @@ class State(metaclass=abc.ABCMeta):
     def on_render(self, screen):
         " Called on render "
         return
+
+    @abc.abstractmethod
+    def on_mouse_down(self, pos):
+        " Passed the mouse position "
+        return
