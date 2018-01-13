@@ -19,19 +19,8 @@ class StateRegistry():
 
         return False
 
-    def change_state(self, name):
-        if self.state_stack:
-            self.state_stack.pop().on_exit()
-
-        self.state_stack = []
-
-        state = self.get_state(name)
-        state.on_enter()
-
-        self.state_stack.append(state)
-
     @staticmethod
-    def get_instance():
+    def instance():
         if not StateRegistry._instance:
             StateRegistry._instance = StateRegistry()
 
