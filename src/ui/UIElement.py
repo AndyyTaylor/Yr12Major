@@ -20,3 +20,9 @@ class UIElement(metaclass=abc.ABCMeta):
 
     def get_rect(self):
         return (self.x, self.y, self.w, self.h)
+
+    def get_center(self):
+        return (self.x + self.w / 2, self.y + self.h / 2)
+
+    def get_adj_center(self, x_off, y_off):
+        return (self.x + self.w / 2 - x_off, self.y + self.h / 2 - y_off)

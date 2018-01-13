@@ -13,8 +13,10 @@ class MainMenu(State):
 
         self.total_time = 0
         self.elements = [
-            Rectangle(0, 0, 100, 100, config.BLUE),
-            Button(300, 300, 50, 50, lambda: self.parent.change_state("IntroGroup"))
+            Button(100, 100, 400, 400,
+                   config.BLACK, config.WHITE,
+                   "Begin", config.BLACK,
+                   lambda: self.parent.change_state("IntroGroup"))
         ]
 
     def on_init(self):
@@ -34,7 +36,7 @@ class MainMenu(State):
 
         if self.total_time > 3000:
             print("Clicking button")
-            self.elements[1].on_click()
+            # self.elements[1].on_click()
 
     def on_render(self, screen):
         for elem in self.elements:
