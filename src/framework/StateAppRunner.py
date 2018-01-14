@@ -7,9 +7,8 @@ from .. import config
 from .StateRegistry import StateRegistry
 from ..stategroups.StateGroup import StateGroup
 from ..states.IntroState import IntroState
-from ..ml.environments.rawplot.MainState import MainState as RawPlotState
+from ..ml.environments.lineardataset.MainState import MainState as LinearDataState
 from ..states.MainMenu import MainMenu
-from ..states.PlaceHolderEnv import PlaceHolder
 
 class StateAppRunner():
     _instance = None
@@ -18,6 +17,7 @@ class StateAppRunner():
         pygame.init()
 
         self.screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT), 0, 32)
+        pygame.display.set_caption("Andy's Machine Learning")
         self.last_update = datetime.datetime.now()
 
         StateRegistry.instance().register_group(StateGroup("MasterState"))
@@ -26,7 +26,7 @@ class StateAppRunner():
         StateRegistry.instance().register_group(StateGroup("Environments"))
         IntroState()
         MainMenu()
-        PlaceHolder()
+        LinearDataState()
 
         # print(StateRegistry.instance().get_state("Rawplot").parent.name)
 

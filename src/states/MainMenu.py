@@ -33,9 +33,6 @@ class MainMenu(State):
 
     def on_update(self, elapsed):
         self.total_time += elapsed
-
-        if self.total_time > 3000:
-            print("Clicking button")
             # self.elements[1].on_click()
 
     def on_render(self, screen):
