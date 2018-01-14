@@ -16,7 +16,7 @@ class MainMenu(State):
             Button(100, 100, 400, 400,
                    config.BLACK, config.WHITE,
                    "Begin", config.BLACK,
-                   lambda: self.parent.change_state("Environments"))
+                   lambda: self.parent.change_state("Simulation"))
         ]
 
     def on_init(self):

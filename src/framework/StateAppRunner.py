@@ -7,8 +7,8 @@ from .. import config
 from .StateRegistry import StateRegistry
 from ..stategroups.StateGroup import StateGroup
 from ..states.IntroState import IntroState
-from ..ml.environments.lineardataset.MainState import MainState as LinearDataState
 from ..states.MainMenu import MainMenu
+from ..states.Simulation import Simulation
 
 class StateAppRunner():
     _instance = None
@@ -23,10 +23,10 @@ class StateAppRunner():
         StateRegistry.instance().register_group(StateGroup("MasterState"))
         StateRegistry.instance().register_group(StateGroup("IntroGroup"))
         StateRegistry.instance().register_group(StateGroup("Menu"))
-        StateRegistry.instance().register_group(StateGroup("Environments"))
+        # StateRegistry.instance().register_group(StateGroup("Environments"))
         IntroState()
         MainMenu()
-        LinearDataState()
+        Simulation()
 
         # print(StateRegistry.instance().get_state("Rawplot").parent.name)
 

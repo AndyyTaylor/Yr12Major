@@ -1,13 +1,17 @@
 " Andy "
 from .AbstractState import State
 
-class PlaceHolder(State):
+from ..ml.environments.lineardataset.MainState import MainState as Environment
+
+class Simulation(State):
     " A "
 
     def __init__(self):
-        super().__init__("PlaceHolder", "Environments")
+        super().__init__("Simulation", "MasterState")
 
         self.total_time = 0
+
+        self.environment = Environment()
 
     def on_init(self):
         print("Application started.")
@@ -22,14 +26,10 @@ class PlaceHolder(State):
         print("Intro state exited")
 
     def on_update(self, elapsed):
-        self.total_time += elapsed
-        print("PlaceHolder: " + str(self.total_time))
-
-        if self.total_time > 1000:
-            self.parent.change_state("Menu")
+        pass
 
     def on_render(self, screen):
-        print("Rendering")
+        self.environment.on_render(screen)
 
     def on_mouse_down(self, pos):
         pass
