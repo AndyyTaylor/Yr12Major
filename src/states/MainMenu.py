@@ -4,6 +4,7 @@ from .. import config
 from .AbstractState import State
 from ..ui.Rectangle import Rectangle
 from ..ui.Button import Button
+from ..ui.Textbox import Textbox
 
 class MainMenu(State):
     " A "
@@ -13,7 +14,8 @@ class MainMenu(State):
 
         self.total_time = 0
         self.elements = [
-            Button(100, 100, 400, 400,
+            Textbox(100, 10, 400, 50, "What would you like to see today?", config.GRAY, 24),
+            Button(100, 250, 400, 400,
                    config.BLACK, config.WHITE,
                    "Begin", config.BLACK,
                    lambda: self.parent.change_state("Environments"))
@@ -43,4 +45,4 @@ class MainMenu(State):
             elem.on_render(screen)
 
     def on_mouse_down(self, pos):
-        self.elements[0].on_click()
+        self.elements[1].on_click()
