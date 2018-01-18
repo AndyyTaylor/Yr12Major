@@ -24,7 +24,7 @@ class MainState(State):
         pass
 
     def on_render(self, screen):
-        self.plot.on_render(screen, self.data_hander.get_points())
+        self.plot.on_render(screen, self.data_hander.get_data())
 
     def on_enter(self):
         pass
@@ -47,3 +47,6 @@ class MainState(State):
         x = random.uniform(self.x_range[0], self.x_range[1])
         y = self.params[1] * x + self.params[0] + np.random.normal(0, 0.02, 1)[0]
         return x, y
+
+    def get_data(self):
+        return self.data_hander.get_data()

@@ -19,5 +19,5 @@ class DataHandler:
     def clear_data(self):
         self.data = []
 
-    def get_points(self):
+    def get_data(self):
         return self.data

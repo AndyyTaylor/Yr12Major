@@ -28,7 +28,7 @@ class Simulation(State):
         pass
 
     def on_update(self, elapsed):
-        pass
+        self.agent.on_update(self.environment.get_data())
 
     def on_render(self, screen):
         self.environment.on_render(screen)
