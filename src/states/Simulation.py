@@ -3,6 +3,7 @@ from .AbstractState import State
 
 from ..ml.environments.lineardataset.MainState import MainState as Environment
 from ..ml.agents.linearregression.LinearRegression import LinearRegression as Agent
+from ..ml.environments.lineardataset import envconfig
 
 class Simulation(State):
     " A "
@@ -12,8 +13,8 @@ class Simulation(State):
 
         self.total_time = 0
 
-        self.environment = Environment()
-        self.agent = Agent()
+        self.environment = Environment(envconfig)
+        self.agent = Agent(envconfig)
 
     def on_init(self):
         print("Application started.")
@@ -28,7 +29,7 @@ class Simulation(State):
         pass
 
     def on_update(self, elapsed):
-        self.agent.on_update(self.environment.get_data())
+        self.agent.on_update(self.environment.getx(), self.environment.gety())
 
     def on_render(self, screen):
         self.environment.on_render(screen)
