@@ -12,10 +12,10 @@ class MainState(State):
         super().__init__("LinearData", "Environments")
 
         self.x_range = [0, 1]
-        self.y_range = [0, 1]
+        self.y_range = [0, 0.5]
 
         self.params = [random.uniform(self.y_range[0], self.y_range[1]),
-                       random.uniform(-1, 1)]
+                       random.uniform(-0.3, 0.3)]
 
         self.data_hander = DataHandler(self.gen_point, 100)
         self.plot = Plot(50, 50, 500, 500, self.x_range, self.y_range)
