@@ -21,7 +21,6 @@ class StateGroup(State):
             self.parent = StateRegistry.instance().get_group("MasterState")
             self.parent.add_child(self)
 
-        print("created")
 
     def add_child(self, child):
         if not self.children:
@@ -50,7 +49,6 @@ class StateGroup(State):
             self.state_stack.pop().on_exit()
 
     def reset_stack(self):
-        print("Resetting Stack")
         self.state_stack.append(self.default)
 
     def get_current_state(self):
@@ -93,4 +91,3 @@ class StateGroup(State):
         state = self.get_current_state()
         if state:
             state.on_mouse_down(pos)
-            

@@ -45,5 +45,5 @@ class MainState(State):
         # x = random.uniform(self.x_range[0], self.x_range[1])
         # y = random.uniform(self.y_range[0], self.y_range[1])
         x = random.uniform(self.x_range[0], self.x_range[1])
-        y = self.params[1] * x + self.params[0] + np.random.normal(0, 0.05, 1)[0]
+        y = self.params[1] * x + self.params[0] + np.random.normal(0, 0.02, 1)[0]
         return x, y

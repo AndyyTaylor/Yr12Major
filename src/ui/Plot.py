@@ -26,3 +26,17 @@ class Plot(UIElement):
         x = (x - self.x_range[0]) * (self.w / (self.x_range[1] - self.x_range[0])) + self.x
         y = (y - self.x_range[0]) * (self.w / (self.y_range[1] - self.y_range[0])) + self.y
         return int(x), int(y)
+
+    def renderFunction(self, screen, func):
+        prev_point = None
+        for xx in self.frange(self.x_range[0], self.x_range[1], 0.1):
+            new_point = self.adjust((xx, func(xx)))
+            if prev_point:
+                pygame.draw.line(screen, config.RED, prev_point, new_point)
+            prev_point = new_point
+
+    def frange(self, start, stop, step):
+        i = start
+        while i < stop:
+            yield i
+            i += step
