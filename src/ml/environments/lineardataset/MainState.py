@@ -12,21 +12,27 @@ class MainState(State):
 
         self.n = econfig.n
 
-        self.x_range = [-10, 10]
-        self.y_range = [-20, 20]
+        self.x_range = [-30, 30]
+        self.y_range = [-100, 100]
 
         self.params = np.zeros((econfig.n, 1))
 
         for i in range(econfig.n):
-            self.params[i] = random.uniform(-10, 10)
+            self.params[i] = random.uniform(-2, 2)
 
         self.y = np.zeros((econfig.m, 1))
         self.x = np.zeros((econfig.m, econfig.n-1))
 
-        for i in range(econfig.m):
+        i = 0
+        while i < econfig.m:
             x, y = self.gen_point()
-            self.x[i] = x.T
-            self.y[i, 0] = y
+            if y < self.y_range[1] and y > self.y_range[0]:
+                self.x[i] = x.T
+                self.y[i, 0] = y
+                print(y)
+                i += 1
+
+
 
         self.plot = Plot(50, 50, 500, 500, self.n, self.x_range, self.y_range)
 

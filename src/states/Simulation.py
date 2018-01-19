@@ -2,7 +2,7 @@
 from .AbstractState import State
 
 from ..ml.environments.lineardataset.MainState import MainState as Environment
-from ..ml.agents.linearregression.LinearRegression import LinearRegression as Agent
+from ..ml.agents.supervised.regression import LinearRegression as Agent
 from ..ml.environments.lineardataset import envconfig
 
 class Simulation(State):
@@ -14,7 +14,7 @@ class Simulation(State):
         self.total_time = 0
 
         self.environment = Environment(envconfig)
-        self.agent = Agent(envconfig)
+        self.agent = Agent(envconfig.n)
 
     def on_init(self):
         print("Application started.")
