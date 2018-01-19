@@ -49,7 +49,11 @@ class MainState(State):
         pass
 
     def on_mouse_down(self, pos):
-        pass
+        x_val, y = self.plot.screen_to_coords(pos)
+        x = np.array([(x_val**(i+1)) for i in range(self.n-1)])
+
+        self.x = np.vstack((self.x, x))
+        self.y = np.vstack((self.y, y))
 
     def gen_point(self):
         x_val = random.uniform(self.x_range[0], self.x_range[1])
