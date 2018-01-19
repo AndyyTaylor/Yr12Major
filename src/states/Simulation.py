@@ -36,4 +36,4 @@ class Simulation(State):
         self.agent.on_render(screen, self.environment.plot)
 
     def on_mouse_down(self, pos):
-        pass
+        self.environment.on_mouse_down(pos)

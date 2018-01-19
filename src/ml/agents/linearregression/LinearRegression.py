@@ -10,10 +10,14 @@ class LinearRegression():
         self.params = np.zeros((self.n, 1))
         self.params[0] = 1
 
+        # self.scale = scale  # np.array([20, 20**2, 20**3])
+
     def on_update(self, x, y):
 
-        X = np.insert(x, 0, 1, axis=1)
+        self.scale = x.std(0)
 
+        X = np.insert(np.divide(x, self.scale), 0, 1, axis=1)
+        # print(X)
         self.vectorizedBGD(X, y)
         # self.BGD(points)
 
@@ -21,21 +25,33 @@ class LinearRegression():
         plot.renderFunction(screen, self.func)
 
     def func(self, x):
-        return self.params.T.dot(np.insert(x, 0, 1, axis=0))
+        # print(x.shape)
+        # print(np.divide(x.T, np.array([20, 20**2, 20**3])).T.shape)
+        y = self.params.T.dot(np.insert(np.divide(x.T, self.scale).T, 0, 1, axis=0))
+        # print(np.insert(np.divide(x.T, np.array([20, 20**2, 20**3])).T, 0, 1, axis=0))
+        return y
 
     def vectorizedBGD(self, X, y):
-        pred = X.dot(self.params)
+        for iter in range(50):
+            pred = X.dot(self.params)
 
-        err = np.square(np.subtract(pred, y))
-        J = 1.0 / (2*self.m) * np.sum(err)
+            err = np.square(np.subtract(pred, y))
+            J = 1.0 / (2*self.m) * np.sum(err)
 
-        print(J)
-        print((X.T.dot(np.subtract(pred, y))).shape)
+            # print(J)
+            if J > 10**36:
+                print("ALPHA TOO BIG")
 
-        alpha = 0.5
-        new_params = np.subtract(self.params, (alpha / self.m) * (X.T.dot(np.subtract(pred, y))))
-        self.params = new_params
+            # print((self.params).shape)
+            alpha = 0.01
+            # print(X)
+            # print("---------")
+            # print(self.params)
+            # print(X.T.dot(np.subtract(pred, y)))
+            new_params = np.subtract(self.params, (alpha / self.m) * (X.T.dot(np.subtract(pred, y))))
+            self.params = new_params
 
+            # print(self.params)
 
 
 

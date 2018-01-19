@@ -5,11 +5,13 @@ from .. import config
 from .UIElement import UIElement
 
 class Plot(UIElement):
-    def __init__(self, x, y, w, h, x_range, y_range): # pylint: disable=R0913
+    def __init__(self, x, y, w, h, n, x_range, y_range): # pylint: disable=R0913
         super().__init__(x, y, w, h)
 
         self.x_range = x_range
         self.y_range = y_range
+
+        self.n = n
 
     def on_update(self, elapsed):
         pass
@@ -24,17 +26,23 @@ class Plot(UIElement):
 
     def adjust(self, point):
         x, y = point
+        # print(y)
         x = (x - self.x_range[0]) * (self.w / (self.x_range[1] - self.x_range[0])) + self.x
-        y = (y - self.x_range[0]) * (self.w / (self.y_range[1] - self.y_range[0])) + self.y
+        y = (y - self.y_range[0]) * (self.w / (self.y_range[1] - self.y_range[0])) + self.y
         return int(x), int(y)
 
     def renderFunction(self, screen, func):
         prev_point = None
         for xx in self.frange(self.x_range[0], self.x_range[1], 0.1):
-            new_point = self.adjust((xx, func(np.array([[xx], [xx**2]]))))
+            arr = [] # [[xx], [xx**2], [xx**3]]
+            for i in range(self.n-1):
+                arr.append([xx**(i+1)])
+
+            new_point = self.adjust((xx, func(np.array(arr))))
+
             if prev_point:
-                if new_point[0] > self.x and new_point[0] < self.x + self.w and new_point[1] > self.y and new_point[1] < self.y + self.h:
-                    pygame.draw.line(screen, config.RED, prev_point, new_point)
+                pygame.draw.line(screen, config.RED, prev_point, new_point)
+
             prev_point = new_point
 
     def frange(self, start, stop, step):
