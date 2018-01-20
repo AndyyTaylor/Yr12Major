@@ -12,26 +12,30 @@ class LinearRegression():
         self.stddev = 1
         self.mean = 0
 
-    def on_update(self, X, y):
-        self.vectorized_BGD(np.insert(self.scale_features(X), 0, 1, axis=1), y)
-
-    def vectorized_BGD(self, X, y, num_iters=1000):
+    def fit(self, X, y, num_iters=5000):
         m = len(y)
         if m < 2:
             return
 
+        X = np.insert(self.scale_features(X), 0, 1, axis=1)
+
         for i in range(num_iters):
-            prediction = X.dot(self.params)
-            err = np.subtract(prediction, y)
-            J = 1.0 / (2*m) * np.sum(np.square(err))
+            self.vectorized_BGD(X, y, m)
 
-            # print(J)
+    def vectorized_BGD(self, X, y, m):
+        pred = X.dot(self.params)
+        err = np.subtract(pred, y)
 
-            new_params = np.subtract(self.params, (self.alpha / m) * (X.T.dot(err)))
-            self.params = new_params
-
+        self.params = np.subtract(self.params, (self.alpha / m) * (X.T.dot(err)))
 
     # Regression class ?
+    def mse(self, X, y):
+        prediction = X.dot(self.params)
+        err = np.subtract(prediction, y)
+        J = 1.0 / (2*len(y)) * np.sum(np.square(err))
+
+        return J
+
     def scale_features(self, X):
         if X.shape[0] > 1:
             self.stddev = X.std(0)

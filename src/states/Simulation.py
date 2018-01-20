@@ -2,7 +2,7 @@
 from .AbstractState import State
 
 from ..ml.environments.lineardataset.MainState import MainState as Environment
-from ..ml.agents.supervised.regression import LinearRegression as Agent
+from ..ml.agents import LinearRegression as Agent
 from ..ml.environments.lineardataset import envconfig
 
 class Simulation(State):
@@ -29,7 +29,7 @@ class Simulation(State):
         pass
 
     def on_update(self, elapsed):
-        self.agent.on_update(self.environment.getx(), self.environment.gety())
+        self.agent.fit(self.environment.getx(), self.environment.gety())
 
     def on_render(self, screen):
         self.environment.on_render(screen)
