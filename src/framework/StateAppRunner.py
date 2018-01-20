@@ -8,7 +8,7 @@ from .StateRegistry import StateRegistry
 from ..stategroups.StateGroup import StateGroup
 from ..states.IntroState import IntroState
 from ..states.MainMenu import MainMenu
-from ..states.PlaceHolderEnv import PlaceHolder
+from ..states.Simulation import Simulation
 
 class StateAppRunner():
     _instance = None
@@ -17,17 +17,18 @@ class StateAppRunner():
         pygame.init()
 
         self.screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT), 0, 32)
+        pygame.display.set_caption("Andy's Machine Learning")
         self.last_update = datetime.datetime.now()
 
         StateRegistry.instance().register_group(StateGroup("MasterState"))
         StateRegistry.instance().register_group(StateGroup("IntroGroup"))
         StateRegistry.instance().register_group(StateGroup("Menu"))
-        StateRegistry.instance().register_group(StateGroup("Environments"))
+        # StateRegistry.instance().register_group(StateGroup("Environments"))
         IntroState()
         MainMenu()
-        PlaceHolder()
+        Simulation()
 
-        print(StateRegistry.instance().get_state("Intro").parent.name)
+        # print(StateRegistry.instance().get_state("Rawplot").parent.name)
 
         self.closed = False
         self.now = None

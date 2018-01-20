@@ -16,7 +16,7 @@ class MainMenu(State):
             Button(100, 100, 400, 400,
                    config.BLACK, config.WHITE,
                    "Begin", config.BLACK,
-                   lambda: self.parent.change_state("Environments"))
+                   lambda: self.parent.change_state("Simulation"))
         ]
 
     def on_init(self):
@@ -33,9 +33,6 @@ class MainMenu(State):
 
     def on_update(self, elapsed):
         self.total_time += elapsed
-
-        if self.total_time > 3000:
-            print("Clicking button")
             # self.elements[1].on_click()
 
     def on_render(self, screen):

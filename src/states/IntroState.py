@@ -19,11 +19,10 @@ class IntroState(State):
         print("Intro state entered")
 
     def on_exit(self):
-        print("Intro state exited")
+        pass
 
     def on_update(self, elapsed):
         self.total_time += elapsed
-        print("Intro state: " + str(self.total_time))
 
         if self.total_time > 100:
             self.parent.change_state("Menu")

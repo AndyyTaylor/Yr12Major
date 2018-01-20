@@ -8,8 +8,6 @@ class StateRegistry():
         self.all_groups = {}
         self.state_stack = []
 
-        print("created")
-
     def register(self, state, parent_name):
         self.all_states[state.name] = state
         parent = self.get_group(parent_name)
