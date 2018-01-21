@@ -1,9 +1,10 @@
 " Andy "
 from .AbstractState import State
 
-from ..ml.environments.lineardataset.MainState import MainState as Environment
-from ..ml.agents import LinearRegression as Agent
-from ..ml.environments.lineardataset import envconfig
+from ..ml.environments import ClassPlot as Environment
+# from ..ml.environments.lineardataset.MainState import MainState as Environment
+from ..ml.agents import LogisticRegression as Agent
+from ..ml.environments.supervised import envconfig
 
 class Simulation(State):
     " A "
@@ -29,7 +30,7 @@ class Simulation(State):
         pass
 
     def on_update(self, elapsed):
-        self.agent.fit(self.environment.getx(), self.environment.gety())
+        self.agent.on_update(self.environment.getx(), self.environment.gety())
 
     def on_render(self, screen):
         self.environment.on_render(screen)
