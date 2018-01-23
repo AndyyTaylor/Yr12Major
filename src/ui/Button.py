@@ -4,7 +4,7 @@ from .. import config
 from .UIElement import UIElement
 
 class Button(UIElement):
-    def __init__(self, x, y, w, h, back_col, front_col, text, text_col, callback):   # pylint: disable=R0913
+    def __init__(self, x, y, w, h, back_col, front_col, text, text_col, font_size, callback):   # pylint: disable=R0913
         super().__init__(x, y, w, h)
 
         self.callback = callback
@@ -14,7 +14,7 @@ class Button(UIElement):
         self.text = text
         self.text_col = text_col
 
-        self.font = pygame.font.Font('%s/data/fonts/%s' % (config.dir_path, 'Square.ttf'), 106)
+        self.font = pygame.font.Font('%s/data/fonts/%s' % (config.dir_path, 'Square.ttf'), font_size)
         self.rendered_text = self.font.render(self.text, True, self.text_col)
 
     def on_update(self, elapsed):
