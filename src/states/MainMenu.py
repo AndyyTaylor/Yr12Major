@@ -1,9 +1,11 @@
 " Main Menu "
 
+import pygame
 from .. import config
 from .AbstractState import State
 from ..ui.Rectangle import Rectangle
 from ..ui.Button import Button
+from ..ui.Textbox import Textbox
 
 class MainMenu(State):
     " A "
@@ -13,9 +15,26 @@ class MainMenu(State):
 
         self.total_time = 0
         self.elements = [
-            Button(100, 100, 400, 400,
+            Textbox(100, 10, 400, 50, "What would you like to see today?", config.BLACK, 32),
+            Button(50, 80, 500, 110,
                    config.BLACK, config.WHITE,
-                   "Begin", config.BLACK,
+                   "Supervised", config.BLACK, 42,
+                   lambda: self.parent.change_state("Simulation")),
+            Button(50, 210, 500, 110,
+                   config.BLACK, config.WHITE,
+                   "Unsupervised", config.BLACK, 42,
+                   lambda: self.parent.change_state("Simulation")),
+            Button(50, 340, 500, 110,
+                   config.BLACK, config.WHITE,
+                   "Reinforcement", config.BLACK, 42,
+                   lambda: self.parent.change_state("Simulation")),
+            Button(50, 470, 235, 110,
+                   config.BLACK, config.WHITE,
+                   "", config.BLACK, 42,
+                   lambda: self.parent.change_state("Simulation")),
+            Button(315, 470, 235, 110,
+                   config.BLACK, config.WHITE,
+                   "", config.BLACK, 42,
                    lambda: self.parent.change_state("Simulation"))
         ]
 
@@ -33,11 +52,13 @@ class MainMenu(State):
 
     def on_update(self, elapsed):
         self.total_time += elapsed
-            # self.elements[1].on_click()
 
     def on_render(self, screen):
         for elem in self.elements:
             elem.on_render(screen)
 
     def on_mouse_down(self, pos):
-        self.elements[0].on_click()
+        for elem in self.elements:
+            if isinstance(elem, Button) and pygame.Rect(elem.get_rect()).collidepoint(pos):
+                elem.on_click()
+                return
