@@ -29,8 +29,10 @@ class Plot(UIElement):
 
     def adjust(self, point):
         x, y = point
+
         x = (x - self.x_range[0]) * (self.w / (self.x_range[1] - self.x_range[0])) + self.x
         y = (y - self.y_range[0]) * (self.w / (self.y_range[1] - self.y_range[0])) + self.y
+        print(y)
         return int(x), int(y)
 
     def screen_to_coords(self, point):
@@ -47,6 +49,8 @@ class Plot(UIElement):
             for i in range(self.n-1):
                 arr.append([xx**(i+1)])
 
+            # print(arr)
+            # print(func(np.array(arr)))
             new_point = self.adjust((xx, func(np.array(arr))))
 
             if prev_point:

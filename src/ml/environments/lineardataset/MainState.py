@@ -29,7 +29,6 @@ class MainState(State):
             if y < self.y_range[1] and y > self.y_range[0]:
                 self.x[i] = x.T
                 self.y[i, 0] = y
-                print(y)
                 i += 1
 
 

@@ -1,9 +1,9 @@
 " Andy "
 from .AbstractState import State
 
-from ..ml.environments import ClassPlot as Environment
-# from ..ml.environments.lineardataset.MainState import MainState as Environment
-from ..ml.agents import LogisticRegression as Agent
+# from ..ml.environments import ClassPlot as Environment
+from ..ml.environments.lineardataset.MainState import MainState as Environment
+from ..ml.agents import LinearRegression as Agent
 from ..ml.environments.supervised import envconfig
 
 class Simulation(State):
