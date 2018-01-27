@@ -36,8 +36,9 @@ class ClassPlot(State):
     def on_update(self, elapsed):
         pass
 
-    def on_render(self, screen):
-        self.plot.on_render(screen, self.getx()[:, 0], self.getx()[:, 1], self.gety())
+    def on_render(self, screen, agent):
+        self.plot.on_render(screen, self.getx()[:, 0], self.getx()[:, 1], self.gety()[:, 0])
+        self.plot.renderClassification(screen, agent.predict)
 
     def on_enter(self):
         pass

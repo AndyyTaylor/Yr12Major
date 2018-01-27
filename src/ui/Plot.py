@@ -20,8 +20,7 @@ class Plot(UIElement):
         pygame.draw.rect(screen, config.GRAY, self.get_rect())
 
         for i in range(len(vec_y)):
-            # print('point', vec_y[i])
-            x, y = self.adjust((vec_x[i, 0], vec_y[i, 0])) # [i, 0] vs [i]
+            x, y = self.adjust((vec_x[i], vec_y[i])) # [i, 0] vs [i]
             if x > self.x and x < self.x + self.w and y > self.y and y < self.y + self.h:
                 if not isinstance(vec_class, bool) and vec_class[i] == 1:
                     pygame.draw.circle(screen, config.BLACK, (x, y), 2)
@@ -33,7 +32,7 @@ class Plot(UIElement):
 
         x = (x - self.x_range[0]) * (self.w / (self.x_range[1] - self.x_range[0])) + self.x
         y = (y - self.y_range[0]) * (self.w / (self.y_range[1] - self.y_range[0])) + self.y
-        # print('y', y)
+
         return int(x), int(y)
 
     def screen_to_coords(self, point):
@@ -52,7 +51,7 @@ class Plot(UIElement):
 
             # print(arr)
             # print(func(np.array(arr)))
-            new_point = self.adjust((xx, func(np.array(arr))))
+            new_point = self.adjust((xx, func(np.array(arr).T)))
 
             if prev_point:
                 pygame.draw.line(screen, config.RED, prev_point, new_point)
@@ -63,7 +62,7 @@ class Plot(UIElement):
         points = []
         for xx in self.frange(self.x_range[0], self.x_range[1], 0.5):
             for yy in self.frange(self.y_range[0], self.y_range[1], 0.5):
-                if abs(func(np.array([[xx], [yy]]))) < 0.3:
+                if abs(func(np.array([[xx, yy]]))) < 0.3:
                     points.append(self.adjust((xx, yy)))
                     # x, y = self.adjust((xx, yy))
                     # w, h = self.adjust((self.x_range[0] + 0.5, self.y_range[0] + 0.5))
