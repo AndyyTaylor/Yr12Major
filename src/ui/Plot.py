@@ -16,19 +16,24 @@ class Plot(UIElement):
     def on_update(self, elapsed):
         pass
 
-    def on_render(self, screen, vec_x, vec_y):
+    def on_render(self, screen, vec_x, vec_y, vec_class=False):
         pygame.draw.rect(screen, config.GRAY, self.get_rect())
 
         for i in range(len(vec_y)):
-            x, y = self.adjust((vec_x[i, 0], vec_y[i, 0]))
+            # print('point', vec_y[i])
+            x, y = self.adjust((vec_x[i, 0], vec_y[i, 0])) # [i, 0] vs [i]
             if x > self.x and x < self.x + self.w and y > self.y and y < self.y + self.h:
-                pygame.draw.circle(screen, config.BLUE, (x, y), 2)
+                if not isinstance(vec_class, bool) and vec_class[i] == 1:
+                    pygame.draw.circle(screen, config.BLACK, (x, y), 2)
+                else:
+                    pygame.draw.circle(screen, config.BLUE, (x, y), 2)
 
     def adjust(self, point):
         x, y = point
 
         x = (x - self.x_range[0]) * (self.w / (self.x_range[1] - self.x_range[0])) + self.x
         y = (y - self.y_range[0]) * (self.w / (self.y_range[1] - self.y_range[0])) + self.y
+        # print('y', y)
         return int(x), int(y)
 
     def screen_to_coords(self, point):
@@ -45,12 +50,31 @@ class Plot(UIElement):
             for i in range(self.n-1):
                 arr.append([xx**(i+1)])
 
+            # print(arr)
+            # print(func(np.array(arr)))
             new_point = self.adjust((xx, func(np.array(arr))))
 
             if prev_point:
                 pygame.draw.line(screen, config.RED, prev_point, new_point)
 
             prev_point = new_point
+
+    def renderClassification(self, screen, func):
+        points = []
+        for xx in self.frange(self.x_range[0], self.x_range[1], 0.5):
+            for yy in self.frange(self.y_range[0], self.y_range[1], 0.5):
+                if abs(func(np.array([[xx], [yy]]))) < 0.3:
+                    points.append(self.adjust((xx, yy)))
+                    # x, y = self.adjust((xx, yy))
+                    # w, h = self.adjust((self.x_range[0] + 0.5, self.y_range[0] + 0.5))
+                    # pygame.draw.rect(screen, config.RED, (x, y, w, h))
+
+        prev_point = False
+        for point in points:
+            if prev_point:
+                pygame.draw.line(screen, config.RED, prev_point, point)
+
+            prev_point = point
 
     def frange(self, start, stop, step):
         i = start

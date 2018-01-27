@@ -7,6 +7,8 @@ RED   = (255,   0,   0)
 BLUE  = (  0,   0, 255)
 BLACK = (  0,   0,   0)
 GRAY  = (211, 211, 211)
+YELLOW= (255, 255,   0)
+GREEN = (  0, 255,   0)
 
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 600
