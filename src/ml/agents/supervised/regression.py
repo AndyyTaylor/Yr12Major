@@ -8,12 +8,12 @@ class Regression():
         self.n = n_features
         self.alpha = alpha
 
-        self.params = np.zeros((self.n, 1)) # Random?
+        self.params = np.zeros((self.n, 1))
 
         self.stddev = 1
         self.mean = 0
 
-    def on_update(self, X, y, num_iters=5000):
+    def train(self, X, y, num_iters=5000):
         m = len(y)
         if m < 2:
             return
@@ -23,7 +23,15 @@ class Regression():
         self.fit(X, y, num_iters)
 
     def fit(self, X, y, num_iters):
-        pass
+        for i in range(num_iters):
+            self.vectorized_BGD(X, y, len(y))
+
+    def vectorized_BGD(self, X, y, m):
+        self.params = np.subtract(self.params, (self.alpha * self.gradient(X, y, m)))
+
+    def predict(self, x):
+        # print(x)
+        return self.params.T.dot(np.insert(self.scale_features(x).T, 0, 1, axis=0))
 
     def scale_features(self, X):
         if X.shape[0] > 1:
@@ -32,16 +40,19 @@ class Regression():
 
         return np.divide(np.subtract(X, self.mean), self.stddev)
 
+
 class LogisticRegression(Regression):
-    def fit(self, X, y, num_iters):
-        m = len(y)
 
-        for i in range(1):
-            h = self.sigmoid(X.dot(self.params))
-            J = (1.0 / m) * np.subtract(-(y.T).dot(np.log(h)), (1 - y).T.dot(np.log(1-h)))
+    def gradient(self, X, y, m):
+        grad = ((np.subtract(self.sigmoid(X.dot(self.params)), y)).T.dot(X)).T
 
-            grad = ((np.subtract(self.sigmoid(X.dot(self.params)), y)).T.dot(X))
-            self.params = np.subtract(self.params, np.multiply(self.alpha, grad.T))
+        return grad
+
+    def cost(self, X, y, m):
+        h = self.sigmoid(X.dot(self.params))
+        J = (1.0 / m) * np.subtract(-(y.T).dot(np.log(h)), (1 - y).T.dot(np.log(1-h)))
+
+        return J
 
     def sigmoid(self, z):
         return np.divide(1.0, (1 + np.power(e, -z)))
@@ -50,30 +61,22 @@ class LogisticRegression(Regression):
         # print(x)
         return self.params.T.dot(np.insert(self.scale_features(x.T).T, 0, 1, axis=0))
 
-    def on_render(self, screen, plot):
-        plot.renderClassification(screen, self.render_func)
-
 class LinearRegression(Regression):
 
-    def fit(self, X, y, num_iters):
-        for i in range(num_iters):
-            self.vectorized_BGD(X, y, len(y))
-
-    def vectorized_BGD(self, X, y, m):
+    def gradient(self, X, y, m):
         pred = X.dot(self.params)
         err = np.subtract(pred, y)
 
-        self.params = np.subtract(self.params, (self.alpha / m) * (X.T.dot(err)))
+        grad = (1.0 / m) * (X.T.dot(err))
 
-    def mse(self, X, y):
+        return grad
+
+    def cost(self, X, y, m):
         prediction = X.dot(self.params)
         err = np.subtract(prediction, y)
-        J = 1.0 / (2*len(y)) * np.sum(np.square(err))
+        J = 1.0 / (2*m) * np.sum(np.square(err))
 
         return J
-
-    def on_render(self, screen, plot):
-        plot.renderFunction(screen, self.render_func)
 
     def render_func(self, x):
         # print('x', x)

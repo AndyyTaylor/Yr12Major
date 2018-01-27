@@ -2,7 +2,8 @@
 from .AbstractState import State
 
 # from ..ml.environments import ClassPlot as Environment
-from ..ml.environments.lineardataset.MainState import MainState as Environment
+# from ..ml.agents import LogisticRegression as Agent
+from ..ml.environments import LinearPlot as Environment
 from ..ml.agents import LinearRegression as Agent
 from ..ml.environments.supervised import envconfig
 
@@ -30,11 +31,10 @@ class Simulation(State):
         pass
 
     def on_update(self, elapsed):
-        self.agent.on_update(self.environment.getx(), self.environment.gety())
+        self.agent.train(self.environment.getx(), self.environment.gety(), 100)
 
     def on_render(self, screen):
-        self.environment.on_render(screen)
-        self.agent.on_render(screen, self.environment.plot)
+        self.environment.on_render(screen, self.agent)
 
     def on_mouse_down(self, pos):
         self.environment.on_mouse_down(pos)

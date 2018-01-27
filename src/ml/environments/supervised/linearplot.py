@@ -4,7 +4,7 @@ import numpy as np
 from ....states.AbstractState import State
 from ....ui.Plot import Plot
 
-class MainState(State):
+class LinearPlot(State):
     " The main state for this enviroment "
 
     def __init__(self, econfig):
@@ -38,8 +38,9 @@ class MainState(State):
     def on_update(self, elapsed):
         pass
 
-    def on_render(self, screen):
-        self.plot.on_render(screen, self.getx(), self.gety())
+    def on_render(self, screen, agent):
+        self.plot.on_render(screen, self.getx()[:, 0], self.gety()[:, 0])
+        self.plot.renderFunction(screen, agent.predict)
 
     def on_enter(self):
         pass
