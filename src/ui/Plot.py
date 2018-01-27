@@ -20,7 +20,8 @@ class Plot(UIElement):
         pygame.draw.rect(screen, config.GRAY, self.get_rect())
 
         for i in range(len(vec_y)):
-            x, y = self.adjust((vec_x[i], vec_y[i]))
+            # print('point', vec_y[i])
+            x, y = self.adjust((vec_x[i, 0], vec_y[i, 0])) # [i, 0] vs [i]
             if x > self.x and x < self.x + self.w and y > self.y and y < self.y + self.h:
                 if not isinstance(vec_class, bool) and vec_class[i] == 1:
                     pygame.draw.circle(screen, config.BLACK, (x, y), 2)
@@ -32,7 +33,7 @@ class Plot(UIElement):
 
         x = (x - self.x_range[0]) * (self.w / (self.x_range[1] - self.x_range[0])) + self.x
         y = (y - self.y_range[0]) * (self.w / (self.y_range[1] - self.y_range[0])) + self.y
-        print(y)
+        # print('y', y)
         return int(x), int(y)
 
     def screen_to_coords(self, point):

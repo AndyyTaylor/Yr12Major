@@ -76,4 +76,5 @@ class LinearRegression(Regression):
         plot.renderFunction(screen, self.render_func)
 
     def render_func(self, x):
+        # print('x', x)
         return self.params.T.dot(np.insert(self.scale_features(x.T).T, 0, 1, axis=0))
