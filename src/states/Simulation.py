@@ -2,10 +2,9 @@
 from .AbstractState import State
 
 # from ..ml.environments import ClassPlot as Environment
-# from ..ml.agents import LogisticRegression as Agent
-from ..ml.environments import LinearPlot as Environment
-from ..ml.agents import LinearRegression as Agent
-from ..ml.environments.supervised import envconfig
+from ..ml.agents import NN as Agent
+from ..ml.environments import MNIST as Environment
+# from ..ml.agents import LinearRegression as Agent
 
 class Simulation(State):
     " A "
@@ -15,8 +14,8 @@ class Simulation(State):
 
         self.total_time = 0
 
-        self.environment = Environment(envconfig)
-        self.agent = Agent(envconfig.n)
+        self.agent = Agent()
+        self.environment = Environment(self.agent)
 
     def on_init(self):
         print("Application started.")
@@ -25,16 +24,17 @@ class Simulation(State):
         print("Application closed.")
 
     def on_enter(self):
-        pass
+        self.environment.on_init()
 
     def on_exit(self):
         pass
 
     def on_update(self, elapsed):
-        self.agent.train(self.environment.getx(), self.environment.gety(), 100)
+        # self.agent.train(self.environment.getx(), self.environment.gety(), 100)
+        self.environment.on_update(elapsed)
 
     def on_render(self, screen):
-        self.environment.on_render(screen, self.agent)
+        self.environment.on_render(screen)
 
     def on_mouse_down(self, pos):
         self.environment.on_mouse_down(pos)

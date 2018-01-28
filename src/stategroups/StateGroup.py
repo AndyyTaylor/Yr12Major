@@ -34,6 +34,7 @@ class StateGroup(State):
         self.state_stack = []
 
         if name in self.children:
+            self.children[name].on_enter()
             self.state_stack.append(self.children[name])
         else:
             self.parent.change_state(name)
