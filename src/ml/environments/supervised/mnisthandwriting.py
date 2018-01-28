@@ -21,11 +21,12 @@ class MNISTHandwriting(State):
         self.x = np.zeros((0, 28*28))
         self.y = np.zeros((0, 1))
 
-        self.ind = 0
         self.viewer = DataImage(180, 20, 400, 400, 28, 28)
 
         self.labelText = Textbox(180, 450, 100, 100, "-", config.BLACK, 156)
         self.predText = Textbox(480, 450, 100, 100, "-", config.BLACK, 156)
+
+        self.ind = 0
 
         self.elements = [
             self.labelText,
@@ -46,6 +47,7 @@ class MNISTHandwriting(State):
 
     def on_update(self, elapsed):
         self.labelText.set_text(int(self.y[self.ind]))
+        print(self.agent.cost(self.getx(), self.gety()))
 
     def on_render(self, screen):
         self.viewer.on_render(screen, self.x[self.ind, :])
@@ -66,6 +68,8 @@ class MNISTHandwriting(State):
             self.x = np.vstack((self.x, x))
             self.y = np.vstack((self.y, y))
 
+        self.change_digit()     # Load prediction
+
     def on_shutdown(self):
         pass
 
@@ -77,6 +81,7 @@ class MNISTHandwriting(State):
 
     def change_digit(self, inc=0):
         self.ind = max(min(self.ind + inc, 1000), 0)
+        self.predText.set_text(self.agent.predict(np.vstack((np.zeros((1, 784)), self.x[self.ind]))))
 
     def getx(self):
         return self.x
