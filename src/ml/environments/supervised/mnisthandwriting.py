@@ -17,9 +17,10 @@ class MNISTHandwriting(State):
         super().__init__("MNIST Handwritten Digits", "Environments")
 
         self.agent = agent
+        self.m = 2000
 
-        self.x = np.zeros((0, 28*28))
-        self.y = np.zeros((0, 1))
+        self.x = np.zeros((self.m, 28*28))
+        self.y = np.zeros((self.m, 1))
 
         self.viewer = DataImage(180, 20, 400, 400, 28, 28)
 
@@ -27,14 +28,19 @@ class MNISTHandwriting(State):
         self.predText = Textbox(480, 450, 100, 100, "-", config.BLACK, 156)
 
         self.ind = 0
+        self.training = False
 
         self.elements = [
             self.labelText,
             self.predText,
+            # Button(20, 20, 140, 120,
+            #        config.BLACK, config.WHITE,
+            #        "T100x", config.BLACK, 42,
+            #        lambda: self.agent.train(self.getx(), self.gety(), 100)),
             Button(20, 20, 140, 120,
                    config.BLACK, config.WHITE,
                    "T100x", config.BLACK, 42,
-                   lambda: self.agent.train(self.getx(), self.gety(), 100)),
+                   self.toggle_training),
             Button(20, 160, 140, 120,
                    config.BLACK, config.WHITE,
                    "NEXT", config.BLACK, 42,
@@ -45,9 +51,13 @@ class MNISTHandwriting(State):
                    lambda: self.change_digit(-1))
         ]
 
+    def toggle_training(self):
+        self.training = not self.training
+
     def on_update(self, elapsed):
-        self.labelText.set_text(int(self.y[self.ind]))
-        print(self.agent.cost(self.getx(), self.gety()))
+        if self.training:
+            print("Perc:", self.get_percentage())
+            self.agent.train(self.getx(), self.gety(), 100)
 
     def on_render(self, screen):
         self.viewer.on_render(screen, self.x[self.ind, :])
@@ -61,12 +71,16 @@ class MNISTHandwriting(State):
         pass
 
     def on_init(self):
+        i = 0
         for label, img in self.read():
             x = img.flatten()
             y = label
 
-            self.x = np.vstack((self.x, x))
-            self.y = np.vstack((self.y, y))
+            self.x[i, :] = x
+
+            self.y[i, :] = y
+
+            i+=1
 
         self.change_digit()     # Load prediction
 
@@ -80,8 +94,28 @@ class MNISTHandwriting(State):
                 return
 
     def change_digit(self, inc=0):
-        self.ind = max(min(self.ind + inc, 1000), 0)
+        self.ind = max(min(self.ind + inc, self.m-1), 0)
+
         self.predText.set_text(self.agent.predict(np.vstack((np.zeros((1, 784)), self.x[self.ind]))))
+
+        self.labelText.set_text(int(self.y[self.ind]))
+
+        # cost = self.agent.cost(self.getx(), self.gety())
+        # Theta1_grad, Theta2_grad = self.agent.gradient(self.getx(), self.gety())
+        perc = self.get_percentage()
+        # print(perc)
+
+    def get_percentage(self):
+        pred = self.agent.predict(self.getx())
+
+        # print(pred)
+
+        correct = 0
+        for i in range(self.m):
+            if pred[i] == self.y[i]:
+                correct += 1
+
+        return correct / self.m
 
     def getx(self):
         return self.x
@@ -116,5 +150,6 @@ class MNISTHandwriting(State):
         get_img = lambda idx: (lbl[idx], img[idx])
 
         # Create an iterator which returns each image in turn
-        for i in range(min(len(lbl), 1000)):
+        for i in range(min(len(lbl), self.m)):
+            if i % 100 == 0: print("Loaded:", i)
             yield get_img(i)
