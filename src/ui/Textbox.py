@@ -19,3 +19,8 @@ class Textbox(UIElement):
     def on_render(self, screen):
         t_w, t_h = self.font.size(self.text)
         screen.blit(self.rendered_text, self.get_adj_center(t_w / 2, t_h / 2))
+
+    def set_text(self, val):
+        self.text = str(val)
+
+        self.rendered_text = self.font.render(self.text, True, self.text_col)
