@@ -24,3 +24,8 @@ class Textbox(UIElement):
         self.text = str(val)
 
         self.rendered_text = self.font.render(self.text, True, self.text_col)
+
+    def set_col(self, val):
+        self.text_col = val
+
+        self.rendered_text = self.font.render(self.text, True, self.text_col)

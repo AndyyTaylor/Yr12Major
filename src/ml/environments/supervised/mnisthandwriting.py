@@ -17,7 +17,7 @@ class MNISTHandwriting(State):
         super().__init__("MNIST Handwritten Digits", "Environments")
 
         self.agent = agent
-        self.m = 2000
+        self.m = 500
 
         self.x = np.zeros((self.m, 28*28))
         self.y = np.zeros((self.m, 1))
@@ -96,7 +96,13 @@ class MNISTHandwriting(State):
     def change_digit(self, inc=0):
         self.ind = max(min(self.ind + inc, self.m-1), 0)
 
-        self.predText.set_text(self.agent.predict(np.vstack((np.zeros((1, 784)), self.x[self.ind]))))
+        col = config.RED
+        guess = self.agent.predict(np.vstack((np.zeros((1, 784)), self.x[self.ind])))
+        if guess == self.y[self.ind]:
+            col = config.BLUE
+
+        self.predText.set_text(guess)
+        self.predText.set_col(col)
 
         self.labelText.set_text(int(self.y[self.ind]))
 
