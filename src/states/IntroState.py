@@ -28,7 +28,7 @@ class IntroState(State):
             self.parent.change_state("Menu")
 
     def on_render(self, screen):
-        print("Rendering")
+        pass
 
     def on_mouse_down(self, pos):
         pass

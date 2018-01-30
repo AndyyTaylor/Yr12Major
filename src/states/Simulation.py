@@ -14,7 +14,7 @@ class Simulation(State):
 
         self.total_time = 0
 
-        self.agent = Agent()
+        self.agent = Agent(28*28, 412, 216, 96, 10)
         self.environment = Environment(self.agent)
 
     def on_init(self):
