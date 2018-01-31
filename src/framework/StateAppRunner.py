@@ -51,6 +51,8 @@ class StateAppRunner():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
                 StateRegistry.instance().get_group("MasterState").on_mouse_down(pos)
+            elif event.type == pygame.KEYDOWN:
+                StateRegistry.instance().get_group("MasterState").on_key_down(event.key)
 
     def update(self, elapsed):
         StateRegistry.instance().get_group("MasterState").on_update(elapsed)

@@ -3,8 +3,9 @@ from .AbstractState import State
 
 # from ..ml.environments import ClassPlot as Environment
 from ..ml.agents import NN as Agent
-from ..ml.environments import MNIST as Environment
+# from ..ml.environments import MNIST as Environment
 # from ..ml.agents import LinearRegression as Agent
+from ..ml.environments import CatchApples as Environment
 
 class Simulation(State):
     " A "
@@ -38,3 +39,6 @@ class Simulation(State):
 
     def on_mouse_down(self, pos):
         self.environment.on_mouse_down(pos)
+
+    def on_key_down(self, key):
+        self.environment.on_key_down(key)
