@@ -14,6 +14,9 @@ class OpenAiEnv(State):
 
         self.env = gym.make(name)
 
+    def reset(self):
+        return self.env.reset()
+
     def on_render(self, screen):
         pass
 
@@ -41,3 +44,5 @@ class OpenAiEnv(State):
 class Pendulum(OpenAiEnv):
     def __init__(self):
         super().__init__("Pendulum-v0")
+        # print(self.env.action_space.shape)
+        self.num_actions = 2
