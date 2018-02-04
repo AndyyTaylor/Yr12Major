@@ -2,9 +2,10 @@
 from .AbstractState import State
 
 # from ..ml.environments import ClassPlot as Environment
-from ..ml.agents import NN as Agent
+# from ..ml.agents import NN as Agent
 # from ..ml.environments import MNIST as Environment
 # from ..ml.agents import LinearRegression as Agent
+from ..ml.agents import QLearn as Agent
 from ..ml.environments import CatchApples as Environment
 
 class Simulation(State):
@@ -15,8 +16,10 @@ class Simulation(State):
 
         self.total_time = 0
 
-        self.agent = Agent(28*28, 412, 216, 96, 10)
-        self.environment = Environment(self.agent)
+        self.environment = Environment()
+        self.agent = Agent()
+
+        self.obvs = self.environment.get_obvs()
 
     def on_init(self):
         print("Application started.")
@@ -31,8 +34,14 @@ class Simulation(State):
         pass
 
     def on_update(self, elapsed):
-        # self.agent.train(self.environment.getx(), self.environment.gety(), 100)
-        self.environment.on_update(elapsed)
+        self.total_time += elapsed
+
+        if self.total_time > 100:
+            self.total_time = 0
+
+            action = self.agent.get_action(self.obvs)
+            self.obvs, reward, done, info = self.environment.step(action)
+            print(reward)
 
     def on_render(self, screen):
         self.environment.on_render(screen)

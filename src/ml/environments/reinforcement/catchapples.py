@@ -13,10 +13,8 @@ from ....ui.Button import Button
 class CatchApples(State):
     " The main state for this enviroment "
 
-    def __init__(self, agent):
+    def __init__(self):
         super().__init__("Catch Apples", "Environments")
-
-        self.agent = agent
 
         self.num_obvs = 2
         self.grid_size = 20
@@ -24,24 +22,73 @@ class CatchApples(State):
         self.x = np.zeros((1, self.num_obvs))
         self.reward = 0
 
-        self.apples = [[5.5, 1.5], [10.5, 3.5]]
+        self.apples = []
         self.platform = [0, 18]
 
         self.timer = 0
+        self.max_apples = 1
 
-    def on_update(self, elapsed):
-        self.timer += elapsed
+    def step(self, action):
+        for i in range(len(self.apples)):
+            self.apples[i][1] += 1
 
-        if self.timer > 1000:
-            self.timer -= 1000
-            for i in range(len(self.apples)):
-                self.apples[i][1] += 1
+        self.take_action(action)
+        self.check_OOB()
+        self.gen_apples()
+        reward = self.check_collision()
+
+        return (self.get_obvs(), reward, False, '')
+
+    def get_obvs(self):
+        closest_apple = None
+        for apple in self.apples:
+            if closest_apple == None or apple[1] > closest_apple[1]:
+                closest_apple = apple
+
+        if not closest_apple:
+            closest_apple = [0, 0]
+
+        return [self.platform[0], self.platform[1], closest_apple[0], closest_apple[1]]
+
+    def take_action(self, action):
+        if action == 0 and self.platform[0] > 0:
+            self.platform[0] -= 1
+        elif action == 2 and self.platform[0] < self.grid_size-1:
+            self.platform[0] += 1
+
+    def check_OOB(self):
+        i = 0
+        while i < len(self.apples):
+            apple = self.apples[i]
+
+            if apple[1] > self.grid_size:
+                self.apples.remove(apple)
+            else:
+                i+=1
+
+    def check_collision(self):
+        i = 0
+        reward = 0
+        while i < len(self.apples):
+            apple = self.apples[i]
+
+            if apple[1] == self.platform[1]:
+                reward += 1
+                self.apples.remove(apple)
+            else:
+                i += 1
+
+        return reward
+
+    def gen_apples(self):
+        while len(self.apples) < self.max_apples:
+            self.apples.append([random.randint(0, self.grid_size), random.randint(0, self.grid_size/5)])
 
     def on_render(self, screen):
-        pygame.draw.rect(screen, config.BLACK, self.adjust_pos(tuple(self.platform)) + (config.SCREEN_WIDTH / self.grid_size, 30))
+        pygame.draw.rect(screen, config.BLACK, self.adjust_pos(tuple(self.platform)) + (config.SCREEN_WIDTH / self.grid_size * 3, 30))
 
         for apple in self.apples:
-            pygame.draw.circle(screen, config.BLACK, self.adjust_pos(tuple(apple)), 10)
+            pygame.draw.circle(screen, config.RED, self.adjust_pos(tuple(apple)), 10)
 
     def adjust_pos(self, pos):
         x, y = pos
@@ -59,6 +106,9 @@ class CatchApples(State):
         pass
 
     def on_shutdown(self):
+        pass
+
+    def on_update(self):
         pass
 
     def on_key_down(self, key):
