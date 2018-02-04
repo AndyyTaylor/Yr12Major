@@ -8,7 +8,7 @@ from .AbstractState import State
 # from ..ml.environments import MNIST as Environment
 # from ..ml.agents import LinearRegression as Agent
 from ..ml.agents import QLearn as Agent
-from ..ml.environments import CatchApples as Environment
+from ..ml.environments import Pendulum as Environment
 
 class Simulation(State):
     " A "
