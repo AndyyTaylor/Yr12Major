@@ -17,16 +17,20 @@ class CatchApples(State):
         super().__init__("Catch Apples", "Environments")
 
         self.num_obvs = 2
-        self.grid_size = 20
+        self.grid_size = 8
+        self.num_actions = 3
 
-        self.x = np.zeros((1, self.num_obvs))
         self.reward = 0
-
-        self.apples = []
-        self.platform = [0, 18]
 
         self.timer = 0
         self.max_apples = 1
+
+    def reset(self):
+        self.apples = []
+        self.platform = [4, 7]
+        self.lives = 3
+
+        return self.get_obvs()
 
     def step(self, action):
         for i in range(len(self.apples)):
@@ -37,7 +41,7 @@ class CatchApples(State):
         self.gen_apples()
         reward = self.check_collision()
 
-        return (self.get_obvs(), reward, False, '')
+        return (self.get_obvs(), reward, self.lives <= 0, '')
 
     def get_obvs(self):
         closest_apple = None
@@ -63,6 +67,7 @@ class CatchApples(State):
 
             if apple[1] > self.grid_size:
                 self.apples.remove(apple)
+                self.lives -= 1
             else:
                 i+=1
 
@@ -72,7 +77,7 @@ class CatchApples(State):
         while i < len(self.apples):
             apple = self.apples[i]
 
-            if apple[1] == self.platform[1]:
+            if apple[1] == self.platform[1] and abs(apple[0] - self.platform[0]) <= 1:
                 reward += 1
                 self.apples.remove(apple)
             else:
@@ -82,10 +87,12 @@ class CatchApples(State):
 
     def gen_apples(self):
         while len(self.apples) < self.max_apples:
-            self.apples.append([random.randint(0, self.grid_size), random.randint(0, self.grid_size/5)])
+            self.apples.append([random.randint(0, self.grid_size), random.randint(0, int(self.grid_size/5))])
 
     def on_render(self, screen):
-        pygame.draw.rect(screen, config.BLACK, self.adjust_pos(tuple(self.platform)) + (config.SCREEN_WIDTH / self.grid_size * 3, 30))
+        centered_platform = self.platform[:]
+        centered_platform[0] -= 1
+        pygame.draw.rect(screen, config.BLACK, self.adjust_pos(tuple(centered_platform)) + (config.SCREEN_WIDTH / self.grid_size * 2.5, 30))
 
         for apple in self.apples:
             pygame.draw.circle(screen, config.RED, self.adjust_pos(tuple(apple)), 10)
@@ -119,9 +126,3 @@ class CatchApples(State):
 
     def on_mouse_down(self, pos):
         pass
-
-    def getx(self):
-        return self.x
-
-    def gety(self):
-        return self.y
