@@ -50,6 +50,9 @@ class QLearn():
         # alpha = max(EPSILON / self.episodes, 0.00)
         state = self.get_state_id(state)
 
+        while len(self.Q) < state+1:
+            self.Q = np.vstack([self.Q, [0 for i in range(self.max_actions)]])
+
         if random.random() > self.alpha:
             indices = []
             max_val = self.Q[state].max()
