@@ -58,7 +58,7 @@ class QLearn():
         else:
             act = random.randint(0, self.max_actions-1)
         self.prev_action = act
-        return act
+        return np.array([act])
 
     def maxQ(self, state):
         while len(self.Q) < state+1:

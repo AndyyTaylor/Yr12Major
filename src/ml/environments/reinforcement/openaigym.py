@@ -17,8 +17,17 @@ class OpenAiEnv(State):
     def reset(self):
         return self.env.reset()
 
+    def step(self, action):
+        return self.env.step(action)
+
     def on_render(self, screen):
-        pass
+        self.env.render()
+
+    def get_action_space(self):
+        return self.env.action_space
+
+    def get_observation_space(self):
+        return self.env.observation_space
 
     def on_enter(self):
         pass
@@ -41,8 +50,8 @@ class OpenAiEnv(State):
     def on_mouse_down(self, pos):
         pass
 
-class Pendulum(OpenAiEnv):
+class MountainCar(OpenAiEnv):
     def __init__(self):
-        super().__init__("Pendulum-v0")
+        super().__init__("MountainCar-v0")
         # print(self.env.action_space.shape)
         self.num_actions = 2

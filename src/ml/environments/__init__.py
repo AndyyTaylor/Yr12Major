@@ -3,4 +3,4 @@ from .supervised.linearplot import LinearPlot
 from .supervised.mnisthandwriting import MNISTHandwriting as MNIST
 
 from .reinforcement.catchapples import CatchApples
-from .reinforcement.openaigym import Pendulum
+from .reinforcement.openaigym import MountainCar
