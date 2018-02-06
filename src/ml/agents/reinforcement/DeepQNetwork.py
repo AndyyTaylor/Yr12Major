@@ -41,18 +41,12 @@ class DeepQNetwork():
         return action
 
     def create_rewards(self, rewards):
-        new_rewards = []
-        prev_reward = 0
-        for i in range(len(rewards)-1, -1, -1):
-            reward = rewards[i] + prev_reward * self.gamma
-            prev_reward = reward
-            new_rewards.append(reward)
 
-        new_rewards = new_rewards[::-1]
-        new_rewards -= np.mean(new_rewards)
-        new_rewards /= np.std(new_rewards)
+        # new_rewards = new_rewards[::-1]
+        rewards -= np.mean(rewards)
+        # new_rewards /= np.std(new_rewards)
 
-        return new_rewards
+        return rewards
 
     def train(self, prev_obvs, new_obvs, action, reward, done):
         self.memorize((prev_obvs, new_obvs, action, reward, done))
@@ -79,7 +73,7 @@ class DeepQNetwork():
             y[i, actions[i]] = rewards[i]
             if not dones[i]:
                 y[i, actions[i]] += self.gamma * np.max(Qn[i])
-
+        print(y)
         self.model.train(X, y, 10)
         self.memory = []
 

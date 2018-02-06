@@ -48,6 +48,7 @@ class Simulation(State):
         prev_obvs = self.obvs
         self.obvs, reward, done, _ = self.environment.step(action)
         reward += abs(self.obvs[0])
+        # print((self.obvs[0] + 0.5) ** 2)
         self.agent.train(prev_obvs, self.obvs, action, reward, done)
 
         self.total_reward += reward

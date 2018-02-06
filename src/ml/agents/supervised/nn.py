@@ -11,7 +11,7 @@ class NN():
 
         self.num_labels = num_labels
 
-        self.alpha = 0.08
+        self.alpha = 0.1
         self.epoch = 0
 
         self.print_line = ""
@@ -92,7 +92,7 @@ class NN():
 
         # self.out('4', True)
 
-        A5 = self.sigmoid(Z5)
+        A5 = self.relu(Z5)
 
         # self.out('_', True)
 
@@ -181,6 +181,8 @@ class NN():
         Theta3_grad = (1.0 / m) * Theta3_grad
         Theta4_grad = (1.0 / m) * Theta4_grad
 
+        # print(Theta1_grad)
+
         return Theta1_grad, Theta2_grad, Theta3_grad, Theta4_grad
 
     def gradient_check(self, x, y, theta):
@@ -202,6 +204,14 @@ class NN():
             perturb[p] = 0
 
         return numgrad
+
+    def relu(self, x):
+        # print(x * (x > 0))
+        # return x * (x > 0)
+        return x
+
+    def relu_grad(self, x):
+        return self.sigmoid(x)
 
     def sigmoid(self, z):
         return np.divide(1.0, (1 + np.power(e, -z)))
