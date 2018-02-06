@@ -3,11 +3,11 @@ import sys
 from math import e, log
 
 class NN():
-    def __init__(self, input_layer_size, hidden_layer_size, hidden_layer2_size, hidden_layer3_size, num_labels):
+    def __init__(self, input_layer_size, hidden_layer_size, hidden_layer2_size, hidden_layer3_size, output_size, num_labels):
         self.Theta1 = self.init_weights(input_layer_size, hidden_layer_size)
         self.Theta2 = self.init_weights(hidden_layer_size, hidden_layer2_size)
         self.Theta3 = self.init_weights(hidden_layer2_size, hidden_layer3_size)
-        self.Theta4 = self.init_weights(hidden_layer3_size, num_labels)
+        self.Theta4 = self.init_weights(hidden_layer3_size, output_size)
 
         self.num_labels = num_labels
 
@@ -20,7 +20,7 @@ class NN():
 
     def train(self, X, y, num_iters):
 
-        for i in range(1):
+        for i in range(num_iters):
             self.out("Epoch " + str(self.epoch) + " .. ", True)
 
             Theta1_grad, Theta2_grad, Theta3_grad, Theta4_grad = self.gradient(X, y)
@@ -47,6 +47,9 @@ class NN():
 
             print("Epoch " + str(self.epoch) + " .. "  + str(self.cost(X, y)))
             self.print_line = ""
+
+        self.epoch = 0
+        self.prev_cost = 999999
 
     def out(self, s, add=False):
         sys.stdout.write(self.print_line + s + "\r")
@@ -121,10 +124,13 @@ class NN():
             # pred = np.ones(pred.shape) * 0.1
             # pred[int(y[i])] = 0.9
 
-            lbl = np.zeros((self.num_labels, 1))
-            lbl[int(y[i]), 0] = 1
+            if self.num_labels != -1:
+                lbl = np.zeros((self.num_labels, 1))
+                lbl[int(y[i]), 0] = 1
+            else:
+                lbl = y[i].T
             # print(np.subtract(np.multiply(-(lbl.T), (np.log(pred))), np.multiply((1 - lbl.T).T, (np.log(1-pred)))))
-            J += np.sum(np.subtract(np.multiply(-(lbl.T), (np.log(pred))), np.multiply((1 - lbl.T).T, (np.log(1-pred)))))
+            J += np.sum(np.power(np.subtract(pred, lbl), 2))
             # print(lbl)
 
         J = (1.0 / m) * J
@@ -147,10 +153,13 @@ class NN():
         for i in range(m):
             self.out(str(i))
 
-            A1, Z2, A2, Z3, A3, Z4, A4, Z5, A5 = self.feed_forward(np.array(x[i, :]).reshape(1, 784), True, Theta1, Theta2)
+            A1, Z2, A2, Z3, A3, Z4, A4, Z5, A5 = self.feed_forward(np.array(x[i, :]).reshape(1, 2), True, Theta1, Theta2)
 
-            lbl = np.zeros((self.num_labels, 1))
-            lbl[int(y[i]), 0] = 1
+            if self.num_labels != -1:
+                lbl = np.zeros((self.num_labels, 1))
+                lbl[int(y[i]), 0] = 1
+            else:
+                lbl = y[i].T
 
             D5 = np.subtract(A5, lbl.T)
 

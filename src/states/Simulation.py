@@ -47,18 +47,21 @@ class Simulation(State):
 
         prev_obvs = self.obvs
         self.obvs, reward, done, _ = self.environment.step(action)
+        reward += abs(self.obvs[0])
         self.agent.train(prev_obvs, self.obvs, action, reward, done)
 
         self.total_reward += reward
-        print(reward)
 
         if done:
             self.obvs = self.environment.reset()
+
             self.agent.reset()
             self.prev_reward.append(self.total_reward)
 
             if len(self.prev_reward) > 50:
                 self.prev_reward.pop(0)
+
+            print(self.episode, '..', self.total_reward)
 
             self.total_reward = 0
             self.episode += 1
