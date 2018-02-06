@@ -46,7 +46,7 @@ class Simulation(State):
 
             action = self.agent.get_action(self.obvs)
             self.obvs, reward, done, info = self.environment.step(action)
-            self.agent.update(self.obvs, reward)
+            self.agent.update(self.obvs, reward, done)
             self.total_reward += reward
 
             if done:

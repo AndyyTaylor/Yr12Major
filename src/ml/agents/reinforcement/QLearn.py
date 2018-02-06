@@ -17,10 +17,13 @@ class QLearn():
         self.all_states = {}
         self.state_id = 0
 
-    def update(self, new_state, reward):
+    def update(self, new_state, reward, done):
         while len(self.Q) < self.get_state_id(new_state):
             self.Q = np.vstack([self.Q, [0 for i in range(self.max_actions)]])
-        self.Q[self.state][self.prev_action] += LEARNING_RATE * (reward + DISCOUNT_FACTOR * (self.maxQ(self.get_state_id(new_state))) - self.Q[self.state][self.prev_action])
+        if not done:
+            self.Q[self.state][self.prev_action] += LEARNING_RATE * (reward + DISCOUNT_FACTOR * (self.maxQ(self.get_state_id(new_state))) - self.Q[self.state][self.prev_action])
+        else:
+            self.Q[self.state][self.prev_action] += LEARNING_RATE * reward
         self.state = self.get_state_id(new_state)
 
         self.moves+=1
