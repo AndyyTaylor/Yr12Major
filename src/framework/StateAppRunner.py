@@ -9,6 +9,7 @@ from ..stategroups.StateGroup import StateGroup
 from ..states.IntroState import IntroState
 from ..states.MainMenu import MainMenu
 from ..states.Simulation import Simulation
+from ..states.Supervised import Supervised
 
 class StateAppRunner():
     _instance = None
@@ -27,6 +28,7 @@ class StateAppRunner():
         IntroState()
         MainMenu()
         Simulation()
+        Supervised()
 
         # print(StateRegistry.instance().get_state("Rawplot").parent.name)
 

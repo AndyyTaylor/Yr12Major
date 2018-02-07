@@ -7,24 +7,24 @@ from ....ui.Plot import Plot
 class LinearPlot(State):
     " The main state for this enviroment "
 
-    def __init__(self, econfig):
+    def __init__(self, m, n):
         super().__init__("LinearData", "Environments")
 
-        self.n = econfig.n
+        self.n = n
 
         self.x_range = [-30, 30]
         self.y_range = [-100, 100]
 
-        self.params = np.zeros((econfig.n, 1))
+        self.params = np.zeros((n, 1))
 
-        for i in range(econfig.n):
+        for i in range(n):
             self.params[i] = random.uniform(-2, 2)
 
-        self.y = np.zeros((econfig.m, 1))
-        self.x = np.zeros((econfig.m, econfig.n-1))
+        self.y = np.zeros((m, 1))
+        self.x = np.zeros((m, n-1))
 
         i = 0
-        while i < econfig.m:
+        while i < m:
             x, y = self.gen_point()
             if y < self.y_range[1] and y > self.y_range[0]:
                 self.x[i] = x.T

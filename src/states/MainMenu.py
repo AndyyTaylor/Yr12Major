@@ -19,7 +19,7 @@ class MainMenu(State):
             Button(50, 80, 500, 110,
                    config.BLACK, config.WHITE,
                    "Supervised", config.BLACK, 42,
-                   lambda: self.parent.change_state("Simulation")),
+                   lambda: self.parent.change_state("Supervised")),
             Button(50, 210, 500, 110,
                    config.BLACK, config.WHITE,
                    "Unsupervised", config.BLACK, 42,

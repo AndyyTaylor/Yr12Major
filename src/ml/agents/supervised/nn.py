@@ -8,6 +8,7 @@ class NN():
         self.Theta2 = self.init_weights(hidden_layer_size, hidden_layer2_size)
         self.Theta3 = self.init_weights(hidden_layer2_size, hidden_layer3_size)
         self.Theta4 = self.init_weights(hidden_layer3_size, num_labels)
+        self.input_nodes = input_layer_size
 
         self.num_labels = num_labels
 
@@ -147,7 +148,7 @@ class NN():
         for i in range(m):
             self.out(str(i))
 
-            A1, Z2, A2, Z3, A3, Z4, A4, Z5, A5 = self.feed_forward(np.array(x[i, :]).reshape(1, 784), True, Theta1, Theta2)
+            A1, Z2, A2, Z3, A3, Z4, A4, Z5, A5 = self.feed_forward(np.array(x[i, :]).reshape(1, self.input_nodes), True, Theta1, Theta2)
 
             lbl = np.zeros((self.num_labels, 1))
             lbl[int(y[i]), 0] = 1
@@ -173,26 +174,6 @@ class NN():
         Theta4_grad = (1.0 / m) * Theta4_grad
 
         return Theta1_grad, Theta2_grad, Theta3_grad, Theta4_grad
-
-    def gradient_check(self, x, y, theta):
-        numgrad = np.zeros(theta.shape)
-        perturb = np.zeros(theta.shape)
-        epsilon = 0.0001
-
-        for p in range(theta.shape[0]):
-            if (p % 3000 == 0): print(p)
-            perturb[p] = epsilon
-
-            mperturb = theta - perturb
-            aperturb = theta + perturb
-
-            loss1 = self.cost(x, y, mperturb[:19625].reshape(self.Theta1.shape), mperturb[19625:].reshape(self.Theta2.shape))
-            loss2 = self.cost(x, y, aperturb[:19625].reshape(self.Theta1.shape), aperturb[19625:].reshape(self.Theta2.shape))
-
-            numgrad[p] = (loss2 - loss1) / (2*epsilon)
-            perturb[p] = 0
-
-        return numgrad
 
     def sigmoid(self, z):
         return np.divide(1.0, (1 + np.power(e, -z)))
