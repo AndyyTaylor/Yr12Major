@@ -81,7 +81,3 @@ class Simulation(State):
                 self.render_time = 0
             else:
                 self.render_time = 60
-        elif key == pygame.K_l:
-            self.agent.only_optimal(True)
-        elif key == pygame.K_r:
-            self.agent.only_optimal(False)
