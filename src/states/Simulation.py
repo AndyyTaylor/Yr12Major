@@ -16,11 +16,16 @@ class Simulation(State):
     def __init__(self):
         super().__init__("Simulation", "MasterState")
 
-        self.agent = QLearn(2, 2)
+        self.agent = QLearn(4, 3)
+        self.environment = Environment()
 
+        self.episode = 0
         self.tick_rate = 1
+        self.total_time = 0
+        self.render_time = 0
+        self.total_reward = 0
 
-        pass
+        self.prev_state = self.environment.reset()
 
     def on_init(self):
         pass
@@ -35,10 +40,32 @@ class Simulation(State):
         pass
 
     def on_update(self, elapsed):
-        pass
+        self.total_time += elapsed
+        if self.total_time < self.render_time:
+            return
+
+        self.total_time = 0
+
+        for tick in range(self.tick_rate):
+            action = self.agent.choose_action(self.prev_state)
+            new_state, reward, done, _ = self.environment.step(action)
+
+            self.agent.train(self.prev_state, action, reward, done, new_state)
+
+            self.prev_state = new_state
+            self.total_reward += reward
+
+            if done:
+                self.agent.reset()
+                self.prev_state = self.environment.reset()
+
+                print('Episode', self.episode, '..', self.total_reward)
+
+                self.episode += 1
+                self.total_reward = 0
 
     def on_render(self, screen):
-        pass
+        self.environment.on_render(screen)
 
     def on_mouse_down(self, pos):
         pass
@@ -49,3 +76,12 @@ class Simulation(State):
                 self.tick_rate = 1
             else:
                 self.tick_rate = 1000
+        elif key == pygame.K_y:
+            if self.render_time == 60:
+                self.render_time = 0
+            else:
+                self.render_time = 60
+        elif key == pygame.K_l:
+            self.agent.only_optimal(True)
+        elif key == pygame.K_r:
+            self.agent.only_optimal(False)
