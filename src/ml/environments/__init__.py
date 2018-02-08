@@ -3,3 +3,4 @@ from .supervised.linearplot import LinearPlot
 from .supervised.mnisthandwriting import MNISTHandwriting as MNIST
 
 from .reinforcement.catchapples import CatchApples
+from .reinforcement.maze import Maze

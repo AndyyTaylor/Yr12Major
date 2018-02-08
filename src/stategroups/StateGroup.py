@@ -93,7 +93,7 @@ class StateGroup(State):
         if state:
             state.on_key_down(key)
 
-    def on_mouse_down(self, pos):
+    def on_mouse_event(self, pos):
         state = self.get_current_state()
         if state:
-            state.on_mouse_down(pos)
+            state.on_mouse_event(pos)

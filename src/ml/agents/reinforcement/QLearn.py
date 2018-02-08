@@ -2,7 +2,7 @@ import random
 import numpy as np
 
 class QLearn():
-    def __init__(self, num_observations, num_actions, alpha=0.02, gamma=0.95, epsilon=1, min_epsilon=0.05, epsilon_decay=0.0001):
+    def __init__(self, num_observations, num_actions, alpha=0.02, gamma=0.9, epsilon=1, min_epsilon=0.05, epsilon_decay=0.001):
         self.alpha = alpha
         self.gamma = gamma
         self.epsilon = epsilon
@@ -12,7 +12,7 @@ class QLearn():
         self.num_actions = num_actions
         self.num_observations = num_observations
 
-        self.model = SarsaTabular(num_observations, num_actions, self.alpha, self.gamma)
+        self.model = Tabular(num_observations, num_actions, self.alpha, self.gamma)
 
     def choose_action(self, state):
         if random.random() > self.epsilon:
@@ -40,6 +40,9 @@ class Model():
     def train(self, prev_state, action, reward, done, new_state):
         print("Train not implemented")
 
+    def set_epsilon(self, e):
+        pass
+
 class Tabular(Model):
     def __init__(self, num_observations, num_actions, alpha, gamma):
         super().__init__(num_observations, num_actions, alpha, gamma)
@@ -57,7 +60,6 @@ class Tabular(Model):
             self.Q[prev_sid][action] += self.alpha * (reward - self.Q[prev_sid][action])
         else:
             self.Q[prev_sid][action] += self.alpha * (reward + self.gamma * np.max(self.Q[new_sid]) - self.Q[prev_sid][action])
-
 
     def get_optimal_action(self, state):
         sid = self.get_state_id(state)
@@ -78,6 +80,9 @@ class Tabular(Model):
 
         return self.state_id
 
+    def predict(self, state):
+        return self.Q[self.get_state_id(state)]
+
 class SarsaTabular(Tabular):
     def set_epsilon(self, e):
         self.epsilon = e
@@ -90,7 +95,7 @@ class SarsaTabular(Tabular):
             self.Q[prev_sid][action] = self.alpha * reward
         else:
             if random.random() > self.epsilon:
-                self.Q[prev_sid][action] += self.alpha * (reward + self.gamma * np.max(self.Q[new_sid]))
+                self.Q[prev_sid][action] += self.alpha * (reward + self.gamma * np.max(self.Q[new_sid]) - self.Q[prev_sid][action])
             else:
-                self.Q[prev_sid][action] += self.alpha * (reward + self.gamma * self.Q[new_sid][random.randint(0, self.num_actions-1)])
+                self.Q[prev_sid][action] += self.alpha * (reward + self.gamma * self.Q[new_sid][random.randint(0, self.num_actions-1)] - self.Q[prev_sid][action])
 

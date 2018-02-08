@@ -8,7 +8,7 @@ from .AbstractState import State
 # from ..ml.environments import MNIST as Environment
 # from ..ml.agents import LinearRegression as Agent
 from ..ml.agents import QLearn
-from ..ml.environments import CatchApples as Environment
+from ..ml.environments import Maze as Environment
 
 class Simulation(State):
     " A "
@@ -16,8 +16,8 @@ class Simulation(State):
     def __init__(self):
         super().__init__("Simulation", "MasterState")
 
-        self.agent = QLearn(4, 3, gamma=2)
         self.environment = Environment()
+        self.agent = QLearn(2, 4, alpha=1)
 
         self.episode = 0
         self.tick_rate = 1
@@ -26,6 +26,8 @@ class Simulation(State):
         self.total_reward = 0
 
         self.prev_state = self.environment.reset()
+
+        self.human_action = -1
 
     def on_init(self):
         pass
@@ -65,15 +67,17 @@ class Simulation(State):
                 self.total_reward = 0
 
     def on_render(self, screen):
-        self.environment.on_render(screen)
+        self.environment.on_render(screen, self.agent.model.predict)
 
-    def on_mouse_down(self, pos):
-        pass
+    def on_mouse_event(self, event):
+        self.environment.on_mouse_event(event)
 
     def on_key_down(self, key):
         if key == pygame.K_SPACE:
             if self.tick_rate == 1000:
                 self.tick_rate = 1
+            elif self.tick_rate == 1:
+                self.tick_rate = 0
             else:
                 self.tick_rate = 1000
         elif key == pygame.K_y:
@@ -81,3 +85,11 @@ class Simulation(State):
                 self.render_time = 0
             else:
                 self.render_time = 60
+        elif key == pygame.K_LEFT:
+            self.human_action = 2
+        elif key == pygame.K_RIGHT:
+            self.human_action = 1
+        elif key == pygame.K_UP:
+            self.human_action = 0
+        elif key == pygame.K_DOWN:
+            self.human_action = 3
