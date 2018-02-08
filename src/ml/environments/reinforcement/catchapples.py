@@ -89,7 +89,7 @@ class CatchApples(State):
         while len(self.apples) < self.max_apples:
             self.apples.append([random.randint(0, self.grid_size), random.randint(0, int(self.grid_size/5))])
 
-    def on_render(self, screen):
+    def on_render(self, screen, _):
         centered_platform = self.platform[:]
         centered_platform[0] -= 1
         pygame.draw.rect(screen, config.BLACK, self.adjust_pos(tuple(centered_platform)) + (config.SCREEN_WIDTH / self.grid_size * 2.5, 30))

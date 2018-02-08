@@ -8,7 +8,7 @@ from .AbstractState import State
 # from ..ml.environments import MNIST as Environment
 # from ..ml.agents import LinearRegression as Agent
 from ..ml.agents import QLearn
-from ..ml.environments import Maze as Environment
+from ..ml.environments import RaceTrack as Environment
 
 class Simulation(State):
     " A "
@@ -17,10 +17,10 @@ class Simulation(State):
         super().__init__("Simulation", "MasterState")
 
         self.environment = Environment()
-        self.agent = QLearn(2, 4, alpha=1)
+        self.agent = QLearn(2, 4, alpha=0.1)
 
         self.episode = 0
-        self.tick_rate = 1
+        self.tick_rate = 0
         self.total_time = 0
         self.render_time = 0
         self.total_reward = 0
