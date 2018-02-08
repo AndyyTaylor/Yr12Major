@@ -1,73 +1,38 @@
-import numpy as np
-
-import numpy as np
 import random
-from .config import *
+import numpy as np
 
 class QLearn():
-    def __init__(self, num_actions):
-        self.Q = np.zeros((1, num_actions))
-        self.state = 0
-        self.prev_action = 0
-        self.human_control = True
-        self.moves = 0
-        self.episodes = 1
-        self.max_actions = num_actions
-        self.alpha = EPSILON
-        self.all_states = {}
-        self.state_id = 0
+    def __init__(self, num_observations, num_actions, **kwargs):
+        self.num_actions = num_actions
+        self.num_observations = num_observations
 
-    def update(self, new_state, reward, done):
-        while len(self.Q) < self.get_state_id(new_state):
-            self.Q = np.vstack([self.Q, [0 for i in range(self.max_actions)]])
-        if not done:
-            self.Q[self.state][self.prev_action] += LEARNING_RATE * (reward + DISCOUNT_FACTOR * (self.maxQ(self.get_state_id(new_state))) - self.Q[self.state][self.prev_action])
-        else:
-            self.Q[self.state][self.prev_action] += LEARNING_RATE * reward
-        self.state = self.get_state_id(new_state)
+        self.load_keyword_args(kwargs)
 
-        self.moves+=1
+    def choose_action(self, state):
+        if random.random() > self.epsilon:
+            # TODO: choose actual action
+            return random.randint(self.num_actions)
 
-    def get_state_id(self, state):
-        state = str(state)
+        return random.randint(self.num_actions)
 
-        if not state in self.all_states:
-            self.all_states[state] = self.state_id
-            self.state_id += 1
+    def load_keyword_args(self, kwargs):
+        if 'alpha' in kwargs: self.alpha = kwargs['alpha']
+        else: self.alpha = 0.05
 
-        return self.all_states[state]
+        if 'gamma' in kwargs: self.gamma = kwargs['gamma']
+        else: self.gamma = 0.05
 
-    def reset(self, state):
-        self.state = self.get_state_id(state)
-        self.moves = 0
-        self.episodes += 1
-        self.alpha = max(EPS_MIN, self.alpha * EPS_DECAY)
+        if 'epsilon' in kwargs: self.epsilon = kwargs['epsilon']
+        else: self.epsilon = 1
 
-        while len(self.Q) < self.state+1:
-            self.Q = np.vstack([self.Q, [0 for i in range(self.max_actions)]])
+        if 'min_epsilon' in kwargs: self.min_epsilon = kwargs['min_epsilon']
+        else: self.min_epsilon = 0.1
 
-    def get_action(self, state):
-        # alpha = max(EPSILON / self.episodes, 0.00)
-        state = self.get_state_id(state)
+        if 'epsilon_decay' in kwargs: self.epsilon_decay = kwargs['epsilon_decay']
+        else: self.epsilon_decay = 0.005
 
-        while len(self.Q) < state+1:
-            self.Q = np.vstack([self.Q, [0 for i in range(self.max_actions)]])
+class Model():
+    def __init__(num_observations, num_actions):
+        pass
 
-        if random.random() > self.alpha:
-            indices = []
-            max_val = self.Q[state].max()
-            for i in range(len(self.Q[state])):
-                if self.Q[state][i] == max_val:
-                    indices.append(i)
-
-            act = random.choice(indices)
-        else:
-            act = random.randint(0, self.max_actions-1)
-        self.prev_action = act
-        return act
-
-    def maxQ(self, state):
-        while len(self.Q) < state+1:
-            self.Q = np.vstack([self.Q, [0 for i in range(self.max_actions)]])
-        return self.Q[state].max()
 
