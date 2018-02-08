@@ -2,11 +2,15 @@ import random
 import numpy as np
 
 class QLearn():
-    def __init__(self, num_observations, num_actions, **kwargs):
+    def __init__(self, num_observations, num_actions, alpha=0.02, gamma=0.95, epsilon=1, min_epsilon=0.05, epsilon_decay=0.0001):
+        self.alpha = alpha
+        self.gamma = gamma
+        self.epsilon = epsilon
+        self.min_epsilon = min_epsilon
+        self.epsilon_decay = epsilon_decay
+
         self.num_actions = num_actions
         self.num_observations = num_observations
-
-        self.load_keyword_args(kwargs)
 
         self.model = SarsaTabular(num_observations, num_actions, self.alpha, self.gamma)
 
@@ -22,22 +26,6 @@ class QLearn():
     def train(self, prev_state, action, reward, done, new_state):
         self.model.set_epsilon(self.epsilon)
         self.model.train(prev_state, action, reward, done, new_state)
-
-    def load_keyword_args(self, kwargs):
-        if 'alpha' in kwargs: self.alpha = kwargs['alpha']
-        else: self.alpha = 0.02
-
-        if 'gamma' in kwargs: self.gamma = kwargs['gamma']
-        else: self.gamma = 0.95
-
-        if 'epsilon' in kwargs: self.epsilon = kwargs['epsilon']
-        else: self.epsilon = 1
-
-        if 'min_epsilon' in kwargs: self.min_epsilon = kwargs['min_epsilon']
-        else: self.min_epsilon = 0.05
-
-        if 'epsilon_decay' in kwargs: self.epsilon_decay = kwargs['epsilon_decay']
-        else: self.epsilon_decay = 0.0001
 
 class Model():
     def __init__(self, num_observations, num_actions, alpha, gamma):

@@ -16,7 +16,7 @@ class Simulation(State):
     def __init__(self):
         super().__init__("Simulation", "MasterState")
 
-        self.agent = QLearn(4, 3)
+        self.agent = QLearn(4, 3, gamma=2)
         self.environment = Environment()
 
         self.episode = 0
