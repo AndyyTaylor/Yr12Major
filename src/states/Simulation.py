@@ -8,7 +8,7 @@ from .AbstractState import State
 # from ..ml.environments import MNIST as Environment
 # from ..ml.agents import LinearRegression as Agent
 from ..ml.agents import QLearn
-from ..ml.environments import RaceTrack as Environment
+from ..ml.environments import CatchApples as Environment
 
 class Simulation(State):
     " A "
@@ -17,7 +17,7 @@ class Simulation(State):
         super().__init__("Simulation", "MasterState")
 
         self.environment = Environment()
-        self.agent = QLearn(2, 4, alpha=0.1)
+        self.agent = QLearn(self.environment.num_observations, self.environment.num_actions, alpha=0.1, epsilon=0.1)
 
         self.episode = 0
         self.tick_rate = 0
@@ -67,19 +67,19 @@ class Simulation(State):
                 self.total_reward = 0
 
     def on_render(self, screen):
-        self.environment.on_render(screen, self.agent.model.predict)
+        self.environment.on_render(screen)
 
     def on_mouse_event(self, event):
         self.environment.on_mouse_event(event)
 
     def on_key_down(self, key):
         if key == pygame.K_SPACE:
-            if self.tick_rate == 1000:
-                self.tick_rate = 1
-            elif self.tick_rate == 1:
+            if self.tick_rate == 1:
+                self.tick_rate = 100
+            elif self.tick_rate == 100:
                 self.tick_rate = 0
             else:
-                self.tick_rate = 1000
+                self.tick_rate = 1
         elif key == pygame.K_y:
             if self.render_time == 60:
                 self.render_time = 0

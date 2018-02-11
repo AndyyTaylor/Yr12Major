@@ -16,7 +16,7 @@ class CatchApples(State):
     def __init__(self):
         super().__init__("Catch Apples", "Environments")
 
-        self.num_obvs = 2
+        self.num_observations = 4
         self.grid_size = 8
         self.num_actions = 3
 
@@ -52,7 +52,7 @@ class CatchApples(State):
         if not closest_apple:
             closest_apple = [0, 0]
 
-        return [self.platform[0], self.platform[1], closest_apple[0], closest_apple[1]]
+        return np.array([self.platform[0], self.platform[1], closest_apple[0], closest_apple[1]])
 
     def take_action(self, action):
         if action == 0 and self.platform[0] > 0:
@@ -89,7 +89,7 @@ class CatchApples(State):
         while len(self.apples) < self.max_apples:
             self.apples.append([random.randint(0, self.grid_size), random.randint(0, int(self.grid_size/5))])
 
-    def on_render(self, screen, _):
+    def on_render(self, screen, _=None):
         centered_platform = self.platform[:]
         centered_platform[0] -= 1
         pygame.draw.rect(screen, config.BLACK, self.adjust_pos(tuple(centered_platform)) + (config.SCREEN_WIDTH / self.grid_size * 2.5, 30))
@@ -116,6 +116,9 @@ class CatchApples(State):
         pass
 
     def on_update(self):
+        pass
+
+    def on_mouse_event(self, event):
         pass
 
     def on_key_down(self, key):

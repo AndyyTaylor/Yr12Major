@@ -1,6 +1,10 @@
 import random
 import numpy as np
 
+from ..deeplearning.nn import NeuralNetwork
+from ..deeplearning.layers import Dense
+from ..deeplearning.loss_functions import SquareLoss
+
 class QLearn():
     def __init__(self, num_observations, num_actions, alpha=0.02, gamma=0.9, epsilon=1, min_epsilon=0.05, epsilon_decay=0.001):
         self.alpha = alpha
@@ -12,11 +16,15 @@ class QLearn():
         self.num_actions = num_actions
         self.num_observations = num_observations
 
-        self.model = Tabular(num_observations, num_actions, self.alpha, self.gamma)
+        # self.model = Tabular(num_observations, num_actions, self.alpha, self.gamma)
+        self.model = NeuralNetwork(SquareLoss)
+        self.model.add_layer(Dense(64, input_shape=num_observations))
+        self.model.add_layer(Dense(num_actions))
 
     def choose_action(self, state):
         if random.random() > self.epsilon:
-            return self.model.get_optimal_action(state)
+            print(self.model.predict(state))
+            return self.model.predict(state)
 
         return random.randint(0, self.num_actions-1)
 
@@ -24,8 +32,8 @@ class QLearn():
         self.epsilon = max(self.min_epsilon, self.epsilon - self.epsilon_decay)
 
     def train(self, prev_state, action, reward, done, new_state):
-        self.model.set_epsilon(self.epsilon)
-        self.model.train(prev_state, action, reward, done, new_state)
+        # self.model.set_epsilon(self.epsilon)
+        self.model.train(prev_state, action, reward, done, new_state, self.alpha, self.gamma)
 
 class Model():
     def __init__(self, num_observations, num_actions, alpha, gamma):
@@ -34,7 +42,7 @@ class Model():
         self.num_actions = num_actions
         self.num_observations = num_observations
 
-    def get_optimal_action(self, state):
+    def predict(self, state):
         return random.randint(0, self.num_actions-1)
 
     def train(self, prev_state, action, reward, done, new_state):
@@ -61,7 +69,7 @@ class Tabular(Model):
         else:
             self.Q[prev_sid][action] += self.alpha * (reward + self.gamma * np.max(self.Q[new_sid]) - self.Q[prev_sid][action])
 
-    def get_optimal_action(self, state):
+    def predict(self, state):
         sid = self.get_state_id(state)
 
         return np.argmax(self.Q[sid])
