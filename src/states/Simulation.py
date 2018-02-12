@@ -17,7 +17,7 @@ class Simulation(State):
         super().__init__("Simulation", "MasterState")
 
         self.environment = Environment()
-        self.agent = QLearn(self.environment.num_observations, self.environment.num_actions, alpha=0.1, epsilon=0.1)
+        self.agent = QLearn(self.environment.num_observations, self.environment.num_actions, alpha=0.1, epsilon=0.7)
 
         self.episode = 0
         self.tick_rate = 0

@@ -1,4 +1,4 @@
-import random
+import random, sys
 import numpy as np
 
 from ..deeplearning.nn import NeuralNetwork
@@ -21,9 +21,13 @@ class QLearn():
         self.model.add_layer(Dense(64, input_shape=num_observations))
         self.model.add_layer(Dense(num_actions))
 
+        # state = np.array([0, 0, 0, 0])
+        # print(self.model.predict(state))
+        #
+        # sys.exit()
+
     def choose_action(self, state):
         if random.random() > self.epsilon:
-            print(self.model.predict(state))
             return self.model.predict(state)
 
         return random.randint(0, self.num_actions-1)

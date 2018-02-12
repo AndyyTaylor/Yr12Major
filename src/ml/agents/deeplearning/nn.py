@@ -30,7 +30,10 @@ class NeuralNetwork():
         else:
             y[0][action] += alpha * (reward + gamma * np.max(pred_out) - y[0][action])
 
-        self.back_prop(prev_state, y, alpha)
+        print('------------')
+        print(self.cost(prev_state, y))
+        for i in range(10): self.back_prop(prev_state, y, alpha)
+        print(self.cost(prev_state, y))
 
     def feed_forward(self, X):
         if len(X.shape) < 2:
@@ -45,7 +48,13 @@ class NeuralNetwork():
         if len(X.shape) < 2:
             X = X.reshape((1, X.shape[0]))
 
-        D = np.subtract(self.feed_forward(X), y)
+        for i in range(m):
+            o = self.feed_forward(X[i])
+            delta = np.subtract(o, y[i]).T
 
-        for layer in reversed(self.layers):
-            D = layer.back_prop(D, alpha, m)
+            for layer in reversed(self.layers):
+                delta = layer.back_prop(delta, alpha)
+
+    def cost(self, X, y):
+        o = self.feed_forward(X)
+        return (1.0/2) * np.sum(np.subtract(o, y) ** 2)
