@@ -34,22 +34,12 @@ class Dense(Layer):
 
         return self.sigmoid(Z)
 
-    def back_prop(self, delta, alpha):
-        # print(self.A.shape)
-        # print(self.Z.shape)
+    def back_prop(self, delta, alpha, m):
+        W = np.copy(self.weights)
 
-        # error = delta.dot(self.Z.T)
-        # print(self.Z.T.dot(delta.T).shape)
-        # print(self.Z.shape)
-        W = self.weights
+        self.weights -= (1.0 / m) * alpha * self.A2.T.dot(delta.T).T
 
-        # print(self.A2.T.shape)
-        self.weights += self.A2.T.dot(delta.T).T
-        # print(self.A2.T.dot(delta.T).T)
         delta = np.multiply(W.T.dot(delta)[1:], self.g_prime(self.A.T))
-
-        # print('DONE')
-
 
         return delta
 
@@ -63,7 +53,7 @@ class Dense(Layer):
         return np.divide(1.0, (1 + np.power(e, -z)))
 
     def g_prime(self, a):
-        return np.multiply(a, np.subtract(1, a))
+        return np.multiply(a, np.subtract(1.0, a))
 
     def sig_grad(self, z):
         return np.multiply(self.sigmoid(z), (1 - self.sigmoid(z)))

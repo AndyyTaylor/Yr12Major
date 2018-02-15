@@ -57,7 +57,7 @@ class MNISTHandwriting(State):
     def on_update(self, elapsed):
         if self.training:
             print("Perc:", self.get_percentage())
-            self.agent.train(self.getx(), self.gety(), 100)
+            self.agent.train(self.getx(), self.gety(), 1)
 
     def on_render(self, screen):
         self.viewer.on_render(screen, self.x[self.ind, :])
@@ -97,7 +97,7 @@ class MNISTHandwriting(State):
         self.ind = max(min(self.ind + inc, self.m-1), 0)
 
         col = config.RED
-        guess = self.agent.predict(np.vstack((np.zeros((1, 784)), self.x[self.ind])))
+        guess = int(self.agent.predict(self.x[self.ind]))
         if guess == self.y[self.ind]:
             col = config.BLUE
 
@@ -128,7 +128,6 @@ class MNISTHandwriting(State):
 
     def gety(self):
         return self.y
-
 
     def read(self, dataset="training", path="/Users/andytaylor/Google Drive/Major/data/datasets"):
         """
