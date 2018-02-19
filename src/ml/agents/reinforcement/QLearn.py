@@ -21,14 +21,14 @@ class QLearn():
         self.model.add_layer(Dense(64, input_shape=num_observations))
         self.model.add_layer(Dense(num_actions))
 
-        # state = np.array([0, 0, 0, 0])
-        # print(self.model.predict(state))
-        #
-        # sys.exit()
+        self.MAX_MEMORY = 5000
+        self.batch_size = 1
+
+        self.memory = []
 
     def choose_action(self, state):
         if random.random() > self.epsilon:
-            return self.model.predict(state)
+            return int(self.model.predict(np.array(state)))
 
         return random.randint(0, self.num_actions-1)
 
@@ -36,8 +36,29 @@ class QLearn():
         self.epsilon = max(self.min_epsilon, self.epsilon - self.epsilon_decay)
 
     def train(self, prev_state, action, reward, done, new_state):
-        # self.model.set_epsilon(self.epsilon)
-        self.model.train(prev_state, action, reward, done, new_state, self.alpha, self.gamma)
+        self.memorize(prev_state, action, reward, done, new_state)
+
+        samples = np.random.choice(len(self.memory), self.batch_size)
+        for idx in samples:
+            replay = self.memory[idx]
+            state, action, reward, done, new_state = replay
+
+            new_utility = self.model.feed_forward(new_state)[0]
+
+            if done:
+                y = np.zeros(self.num_actions)
+                y[action] = reward
+            else:
+                y = new_utility * self.gamma
+                y[action] += reward
+
+            self.model.train(np.array([state]), np.array([y]), 1, self.alpha)
+
+    def memorize(self, prev_state, action, reward, done, new_state):
+        self.memory.append(np.array([prev_state, action, reward, done, new_state]))
+
+        if len(self.memory) > self.MAX_MEMORY:
+            self.memory.pop(0)
 
 class Model():
     def __init__(self, num_observations, num_actions, alpha, gamma):

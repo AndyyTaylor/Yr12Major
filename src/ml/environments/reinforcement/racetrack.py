@@ -27,6 +27,11 @@ class RaceTrack():
         reward = 0.05
         done = False
 
+        if action == 1:
+            self.car_angle += math.radians(self.car_turn_speed)
+        elif action == 2:
+            self.car_angle -= math.radians(self.car_turn_speed)
+
         self.car_pos[0] += math.cos(self.car_angle) * self.car_speed
         self.car_pos[1] += math.sin(self.car_angle) * self.car_speed
 
@@ -64,8 +69,46 @@ class RaceTrack():
         points = [list(self.rotate(tuple(self.car_pos), tuple(point), self.car_angle)) for point in orig_points]
         pygame.draw.polygon(screen, config.BLUE, points)
 
+        collision_points = self.read_sensors(True)
+        startX, startY = collision_points[0]
+
+        for i in range(len(collision_points) - 1):
+            x, y = collision_points[i + 1]
+            pygame.draw.line(screen, config.RED, (startX, startY), (x, y))
+
     def get_state(self):
-        return [0, 0]   # TODO
+        fl = 0
+        fr = 0
+
+        fl, fr = self.read_sensors()
+
+        return np.array([fl, fr])
+
+    def read_sensors(self, render=False):
+        startX = self.car_pos[0]
+        startY = self.car_pos[1]
+
+        collision_points = [(startX, startY)]
+
+        x = startX
+        y = startY
+        while self.is_on_track((x, y)):
+            x += math.cos(math.radians(-45) + self.car_angle) * 3
+            y += math.sin(math.radians(-45) + self.car_angle) * 3
+        collision_points.append((x, y))
+        fl = self.distance(startX, startY, x, y)
+
+        x = startX
+        y = startY
+        while self.is_on_track((x, y)):
+            x += math.cos(math.radians(45) + self.car_angle) * 3
+            y += math.sin(math.radians(45) + self.car_angle) * 3
+        collision_points.append((x, y))
+        fr = self.distance(startX, startY, x, y)
+
+        if not render:
+            return (fl, fr)
+        return collision_points
 
     def is_on_track(self, pos):
         x, y = pos

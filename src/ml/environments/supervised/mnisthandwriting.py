@@ -127,7 +127,10 @@ class MNISTHandwriting(State):
         return self.x
 
     def gety(self):
-        return self.y
+        lbl = np.zeros((len(self.y), 10))
+        for i in range(len(self.y)):
+            lbl[i, int(self.y[i])] = 1
+        return lbl
 
     def read(self, dataset="training", path="/Users/andytaylor/Google Drive/Major/data/datasets"):
         """
