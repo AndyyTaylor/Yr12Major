@@ -77,12 +77,12 @@ class Simulation(State):
 
     def on_key_down(self, key):
         if key == pygame.K_SPACE:
-            if self.tick_rate == 1000:
+            if self.tick_rate == 0:
                 self.tick_rate = 1
-            elif self.tick_rate == 1:
+            elif self.tick_rate == 100:
                 self.tick_rate = 0
             else:
-                self.tick_rate = 1000
+                self.tick_rate = 100
         elif key == pygame.K_y:
             if self.render_time == 60:
                 self.render_time = 0

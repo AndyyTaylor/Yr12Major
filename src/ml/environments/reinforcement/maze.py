@@ -18,6 +18,7 @@ class Maze():
         # Setup ML stuff
         self.pos = np.array(self.getPos(SPAWN_STATE))
         self.num_actions = 4
+        self.num_observations = 2
         self.max_states = GRID_WIDTH * GRID_HEIGHT
 
         self.Q = np.zeros([GRID_WIDTH*GRID_HEIGHT, self.num_actions])
@@ -42,11 +43,12 @@ class Maze():
         else:
             done = False
 
-        return (list(self.pos), reward, done, {})
+        return (np.array(self.pos), reward, done, {})
 
     def reset(self):
         self.pos = np.array(self.getPos(self.SPAWN_STATE))
-        return list(self.pos)
+
+        return np.array(self.pos)
 
     def on_render(self, screen, predict):
         screen.fill((0, 0, 0))
@@ -133,7 +135,7 @@ class Maze():
         if not pos:
             pos = self.pos
 
-        return int(pos[1]*GRID_WIDTH+pos[0])
+        return np.array(self.pos)
 
     def getPos(self, state):
         return [state % GRID_WIDTH, state // GRID_WIDTH]

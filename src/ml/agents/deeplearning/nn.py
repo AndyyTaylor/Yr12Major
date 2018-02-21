@@ -1,4 +1,4 @@
-import random
+import random, sys, time
 import numpy as np
 
 class NeuralNetwork():
@@ -46,12 +46,24 @@ class NeuralNetwork():
             X = X.reshape((1, X.shape[0]))
 
         for i in range(m):
+        # for l in range(6):
+        #     i = 0
+        #     if l % 3 == 0:
+        #         X[i] = np.array([0.2, 1])
+        #         y[i] = np.array([0, 1, 0])
+        #     elif l % 3 == 1:
+        #         X[i] = np.array([1, 1])
+        #         y[i] = np.array([0, 0, 1])
+        #     else:
+        #         X[i] = np.array([1, 0.2])
+        #         y[i] = np.array([1, 0, 0])
             o = self.feed_forward(X[i])
 
             delta = np.subtract(o[0], y[i].reshape(1, y.shape[1])).T
 
             for layer in reversed(self.layers):
                 delta = layer.back_prop(delta, alpha, m)
+                # sys.exit()
 
     def cost(self, X, y):
         # print(lbl)

@@ -1,12 +1,13 @@
-import random, sys
+import random, sys, time
 import numpy as np
+import copy
 
 from ..deeplearning.nn import NeuralNetwork
 from ..deeplearning.layers import Dense
 from ..deeplearning.loss_functions import SquareLoss
 
 class QLearn():
-    def __init__(self, num_observations, num_actions, alpha=0.02, gamma=0.9, epsilon=1, min_epsilon=0.05, epsilon_decay=0.001):
+    def __init__(self, num_observations, num_actions, alpha=0.00001, gamma=0.90, epsilon=0.1, min_epsilon=0.1, epsilon_decay=0.001):
         self.alpha = alpha
         self.gamma = gamma
         self.epsilon = epsilon
@@ -17,42 +18,62 @@ class QLearn():
         self.num_observations = num_observations
 
         # self.model = Tabular(num_observations, num_actions, self.alpha, self.gamma)
+        self.isnn = True
         self.model = NeuralNetwork(SquareLoss)
-        self.model.add_layer(Dense(64, input_shape=num_observations))
-        self.model.add_layer(Dense(num_actions))
+        self.model.add_layer(Dense(64, 'relu', input_shape=num_observations))
+        self.model.add_layer(Dense(48, 'relu'))
+        self.model.add_layer(Dense(num_actions, 'linear'))
 
-        self.MAX_MEMORY = 5000
+        self.MAX_MEMORY = 500000
         self.batch_size = 1
 
         self.memory = []
 
-    def choose_action(self, state):
+        self.new_util = 0
+
+    def choose_action(self, state, epsilon=-1):
+        if epsilon == -1: epsilon = self.epsilon
+
         if random.random() > self.epsilon:
             return int(self.model.predict(np.array(state)))
 
         return random.randint(0, self.num_actions-1)
 
     def reset(self):
+        print(self.new_util)
+        print(self.model.predict(np.array([0.3, 1])), self.model.predict(np.array([1, 1])), self.model.predict(np.array([1, 0.3])))
         self.epsilon = max(self.min_epsilon, self.epsilon - self.epsilon_decay)
 
     def train(self, prev_state, action, reward, done, new_state):
-        self.memorize(prev_state, action, reward, done, new_state)
+        if self.isnn:
+            self.memorize(prev_state, action, reward, done, new_state)
+            # print(reward)
+            self.old_model = copy.deepcopy(self.model)
 
-        samples = np.random.choice(len(self.memory), self.batch_size)
-        for idx in samples:
-            replay = self.memory[idx]
-            state, action, reward, done, new_state = replay
+            samples = np.random.choice(len(self.memory), min(len(self.memory), self.batch_size))
+            for idx in samples:
+                replay = self.memory[idx]
+                state, action, reward, done, new_state = replay
 
-            new_utility = self.model.feed_forward(new_state)[0]
+                new_utility = self.old_model.feed_forward(new_state)[0]
+                if np.random.random() < 0.1: self.new_util = new_utility
 
-            if done:
-                y = np.zeros(self.num_actions)
+                y = self.old_model.feed_forward(prev_state)[0]
+                # print(y)
                 y[action] = reward
-            else:
-                y = new_utility * self.gamma
-                y[action] += reward
 
-            self.model.train(np.array([state]), np.array([y]), 1, self.alpha)
+                if not done:
+                    y[action] += self.gamma * np.max(new_utility)
+
+                # print(np.array([state]))
+                # print(np.array([y]))
+                # print(action)
+                # time.sleep(0.5)
+                self.model.train(np.array([state]), np.array([y]), 1, self.alpha)
+
+            # print(new_util)
+        else:
+            self.model.train(prev_state, action, reward, done, new_state)
 
     def memorize(self, prev_state, action, reward, done, new_state):
         self.memory.append(np.array([prev_state, action, reward, done, new_state]))
@@ -112,9 +133,9 @@ class Tabular(Model):
         self.Q = np.vstack([self.Q, [0 for i in range(self.num_actions)]])
 
         return self.state_id
-
-    def predict(self, state):
-        return self.Q[self.get_state_id(state)]
+    #
+    # def predict(self, state):
+    #     return self.Q[self.get_state_id(state)]
 
 class SarsaTabular(Tabular):
     def set_epsilon(self, e):

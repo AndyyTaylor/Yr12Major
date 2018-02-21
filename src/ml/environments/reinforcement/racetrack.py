@@ -16,14 +16,17 @@ class RaceTrack():
         self.car_pos = [0, 0]
         self.car_angle = 1
         self.car_speed = 5
+        self.car_turn_speed = 5
         self.car_width = 10
 
         self.start_pos = [0, 0]
         self.start_angle = 1
+        self.ticks = 0
 
         self.mouse_down = False
 
     def step(self, action):
+        self.ticks += 1
         reward = 0.05
         done = False
 
@@ -35,13 +38,17 @@ class RaceTrack():
         self.car_pos[0] += math.cos(self.car_angle) * self.car_speed
         self.car_pos[1] += math.sin(self.car_angle) * self.car_speed
 
+        reward = np.sum(np.power(self.get_state(), 2))
+
         if not self.is_on_track(tuple(self.car_pos)):
-            done = True
             reward = -1
+            done = True
+
 
         return self.get_state(), reward, done, {}
 
     def reset(self):
+        self.ticks = 0
         self.car_pos = list(self.start_pos)
         self.car_angle = self.start_angle
 
@@ -92,19 +99,19 @@ class RaceTrack():
 
         x = startX
         y = startY
-        while self.is_on_track((x, y)):
+        while self.is_on_track((x, y)) and self.distance(startX, startY, x, y) < self.track_width:
             x += math.cos(math.radians(-45) + self.car_angle) * 3
             y += math.sin(math.radians(-45) + self.car_angle) * 3
         collision_points.append((x, y))
-        fl = self.distance(startX, startY, x, y)
+        fl = self.distance(startX, startY, x, y) / self.track_width
 
         x = startX
         y = startY
-        while self.is_on_track((x, y)):
+        while self.is_on_track((x, y)) and self.distance(startX, startY, x, y) < self.track_width:
             x += math.cos(math.radians(45) + self.car_angle) * 3
             y += math.sin(math.radians(45) + self.car_angle) * 3
         collision_points.append((x, y))
-        fr = self.distance(startX, startY, x, y)
+        fr = self.distance(startX, startY, x, y) / self.track_width
 
         if not render:
             return (fl, fr)
