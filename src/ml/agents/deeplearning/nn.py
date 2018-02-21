@@ -25,7 +25,7 @@ class NeuralNetwork():
         if len(output.shape) > 1:
             return np.argmax(output, axis=1)
 
-        return np.argmax(output)
+        return int(np.argmax(output))
 
     def train(self, X, y, num_iters, alpha=0.01):
         for i in range(num_iters):
@@ -57,12 +57,15 @@ class NeuralNetwork():
         #     else:
         #         X[i] = np.array([1, 0.2])
         #         y[i] = np.array([1, 0, 0])
+            # y[i] = np.array([1, 0])
             o = self.feed_forward(X[i])
 
-            delta = (1 / 32) * np.subtract(o[0], y[i].reshape(1, y.shape[1])).T
+            delta = np.subtract(o[0], y[i]).reshape(1, y.shape[1]).T
             if np.any(np.isnan(delta)):
                 print(delta)
-                time.sleep(0.2)
+                print(o[0])
+                print(y[i])
+                time.sleep(10)
 
             for layer in reversed(self.layers):
                 delta = layer.back_prop(delta, alpha, m)

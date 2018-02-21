@@ -42,6 +42,9 @@ class Dense(Layer):
 
     def back_prop(self, delta, alpha, m):
         W = np.copy(self.weights)
+
+        if np.any(np.isnan(delta)):
+            print(self.weights.shape)
         # print((1.0 / m) * alpha * self.A2.T.dot(delta.T).T)
         self.weights -= (1.0 / m) * alpha * self.A2.T.dot(delta.T).T
 

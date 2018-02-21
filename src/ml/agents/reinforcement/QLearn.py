@@ -7,7 +7,7 @@ from ..deeplearning.layers import Dense
 from ..deeplearning.loss_functions import SquareLoss
 
 class QLearn():
-    def __init__(self, num_observations, num_actions, alpha=0.00001, gamma=0.90, epsilon=0.1, min_epsilon=0.1, epsilon_decay=0.001):
+    def __init__(self, num_observations, num_actions, alpha=0.01, gamma=0.99, epsilon=1, min_epsilon=0.01, epsilon_decay=0.005):
         self.alpha = alpha
         self.gamma = gamma
         self.epsilon = epsilon
@@ -20,16 +20,19 @@ class QLearn():
         # self.model = Tabular(num_observations, num_actions, self.alpha, self.gamma)
         self.isnn = True
         self.model = NeuralNetwork(SquareLoss)
-        self.model.add_layer(Dense(64, 'relu', input_shape=num_observations))
-        self.model.add_layer(Dense(48, 'relu'))
+        self.model.add_layer(Dense(256, 'relu', input_shape=num_observations))
+        self.model.add_layer(Dense(512, 'relu'))
         self.model.add_layer(Dense(num_actions, 'linear'))
 
+        self.old_model = copy.deepcopy(self.model)
+
         self.MAX_MEMORY = 500000
-        self.batch_size = 1
+        self.batch_size = 32
 
         self.memory = []
 
         self.new_util = 0
+        self.step = 0
 
     def choose_action(self, state, epsilon=-1):
         if epsilon == -1: epsilon = self.epsilon
@@ -40,15 +43,16 @@ class QLearn():
         return random.randint(0, self.num_actions-1)
 
     def reset(self):
-        print(self.new_util)
-        print(self.model.predict(np.array([0.3, 1])), self.model.predict(np.array([1, 1])), self.model.predict(np.array([1, 0.3])))
+        print(self.model.feed_forward(np.array([1, 0, 0, 0])))
+        print(self.model.predict(np.array([1, 0, 0, 0])))
+        # print(self.model.predict(np.array([0.3, 1])), self.model.predict(np.array([1, 1])), self.model.predict(np.array([1, 0.3])))
         self.epsilon = max(self.min_epsilon, self.epsilon - self.epsilon_decay)
 
     def train(self, prev_state, action, reward, done, new_state):
+
         if self.isnn:
             self.memorize(prev_state, action, reward, done, new_state)
             # print(reward)
-            self.old_model = copy.deepcopy(self.model)
 
             samples = np.random.choice(len(self.memory), min(len(self.memory), self.batch_size))
             for idx in samples:
@@ -58,18 +62,20 @@ class QLearn():
                 new_utility = self.old_model.feed_forward(new_state)[0]
                 if np.random.random() < 0.1: self.new_util = new_utility
 
-                y = self.old_model.feed_forward(prev_state)[0]
-                # print(y)
-                y[action] = reward
+                y = self.model.feed_forward(state)[0]
 
-                if not done:
-                    y[action] += self.gamma * np.max(new_utility)
+                if done:
+                    y[action] += self.alpha * (reward - y[action])
+                else:
+                    y[action] += self.alpha * (reward + self.gamma * np.max(new_utility) - y[action])
 
-                # print(np.array([state]))
-                # print(np.array([y]))
-                # print(action)
-                # time.sleep(0.5)
-                self.model.train(np.array([state]), np.array([y]), 1, self.alpha)
+                self.model.train(np.array([state]), np.array([y]), 1, 1)
+
+                self.step += 1
+
+                if self.step % 1000 == 0:
+                    self.old_model = copy.deepcopy(self.model)
+                    print("Update model")
 
             # print(new_util)
         else:
