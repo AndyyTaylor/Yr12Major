@@ -59,7 +59,10 @@ class NeuralNetwork():
         #         y[i] = np.array([1, 0, 0])
             o = self.feed_forward(X[i])
 
-            delta = np.subtract(o[0], y[i].reshape(1, y.shape[1])).T
+            delta = (1 / 32) * np.subtract(o[0], y[i].reshape(1, y.shape[1])).T
+            if np.any(np.isnan(delta)):
+                print(delta)
+                time.sleep(0.2)
 
             for layer in reversed(self.layers):
                 delta = layer.back_prop(delta, alpha, m)
