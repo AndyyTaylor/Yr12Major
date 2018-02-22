@@ -7,6 +7,7 @@ from ..ui.Rectangle import Rectangle
 from ..ui.Button import Button
 from ..ui.Textbox import Textbox
 
+
 class MainMenu(State):
     " A "
 
@@ -19,15 +20,15 @@ class MainMenu(State):
             Button(50, 80, 500, 110,
                    config.BLACK, config.WHITE,
                    "Supervised", config.BLACK, 42,
-                   lambda: self.parent.change_state("Selection")),
+                   lambda: self.parent.change_state("Selection", ["agents", "supervised"])),
             Button(50, 210, 500, 110,
                    config.BLACK, config.WHITE,
                    "Unsupervised", config.BLACK, 42,
-                   lambda: self.parent.change_state("Simulation")),
+                   lambda: self.parent.change_state("Selection", ["agents", "unsupervised"])),
             Button(50, 340, 500, 110,
                    config.BLACK, config.WHITE,
                    "Reinforcement", config.BLACK, 42,
-                   lambda: self.parent.change_state("Simulation")),
+                   lambda: self.parent.change_state("Selection", ["agents", "reinforcement"])),
             Button(50, 470, 235, 110,
                    config.BLACK, config.WHITE,
                    "", config.BLACK, 42,

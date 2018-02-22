@@ -32,7 +32,6 @@ class Regression():
         self.params = np.subtract(self.params, (self.alpha * self.gradient(X, y, m)))
 
     def predict(self, x):
-        # print(x)
         return self.params.T.dot(np.insert(self.scale_features(x).T, 0, 1, axis=0))
 
     def scale_features(self, X):

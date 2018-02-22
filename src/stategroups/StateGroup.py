@@ -21,13 +21,15 @@ class StateGroup(State):
             self.parent = StateRegistry.instance().get_group("MasterState")
             self.parent.add_child(self)
 
-
     def add_child(self, child):
         if not self.children:
             self.default = child
         self.children[child.name] = child
 
-    def change_state(self, name):
+    def change_state(self, name, args=[]):
+        for arg in args:
+            StateRegistry.instance().push_arg(arg)
+
         if self.state_stack:
             self.state_stack.pop().on_exit()
 
