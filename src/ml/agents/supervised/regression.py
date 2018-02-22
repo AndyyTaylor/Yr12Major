@@ -4,6 +4,8 @@ from math import e, log
 import numpy as np
 
 class Regression():
+    name = "Regression"
+
     def __init__(self, n_features, alpha=0.01):
         self.n = n_features
         self.alpha = alpha
@@ -42,6 +44,7 @@ class Regression():
 
 
 class LogisticRegression(Regression):
+    name = "Logistic Regression"
 
     def gradient(self, X, y, m):
         grad = ((np.subtract(self.sigmoid(X.dot(self.params)), y)).T.dot(X)).T
@@ -61,7 +64,9 @@ class LogisticRegression(Regression):
         # print(x)
         return self.params.T.dot(np.insert(self.scale_features(x.T).T, 0, 1, axis=0))
 
+
 class LinearRegression(Regression):
+    name = "Linear Regression"
 
     def gradient(self, X, y, m):
         pred = X.dot(self.params)

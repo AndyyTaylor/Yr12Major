@@ -6,6 +6,7 @@ from ..ml.agents import NN as Agent
 from ..ml.environments import MNIST as Environment
 # from ..ml.agents import LinearRegression as Agent
 
+
 class Simulation(State):
     " A "
 
@@ -30,7 +31,6 @@ class Simulation(State):
         pass
 
     def on_update(self, elapsed):
-        # self.agent.train(self.environment.getx(), self.environment.gety(), 100)
         self.environment.on_update(elapsed)
 
     def on_render(self, screen):

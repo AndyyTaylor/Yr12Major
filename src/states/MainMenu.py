@@ -19,7 +19,7 @@ class MainMenu(State):
             Button(50, 80, 500, 110,
                    config.BLACK, config.WHITE,
                    "Supervised", config.BLACK, 42,
-                   lambda: self.parent.change_state("Simulation")),
+                   lambda: self.parent.change_state("Selection")),
             Button(50, 210, 500, 110,
                    config.BLACK, config.WHITE,
                    "Unsupervised", config.BLACK, 42,
@@ -37,18 +37,6 @@ class MainMenu(State):
                    "", config.BLACK, 42,
                    lambda: self.parent.change_state("Simulation"))
         ]
-
-    def on_init(self):
-        print("Application started.")
-
-    def on_shutdown(self):
-        print("Application closed.")
-
-    def on_enter(self):
-        print("Intro state entered")
-
-    def on_exit(self):
-        print("Intro state exited")
 
     def on_update(self, elapsed):
         self.total_time += elapsed

@@ -2,7 +2,10 @@ import numpy as np
 import sys
 from math import e, log
 
+
 class NN():
+    name = "Neural Network"
+
     def __init__(self, input_layer_size, hidden_layer_size, hidden_layer2_size, hidden_layer3_size, num_labels):
         self.Theta1 = self.init_weights(input_layer_size, hidden_layer_size)
         self.Theta2 = self.init_weights(hidden_layer_size, hidden_layer2_size)
