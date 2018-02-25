@@ -6,8 +6,9 @@ from ..deeplearning.nn import NeuralNetwork
 from ..deeplearning.layers import Dense
 from ..deeplearning.loss_functions import SquareLoss
 
+
 class QLearn():
-    def __init__(self, num_observations, num_actions, alpha=0.01, gamma=0.99, epsilon=1, min_epsilon=0.01, epsilon_decay=0.005):
+    def __init__(self, num_observations, num_actions, alpha=0.05, gamma=0.9, epsilon=1, min_epsilon=0.1, epsilon_decay=0.0001):
         self.alpha = alpha
         self.gamma = gamma
         self.epsilon = epsilon
@@ -17,12 +18,12 @@ class QLearn():
         self.num_actions = num_actions
         self.num_observations = num_observations
 
-        # self.model = Tabular(num_observations, num_actions, self.alpha, self.gamma)
-        self.isnn = True
-        self.model = NeuralNetwork(SquareLoss)
-        self.model.add_layer(Dense(256, 'relu', input_shape=num_observations))
-        self.model.add_layer(Dense(512, 'relu'))
-        self.model.add_layer(Dense(num_actions, 'linear'))
+        self.model = Tabular(num_observations, num_actions, self.alpha, self.gamma)
+        self.isnn = False
+        # self.model = NeuralNetwork(SquareLoss)
+        # self.model.add_layer(Dense(256, 'relu', input_shape=num_observations))
+        # self.model.add_layer(Dense(512, 'relu'))
+        # self.model.add_layer(Dense(num_actions, 'linear'))
 
         self.old_model = copy.deepcopy(self.model)
 
@@ -34,18 +35,13 @@ class QLearn():
         self.new_util = 0
         self.step = 0
 
-    def choose_action(self, state, epsilon=-1):
-        if epsilon == -1: epsilon = self.epsilon
-
-        if random.random() > self.epsilon:
+    def choose_action(self, state, eps=1):
+        if random.random() > min(self.epsilon, eps):
             return int(self.model.predict(np.array(state)))
 
         return random.randint(0, self.num_actions-1)
 
     def reset(self):
-        print(self.model.feed_forward(np.array([1, 0, 0, 0])))
-        print(self.model.predict(np.array([1, 0, 0, 0])))
-        # print(self.model.predict(np.array([0.3, 1])), self.model.predict(np.array([1, 1])), self.model.predict(np.array([1, 0.3])))
         self.epsilon = max(self.min_epsilon, self.epsilon - self.epsilon_decay)
 
     def train(self, prev_state, action, reward, done, new_state):
@@ -60,7 +56,8 @@ class QLearn():
                 state, action, reward, done, new_state = replay
 
                 new_utility = self.old_model.feed_forward(new_state)[0]
-                if np.random.random() < 0.1: self.new_util = new_utility
+                if np.random.random() < 0.1:
+                    self.new_util = new_utility
 
                 y = self.model.feed_forward(state)[0]
 
@@ -77,7 +74,6 @@ class QLearn():
                     self.old_model = copy.deepcopy(self.model)
                     print("Update model")
 
-            # print(new_util)
         else:
             self.model.train(prev_state, action, reward, done, new_state)
 
@@ -86,6 +82,7 @@ class QLearn():
 
         if len(self.memory) > self.MAX_MEMORY:
             self.memory.pop(0)
+
 
 class Model():
     def __init__(self, num_observations, num_actions, alpha, gamma):
@@ -102,6 +99,7 @@ class Model():
 
     def set_epsilon(self, e):
         pass
+
 
 class Tabular(Model):
     def __init__(self, num_observations, num_actions, alpha, gamma):
@@ -139,9 +137,7 @@ class Tabular(Model):
         self.Q = np.vstack([self.Q, [0 for i in range(self.num_actions)]])
 
         return self.state_id
-    #
-    # def predict(self, state):
-    #     return self.Q[self.get_state_id(state)]
+
 
 class SarsaTabular(Tabular):
     def set_epsilon(self, e):
@@ -152,7 +148,7 @@ class SarsaTabular(Tabular):
         new_sid = self.get_state_id(new_state)
 
         if done:
-            self.Q[prev_sid][action] = self.alpha * reward
+            self.Q[prev_sid][action] += self.alpha * (reward - self.Q[prev_sid][action])
         else:
             if random.random() > self.epsilon:
                 self.Q[prev_sid][action] += self.alpha * (reward + self.gamma * np.max(self.Q[new_sid]) - self.Q[prev_sid][action])

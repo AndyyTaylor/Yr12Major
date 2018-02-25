@@ -36,9 +36,9 @@ class Maze():
 
         reward = -0.04
         done = True
-        if self.getState() == self.WIN_STATE:
+        if list(self.getState()) == self.WIN_STATE:
             reward = 10
-        elif self.getState() == self.LOSE_STATE:
+        elif list(self.getState()) == self.LOSE_STATE:
             reward = -10
         else:
             done = False
@@ -76,9 +76,9 @@ class Maze():
                     s = pygame.Surface((BOX_WIDTH,BOX_HEIGHT), pygame.SRCALPHA)
                     s.fill((0, 0, 0, 0))
 
-                    if self.getState((x, y)) == self.WIN_STATE:
+                    if list(self.getState((x, y))) == self.WIN_STATE:
                         col = (0, 255, 0, 255)
-                    elif self.getState((x, y)) == self.LOSE_STATE:
+                    elif list(self.getState((x, y))) == self.LOSE_STATE:
                         col = (255, 0, 0, 255)
                     elif [x, y] in self.WALLS:
                         col = (128, 128, 128, 255)
@@ -93,7 +93,7 @@ class Maze():
                         pygame.draw.polygon(s, col, [[all_points[a][b][0]-x*BOX_WIDTH, all_points[a][b][1]-y*BOX_HEIGHT] for b in range(3)])
                         screen.blit(s, (x*BOX_WIDTH, y*BOX_HEIGHT))
 
-                        if self.getState((x, y)) != self.WIN_STATE and self.getState((x, y)) != self.LOSE_STATE and [x, y] not in self.WALLS:
+                        if list(self.getState((x, y))) != self.WIN_STATE and list(self.getState((x, y))) != self.LOSE_STATE and [x, y] not in self.WALLS:
                             pygame.draw.polygon(screen, (255, 255, 255), all_points[a], 2)
 
                             #if BOX_WIDTH > 80:

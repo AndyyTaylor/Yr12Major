@@ -2,7 +2,4 @@ from .supervised.classplot import ClassPlot
 from .supervised.linearplot import LinearPlot
 from .supervised.mnisthandwriting import MNISTHandwriting as MNIST
 
-from .reinforcement.catchapples import CatchApples
-from .reinforcement.racetrack import RaceTrack
-from .reinforcement.maze import Maze
-from .reinforcement.openaigym import MountainCar
+from .reinforcement import *

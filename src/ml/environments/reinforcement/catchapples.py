@@ -10,6 +10,7 @@ from ....ui.DataImage import DataImage
 from ....ui.Textbox import Textbox
 from ....ui.Button import Button
 
+
 class CatchApples(State):
     " The main state for this enviroment "
 
@@ -103,29 +104,8 @@ class CatchApples(State):
         y = config.SCREEN_HEIGHT / self.grid_size * y
         return (int(x), int(y))
 
-    def on_enter(self):
-        pass
-
-    def on_exit(self):
-        pass
-
-    def on_init(self):
-        pass
-
-    def on_shutdown(self):
-        pass
-
-    def on_update(self):
-        pass
-
-    def on_mouse_event(self, event):
-        pass
-
     def on_key_down(self, key):
         if key == pygame.K_LEFT and self.platform[0] > 0:
             self.platform[0] -= 1
         elif key == pygame.K_RIGHT and self.platform[0] < self.grid_size-1:
             self.platform[0] += 1
-
-    def on_mouse_down(self, pos):
-        pass
