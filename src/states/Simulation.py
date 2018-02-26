@@ -63,7 +63,7 @@ class Simulation(State):
             if self.human_turn and not self.auto_turns:
                 break
 
-            action = self.agent.choose_action(self.prev_state, int(not self.human_turn))
+            action = self.agent.choose_action(self.prev_state)
             new_state, reward, done, _ = self.environment.step(action)
 
             if _['valid'] and not done:
@@ -85,7 +85,6 @@ class Simulation(State):
             self.total_reward += reward
 
             if done:
-                self.agent.reset()
                 self.prev_state = self.environment.reset()
 
                 print('Episode', self.episode, '..', self.total_reward)
