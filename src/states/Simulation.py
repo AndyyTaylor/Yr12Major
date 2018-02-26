@@ -27,7 +27,7 @@ class Simulation(State):
         self.total_reward = 0
 
         self.environment = Environment()
-        self.agent = Agent(self.environment.num_observations, self.environment.num_actions)
+        self.agent = Agent(self.environment.num_observations, self.environment.num_actions, model='value-iteration', policy='greedy')
 
         self.prev_state = self.environment.reset()
         self.reward = 0
@@ -63,7 +63,7 @@ class Simulation(State):
             if self.human_turn and not self.auto_turns:
                 break
 
-            action = self.agent.choose_action(self.prev_state)
+            action = self.agent.choose_action(self.prev_state, env=self.environment)
             new_state, reward, done, _ = self.environment.step(action)
 
             if _['valid'] and not done:

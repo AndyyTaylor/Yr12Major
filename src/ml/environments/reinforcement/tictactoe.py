@@ -59,7 +59,7 @@ class TicTacToe(State):
         row = action // self.num_rows
         column = action % self.num_rows
 
-        if self.board[row, column] == 0:
+        if self.board[row, column] == 0 or val == 0:
             self.board[row, column] = val
             return True
 
@@ -134,6 +134,14 @@ class TicTacToe(State):
             cc = pos[0] // 200
             rr = pos[1] // 200
             return self.take_action(rr * self.num_rows + cc, -1)
+
+    def get_state_if_move(self, action, val):
+        valid = self.take_action(action, val)
+        obvs = self.get_obvs()
+        if valid:
+            self.take_action(action, 0)
+
+        return obvs
 
     def make_winning_move(self, val, player=0):
         if player == 0:
