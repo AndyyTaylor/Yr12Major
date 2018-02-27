@@ -25,6 +25,10 @@ class TicTacToe(State):
         self.num_rows = 3
         self.num_columns = 3
 
+        self.x = 1
+        self.y = -1
+        self.sym = self.x
+
         self.board = np.zeros((self.num_rows, self.num_columns))
 
     def reset(self):
@@ -39,28 +43,35 @@ class TicTacToe(State):
 
         done = True
         if self.check_winning(-1):
-            reward = -10
+            reward = -1
         elif self.check_winning(1):
-            reward = 10
+            reward = 1
         elif np.count_nonzero(self.board) == self.num_rows * self.num_columns:
             reward = 0
         else:
             done = False
 
-        if not valid:
-            reward = -1
+        if done:
+            self.sym = self.x
 
         return (self.get_obvs(), reward, done, {'valid': valid})
 
     def get_obvs(self):
         return self.board.flatten()
 
-    def take_action(self, action, val=1):
+    def take_action(self, action, val=-2):
+        if val == -2:
+            val = self.sym
+
         row = action // self.num_rows
         column = action % self.num_rows
 
         if self.board[row, column] == 0 or val == 0:
             self.board[row, column] = val
+            if self.sym == self.x:
+                self.sym = self.y
+            else:
+                self.sym = self.x
             return True
 
         return False
@@ -108,7 +119,7 @@ class TicTacToe(State):
 
         return False
 
-    def on_render(self, screen, _=None):
+    def on_render(self, screen, predict, _=None):
         pygame.draw.rect(screen, config.BLACK, (180, 20, 20, 560))
         pygame.draw.rect(screen, config.BLACK, (400, 20, 20, 560))
         pygame.draw.rect(screen, config.BLACK, (20, 180, 560, 20))
@@ -116,6 +127,14 @@ class TicTacToe(State):
 
         for rr in range(self.num_rows):
             for cc in range(self.num_columns):
+                s = self.get_state_if_move(rr * self.num_rows + cc)
+                if np.any(s != self.get_obvs()):
+                    acc = predict(s, env=self)
+                    if acc > 0:
+                        pygame.draw.rect(screen, (0, acc * 255, 0), (50 + cc * 200, 50 + rr * 200, 100, 100))
+                    else:
+                        pygame.draw.rect(screen, (-acc * 255, 0, 0), (50 + cc * 200, 50 + rr * 200, 100, 100))
+
                 val = self.board[rr, cc]
                 if val == -1:
                     self.draw_O(screen, 100 + cc * 200, 100 + rr * 200)
@@ -133,9 +152,12 @@ class TicTacToe(State):
             pos = pygame.mouse.get_pos()
             cc = pos[0] // 200
             rr = pos[1] // 200
-            return self.take_action(rr * self.num_rows + cc, -1)
+            return self.take_action(rr * self.num_rows + cc)
 
-    def get_state_if_move(self, action, val):
+    def get_state_if_move(self, action, val=-2):
+        if val == -2:
+            val = self.sym
+
         valid = self.take_action(action, val)
         obvs = self.get_obvs()
         if valid:
@@ -204,3 +226,14 @@ class TicTacToe(State):
             return True
 
         return False
+
+    def sample_action(self):
+        r = [i for i in range(self.num_actions)]
+        random.shuffle(r)
+
+        for i in range(len(r)):
+            if not self.take_action(r[i]):
+                r[i] = r[min(i+1, len(r)-2)]
+            else:
+                self.take_action(r[i], 0)
+                return r[i]

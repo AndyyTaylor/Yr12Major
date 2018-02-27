@@ -20,8 +20,10 @@ class Model():
 
 
 class ValueIteration(Model):
-    def __init__(self, num_observations, num_actions, **extras):
+    def __init__(self, num_observations, num_actions, alpha=0.5, **extras):
         super().__init__(num_observations, num_actions)
+
+        self.alpha = alpha
 
         self.state_id = -1
         self.V = {}
@@ -32,23 +34,40 @@ class ValueIteration(Model):
         best_action = 0
 
         for i in range(1, self.num_actions):
-            new_state = self.get_state_id(env.get_state_if_move(i, 1))
-            best_state = self.get_state_id(env.get_state_if_move(best_action, 1))
+            new_state = self.get_state_id(env.get_state_if_move(i))
+            best_state = self.get_state_id(env.get_state_if_move(best_action))
 
             if best_state == self.get_state_id(state) or (new_state != self.get_state_id(state) and self.V[new_state] > self.V[best_state]):
                 best_action = i
 
         return best_action
 
+    def get_val(self, state, env=0):
+        sid = self.get_state_id(state)
+        return self.V[sid]
+
     def train(self, prev_state, action, reward, done, new_state):
         self.remember_state(prev_state)
 
         if done:
-            pass
+            self.remember_state(new_state)
+
+            self.update(reward)
+
+    def update(self, reward):
+        target = reward
+        for prev in reversed(self.state_history):
+            value = self.V[prev] + self.alpha * (target - self.V[prev])
+            self.V[prev] = value
+            target = value
+        self.clear_history()
 
     def remember_state(self, state):
         sid = self.get_state_id(state)
         self.state_history.append(sid)
+
+    def clear_history(self):
+        self.state_history = []
 
     def get_state_id(self, state):
         str_state = str(state)

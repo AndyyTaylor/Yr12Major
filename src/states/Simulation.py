@@ -27,7 +27,9 @@ class Simulation(State):
         self.total_reward = 0
 
         self.environment = Environment()
-        self.agent = Agent(self.environment.num_observations, self.environment.num_actions, model='value-iteration', policy='greedy')
+        self.agent = Agent(self.environment.num_observations, self.environment.num_actions, model='value-iteration', policy='eps-greedy')
+        self.agent2 = Agent(self.environment.num_observations, self.environment.num_actions, model='value-iteration', policy='eps-greedy')
+        self.current_player = self.agent
 
         self.prev_state = self.environment.reset()
         self.reward = 0
@@ -54,32 +56,34 @@ class Simulation(State):
 
     def on_update(self, elapsed):
         self.total_time += elapsed
-        if self.total_time < 0:
+        if self.total_time < (1-int(self.auto_turns)) * 500:
             return
 
         self.total_time = 0
 
-        for tick in range(self.tick_rate):
+        for tick in range(int(self.auto_turns) * 49 + 1):
             if self.human_turn and not self.auto_turns:
                 break
 
-            action = self.agent.choose_action(self.prev_state, env=self.environment)
+            if not self.auto_turns:
+                self.current_player = self.agent
+
+            action = self.current_player.choose_action(self.prev_state, env=self.environment)
             new_state, reward, done, _ = self.environment.step(action)
-
-            if _['valid'] and not done:
-                if self.auto_turns:
-                    self.human_turn = False
-
-                    if random.random() < 0.5 or not self.environment.make_winning_move(-1):
-                        if random.random() < 0.5 or not self.environment.make_winning_move(1, -1):
-                            while not self.environment.take_action(random.randint(0, 8), -1):
-                                pass
-                else:
-                    self.human_turn = True
 
             new_state = self.environment.get_obvs()
 
             self.agent.train(self.prev_state, action, reward, done, new_state)
+            if self.auto_turns:
+                self.agent2.train(self.prev_state, action, -reward, done, new_state)
+
+            if _['valid'] and not self.auto_turns:
+                self.human_turn = True
+            elif _['valid']:
+                if self.current_player == self.agent2:
+                    self.current_player = self.agent
+                else:
+                    self.current_player = self.agent2
 
             self.prev_state = new_state
             self.total_reward += reward
@@ -87,13 +91,20 @@ class Simulation(State):
             if done:
                 self.prev_state = self.environment.reset()
 
-                print('Episode', self.episode, '..', self.total_reward)
+                if self.episode % 20 == 0:
+                    print("Episode:", self.episode)
 
                 self.episode += 1
                 self.total_reward = 0
 
+                self.human_turn = False
+                if random.random() < 0.5 or True:
+                    self.current_player = self.agent
+                else:
+                    self.current_player = self.agent2
+
     def on_render(self, screen):
-        self.environment.on_render(screen)
+        self.environment.on_render(screen, self.agent.model.get_val)
 
     def on_mouse_event(self, event):
         if not self.human_turn:

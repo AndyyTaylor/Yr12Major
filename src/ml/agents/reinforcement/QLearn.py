@@ -14,11 +14,15 @@ class QLearn():
             self.model = Tabular(num_observations, num_actions, **kwargs)
         elif model == 'value-iteration':
             self.model = ValueIteration(num_observations, num_actions, **kwargs)
+        else:
+            raise NotImplementedError("Unknown Model: " + model)
 
         if policy == 'eps-greedy':
             self.policy = EpsGreedy(num_observations, num_actions, **kwargs)
         elif policy == 'greedy':
             self.policy = Greedy(num_observations, num_actions, **kwargs)
+        else:
+            raise NotImplementedError("Unknown Policy: " + policy)
 
     def choose_action(self, state, **kwargs):
         return self.policy.choose_action(state, self.optimal_action, **kwargs)
