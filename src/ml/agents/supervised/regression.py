@@ -3,6 +3,7 @@
 from math import e, log
 import numpy as np
 
+
 class Regression():
     def __init__(self, n_features, alpha=0.01):
         self.n = n_features
@@ -60,6 +61,7 @@ class LogisticRegression(Regression):
     def render_func(self, x):
         # print(x)
         return self.params.T.dot(np.insert(self.scale_features(x.T).T, 0, 1, axis=0))
+
 
 class LinearRegression(Regression):
 
