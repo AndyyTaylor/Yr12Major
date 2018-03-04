@@ -1,5 +1,6 @@
 " Andy "
-import pygame
+import pygame, random
+import numpy as np
 
 from .AbstractState import State
 
@@ -7,8 +8,12 @@ from .AbstractState import State
 # from ..ml.agents import NN as Agent
 # from ..ml.environments import MNIST as Environment
 # from ..ml.agents import LinearRegression as Agent
+from ..ml.agents.deeplearning.layers import Dense
 from ..ml.agents import QLearn as Agent
-from ..ml.environments import CatchApples as Environment
+# from ..ml.environments import MNIST as Environment
+from ..ml.environments import TicTacToe as Environment
+from ..ml.agents.deeplearning.loss_functions import SquareLoss
+
 
 class Simulation(State):
     " A "
@@ -16,57 +21,99 @@ class Simulation(State):
     def __init__(self):
         super().__init__("Simulation", "MasterState")
 
+        self.episode = 0
         self.total_time = 0
+        self.render_time = 0
         self.total_reward = 0
-        self.tick_rate = 100
-        self.prev_reward = []
 
         self.environment = Environment()
-        self.agent = Agent(self.environment.num_actions)
+        self.agent = Agent(self.environment.num_observations, self.environment.num_actions, model='value-iteration', policy='eps-greedy')
+        self.agent2 = Agent(self.environment.num_observations, self.environment.num_actions, model='value-iteration', policy='eps-greedy')
+        self.current_player = self.agent
 
-        self.obvs = self.environment.reset()
+        self.prev_state = self.environment.reset()
+        self.reward = 0
+        self.done = False
+
+        self.tick_rate = 1
+
+        self.prev_reward = []
+
+        self.human_turn = True
+        self.auto_turns = False
 
     def on_init(self):
-        print("Application started.")
+        pass
 
     def on_shutdown(self):
-        print("Application closed.")
+        pass
 
     def on_enter(self):
-        self.environment.on_init()
+        pass
 
     def on_exit(self):
         pass
 
     def on_update(self, elapsed):
         self.total_time += elapsed
+        if self.total_time < (1-int(self.auto_turns)) * 500:
+            return
 
-        if self.total_time > self.tick_rate:
-            self.total_time = 0
+        self.total_time = 0
 
-            action = self.agent.get_action(self.obvs)
-            self.obvs, reward, done, info = self.environment.step(action)
-            self.agent.update(self.obvs, reward, done)
+        for tick in range(int(self.auto_turns) * 49 + 1):
+            if self.human_turn and not self.auto_turns:
+                break
+
+            if not self.auto_turns:
+                self.current_player = self.agent
+
+            action = self.current_player.choose_action(self.prev_state, env=self.environment)
+            new_state, reward, done, _ = self.environment.step(action)
+
+            new_state = self.environment.get_obvs()
+
+            self.agent.train(self.prev_state, action, reward, done, new_state)
+            if self.auto_turns:
+                self.agent2.train(self.prev_state, action, -reward, done, new_state)
+
+            if _['valid'] and not self.auto_turns:
+                self.human_turn = True
+            elif _['valid']:
+                if self.current_player == self.agent2:
+                    self.current_player = self.agent
+                else:
+                    self.current_player = self.agent2
+
+            self.prev_state = new_state
             self.total_reward += reward
 
             if done:
-                self.agent.reset(self.environment.reset())
-                self.prev_reward.append(self.total_reward)
-                if len(self.prev_reward) > 50:
-                    self.prev_reward.pop(0)
-                print(self.agent.episodes, "-", self.total_reward, sum(self.prev_reward)/len(self.prev_reward))
+                self.prev_state = self.environment.reset()
+
+                if self.episode % 20 == 0:
+                    print("Episode:", self.episode)
+
+                self.episode += 1
                 self.total_reward = 0
 
-    def on_render(self, screen):
-        self.environment.on_render(screen)
+                self.human_turn = False
+                if random.random() < 0.5 or True:
+                    self.current_player = self.agent
+                else:
+                    self.current_player = self.agent2
 
-    def on_mouse_down(self, pos):
-        self.environment.on_mouse_down(pos)
+    def on_render(self, screen):
+        self.environment.on_render(screen, self.agent.model.get_val)
+
+    def on_mouse_event(self, event):
+        if not self.human_turn:
+            return
+
+        valid = self.environment.on_mouse_event(event)
+        if valid:
+            self.human_turn = False
 
     def on_key_down(self, key):
         if key == pygame.K_SPACE:
-            if self.tick_rate == 100:
-                self.tick_rate = 0
-            else:
-                self.tick_rate = 100
-        self.environment.on_key_down(key)
+            self.auto_turns = not self.auto_turns

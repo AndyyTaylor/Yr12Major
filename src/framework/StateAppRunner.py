@@ -48,9 +48,9 @@ class StateAppRunner():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.close()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP or event.type == pygame.MOUSEMOTION:
                 pos = pygame.mouse.get_pos()
-                StateRegistry.instance().get_group("MasterState").on_mouse_down(pos)
+                StateRegistry.instance().get_group("MasterState").on_mouse_event(event)
             elif event.type == pygame.KEYDOWN:
                 StateRegistry.instance().get_group("MasterState").on_key_down(event.key)
 

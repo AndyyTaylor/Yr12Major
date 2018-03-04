@@ -1,7 +1,7 @@
-import sys
-
-for i in range(1000):
-    sys.stdout.write('Hey ' + str(i) + '\r')
-    sys.stdout.flush()
-
-print()
+import gym
+env = gym.make('Pendulum-v0')
+env.reset()
+for _ in range(1000):
+    env.render()
+    print(env.action_space.sample())
+    env.step(env.action_space.sample()) # take a random action

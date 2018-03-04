@@ -24,8 +24,8 @@ class IntroState(State):
     def on_update(self, elapsed):
         self.total_time += elapsed
 
-        if self.total_time > 100:
-            self.parent.change_state("Menu")
+        if self.total_time > 1:
+            self.parent.change_state("Simulation")
 
     def on_render(self, screen):
         pass
