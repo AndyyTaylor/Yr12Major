@@ -12,7 +12,7 @@ class QLearn():
 
         if model == 'tabular':
             self.model = Tabular(num_observations, num_actions, **kwargs)
-        elif model == 'state-values':
+        elif model == 'state-value':
             self.model = StateValues(num_observations, num_actions, **kwargs)
         elif model == 'policy-iteration':
             self.model = PolicyIteration(num_observations, num_actions, **kwargs)
