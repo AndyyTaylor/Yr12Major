@@ -14,6 +14,8 @@ class QLearn():
             self.model = Tabular(num_observations, num_actions, **kwargs)
         elif model == 'state-values':
             self.model = StateValues(num_observations, num_actions, **kwargs)
+        elif model == 'policy-iteration':
+            self.model = PolicyIteration(num_observations, num_actions, **kwargs)
         else:
             raise NotImplementedError("Unknown Model: " + model)
 

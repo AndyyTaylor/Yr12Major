@@ -14,7 +14,7 @@ class GridWorld():
         self.num_observations = 2
         self.num_actions = 4
 
-        self.step_cost = -0.5
+        self.step_cost = -0.2
 
         self.player_pos = (0, 2)
         self.wall_pos = [(1, 1)]
@@ -109,3 +109,17 @@ class GridWorld():
 
     def sample_action(self):
         return random.randint(0, self.num_actions-1)
+
+    def get_all_states(self):
+        states = []
+        for xx in range(self.WIDTH):
+            for yy in range(self.HEIGHT):
+                states.append(np.array((xx, yy)))
+
+        return states
+
+    def set_state(self, state):
+        self.player_pos = tuple(state)
+
+    def is_terminal(self, state):
+        return tuple(state) in self.win_pos or tuple(state) in self.lose_pos
