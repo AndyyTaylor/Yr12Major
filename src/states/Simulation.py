@@ -11,7 +11,7 @@ from .AbstractState import State
 from ..ml.agents.deeplearning.layers import Dense
 from ..ml.agents import QLearn as Agent
 # from ..ml.environments import MNIST as Environment
-from ..ml.environments import TicTacToe as Environment
+from ..ml.environments import GridWorld as Environment
 from ..ml.agents.deeplearning.loss_functions import SquareLoss
 
 
@@ -27,9 +27,7 @@ class Simulation(State):
         self.total_reward = 0
 
         self.environment = Environment()
-        self.agent = Agent(self.environment.num_observations, self.environment.num_actions, model='value-iteration', policy='eps-greedy')
-        self.agent2 = Agent(self.environment.num_observations, self.environment.num_actions, model='value-iteration', policy='eps-greedy')
-        self.current_player = self.agent
+        self.agent = Agent(self.environment.num_observations, self.environment.num_actions, model='state-values', policy='eps-greedy')
 
         self.prev_state = self.environment.reset()
         self.reward = 0
@@ -39,7 +37,7 @@ class Simulation(State):
 
         self.prev_reward = []
 
-        self.human_turn = True
+        self.human_turn = False
         self.auto_turns = False
 
     def on_init(self):
@@ -56,7 +54,7 @@ class Simulation(State):
 
     def on_update(self, elapsed):
         self.total_time += elapsed
-        if self.total_time < (1-int(self.auto_turns)) * 500:
+        if self.total_time < (1-int(self.auto_turns)) * 100:
             return
 
         self.total_time = 0
@@ -65,25 +63,12 @@ class Simulation(State):
             if self.human_turn and not self.auto_turns:
                 break
 
-            if not self.auto_turns:
-                self.current_player = self.agent
-
-            action = self.current_player.choose_action(self.prev_state, env=self.environment)
+            action = self.agent.choose_action(self.prev_state, env=self.environment)
             new_state, reward, done, _ = self.environment.step(action)
 
             new_state = self.environment.get_obvs()
 
             self.agent.train(self.prev_state, action, reward, done, new_state)
-            if self.auto_turns:
-                self.agent2.train(self.prev_state, action, -reward, done, new_state)
-
-            if _['valid'] and not self.auto_turns:
-                self.human_turn = True
-            elif _['valid']:
-                if self.current_player == self.agent2:
-                    self.current_player = self.agent
-                else:
-                    self.current_player = self.agent2
 
             self.prev_state = new_state
             self.total_reward += reward
@@ -92,16 +77,10 @@ class Simulation(State):
                 self.prev_state = self.environment.reset()
 
                 if self.episode % 20 == 0:
-                    print("Episode:", self.episode)
+                    print("Episode:", self.episode, '..', self.total_reward)
 
                 self.episode += 1
                 self.total_reward = 0
-
-                self.human_turn = False
-                if random.random() < 0.5 or True:
-                    self.current_player = self.agent
-                else:
-                    self.current_player = self.agent2
 
     def on_render(self, screen):
         self.environment.on_render(screen, self.agent.model.get_val)

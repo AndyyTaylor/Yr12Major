@@ -2,6 +2,7 @@ import random
 import numpy as np
 import time
 
+
 class Policy():
     def __init__(self, num_observations, num_actions, **extras):
         self.num_actions = num_actions
@@ -23,7 +24,7 @@ class Greedy(Policy):
 
 
 class EpsGreedy(Policy):
-    def __init__(self, num_observations, num_actions, epsilon=1, min_epsilon=0.01, epsilon_decay=0.0001, **extras):
+    def __init__(self, num_observations, num_actions, epsilon=1, min_epsilon=0.01, epsilon_decay=0.01, **extras):
         super().__init__(num_observations, num_actions)
 
         self.epsilon = epsilon

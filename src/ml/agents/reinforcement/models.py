@@ -13,14 +13,14 @@ class Model():
         return random.randint(0, self.num_actions-1)
 
     def train(self, prev_state, action, reward, done, new_state):
-        print("Train not implemented")
+        pass
 
     def set_epsilon(self, e):
         pass
 
 
-class ValueIteration(Model):
-    def __init__(self, num_observations, num_actions, alpha=0.5, **extras):
+class StateValues(Model):
+    def __init__(self, num_observations, num_actions, alpha=0.5, gamma=0.9, **extras):
         super().__init__(num_observations, num_actions)
 
         self.alpha = alpha
@@ -40,9 +40,11 @@ class ValueIteration(Model):
             if best_state == self.get_state_id(state) or (new_state != self.get_state_id(state) and self.V[new_state] > self.V[best_state]):
                 best_action = i
 
+        best_state = self.get_state_id(env.get_state_if_move(best_action))
+
         return best_action
 
-    def get_val(self, state, env=0):
+    def get_val(self, state, env=0, **extras):
         sid = self.get_state_id(state)
         return self.V[sid]
 
@@ -59,7 +61,7 @@ class ValueIteration(Model):
         for prev in reversed(self.state_history):
             value = self.V[prev] + self.alpha * (target - self.V[prev])
             self.V[prev] = value
-            target = value
+            target = value * self.gamma
         self.clear_history()
 
     def remember_state(self, state):
@@ -86,6 +88,19 @@ class ValueIteration(Model):
         return self.state_id
 
 
+class PolicyIteration(Model):
+    def __init__(self, num_observations, num_actions, gamma=0.99, **extras):
+        super().__init__(num_observations, num_actions, gamma=0.99)
+
+        self.THRESHOLD = 1e-3
+
+        self.converged = False
+
+    def predict(self, state, env=0, **extras):
+        if not self.converged:
+            self.train(env)
+
+
 class Tabular(Model):
     def __init__(self, num_observations, num_actions, alpha=0.01, gamma=0.99, **extras):
         super().__init__(num_observations, num_actions, alpha, gamma)
@@ -108,6 +123,14 @@ class Tabular(Model):
         sid = self.get_state_id(state)
 
         return np.argmax(self.Q[sid])
+
+    def get_val(self, state, action=None):
+        sid = self.get_state_id(state)
+
+        if action is None:
+            action = self.predict(state)
+
+        return self.Q[sid, action]
 
     def get_state_id(self, state):
         str_state = str(state)
