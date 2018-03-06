@@ -9,7 +9,8 @@ from ..stategroups.StateGroup import StateGroup
 from ..states.IntroState import IntroState
 from ..states.MainMenu import MainMenu
 
-from ..states.RLSim import Simulation
+# from ..states.RLSim import Simulation
+from ..states.SupSim import Simulation
 
 
 class StateAppRunner():

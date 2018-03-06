@@ -3,12 +3,15 @@
 from math import e, log
 import numpy as np
 
+
 class Regression():
     def __init__(self, n_features, alpha=0.01):
-        self.n = n_features
+        self.n = n_features + 1  # bias
         self.alpha = alpha
 
         self.params = np.zeros((self.n, 1))
+
+        self.lambd = 9
 
         self.stddev = 1
         self.mean = 0
@@ -30,15 +33,10 @@ class Regression():
         self.params = np.subtract(self.params, (self.alpha * self.gradient(X, y, m)))
 
     def predict(self, x):
-        # print(x)
-        return self.params.T.dot(np.insert(self.scale_features(x).T, 0, 1, axis=0))
+        return np.sum(np.insert(x, 0, 1, axis=1).dot(self.params), axis=1)
 
     def scale_features(self, X):
-        if X.shape[0] > 1:
-            self.stddev = X.std(0)
-            self.mean = X.mean(0)
-
-        return np.divide(np.subtract(X, self.mean), self.stddev)
+        return X
 
 
 class LogisticRegression(Regression):
@@ -61,20 +59,22 @@ class LogisticRegression(Regression):
         # print(x)
         return self.params.T.dot(np.insert(self.scale_features(x.T).T, 0, 1, axis=0))
 
+
 class LinearRegression(Regression):
 
     def gradient(self, X, y, m):
         pred = X.dot(self.params)
         err = np.subtract(pred, y)
 
-        grad = (1.0 / m) * (X.T.dot(err))
+        self.params2 = np.vstack((0, self.params[1:]))
+        grad = (1.0 / m) * (X.T.dot(err)) + (self.lambd / m) * self.params2
 
         return grad
 
     def cost(self, X, y, m):
         prediction = X.dot(self.params)
         err = np.subtract(prediction, y)
-        J = 1.0 / (2*m) * np.sum(np.square(err))
+        J = 1.0 / (2*m) * np.sum(np.square(err)) + (self.lambd / (2*m)) * np.sum(np.square(self.params[1:]))
 
         return J
 
