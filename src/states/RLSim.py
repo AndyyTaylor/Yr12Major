@@ -27,7 +27,7 @@ class Simulation(State):
         self.total_reward = 0
 
         self.environment = Environment()
-        self.agent = Agent(self.environment.num_observations, self.environment.num_actions, env=self.environment, model='state-value', policy='eps-greedy')
+        self.agent = Agent(self.environment.num_observations, self.environment.num_actions, env=self.environment, model='value-iteration', policy='eps-greedy')
 
         self.prev_state = self.environment.reset()
         self.reward = 0
