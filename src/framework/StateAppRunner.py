@@ -8,7 +8,7 @@ from .StateRegistry import StateRegistry
 from ..stategroups.StateGroup import StateGroup
 from ..states.IntroState import IntroState
 from ..states.MainMenu import MainMenu
-from ..states.Simulation import Simulation
+from ..states.SupSim import Simulation
 
 class StateAppRunner():
     _instance = None
