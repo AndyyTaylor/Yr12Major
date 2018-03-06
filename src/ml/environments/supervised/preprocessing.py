@@ -12,7 +12,8 @@ class Numerical():
         self.vals.append(float(val))
 
     def process(self):
-        self.vals = np.array(self.vals)
+        self.vals = np.log(np.array(self.vals))
+        self.vals[np.isneginf(self.vals)] = 0
         self.vals = np.divide(np.subtract(self.vals, self.vals.mean()), self.vals.std())
 
         return self.vals
@@ -86,7 +87,7 @@ def load_file(file_name):  # Seperate to lead csv text etc based on extension
                 X = np.hstack((X, v))
         X = X[:, 1:]
 
-        return (X, np.array(y.vals).reshape((X.shape[0], 1)))
+        return (X, np.array(np.log(y.vals)).reshape((X.shape[0], 1)))
 
 
 def is_float(val):

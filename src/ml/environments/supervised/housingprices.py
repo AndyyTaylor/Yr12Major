@@ -9,12 +9,12 @@ class HousingPrices():
         self.X, self.y = pp.load_file("housing-prices/train.csv")
         self.m = len(self.y)
 
-        self.trainX = self.X[:int(np.ceil(self.m * 0.6))]
-        self.crossX = self.X[int(np.floor(self.m * 0.6)):int(np.ceil(self.m * 0.8))]
+        self.trainX = self.X[:int(np.ceil(self.m * 0.8))]
+        self.crossX = self.X[int(np.floor(self.m * 0.8)):int(np.ceil(self.m * 0.8))]
         self.testX = self.X[int(np.floor(self.m * 0.8)):]
 
-        self.trainy = self.y[:int(np.ceil(self.m * 0.6))]
-        self.crossy = self.y[int(np.floor(self.m * 0.6)):int(np.ceil(self.m * 0.8))]
+        self.trainy = self.y[:int(np.ceil(self.m * 0.8))]
+        self.crossy = self.y[int(np.floor(self.m * 0.8)):int(np.ceil(self.m * 0.8))]
         self.testy = self.y[int(np.floor(self.m * 0.8)):]
 
         self.num_features = self.X.shape[1]
@@ -33,6 +33,7 @@ class HousingPrices():
             X = self.testX
             y = self.testy
 
-        predictions = predict(X)
-        perc = np.subtract(1, np.divide(predictions, y.T))
+        y = np.exp(y)
+        predictions = np.exp(predict(X))
+        perc = np.divide(np.subtract(predictions, y.T), y.T) * 100
         return np.abs(perc).mean()

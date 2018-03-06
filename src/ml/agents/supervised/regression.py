@@ -11,7 +11,7 @@ class Regression():
 
         self.params = np.zeros((self.n, 1))
 
-        self.lambd = 5
+        self.lambd = 9
 
         self.stddev = 1
         self.mean = 0

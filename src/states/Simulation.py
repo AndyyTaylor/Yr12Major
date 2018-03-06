@@ -53,11 +53,26 @@ class Simulation(State):
         examples = np.random.randint(0, high=len(self.environment.testy), size=5)
         predictions = self.agent.predict(self.environment.testX)
         for i in examples:
-            print(int(predictions[i]), "->", int(self.environment.testy[i]))
+            print(int(np.exp(predictions[i])), "->", int(np.exp(self.environment.testy[i])))
+
+        if self.iteration == 3000:
+            preds = np.exp(predictions)
+            true = np.exp(self.environment.testy)
+            with open("data1.txt", "w") as f:
+                for i in range(len(preds)):
+                    f.write(str(preds[i]) + "," + str(float(true[i])) + "\n")
+
+        if self.iteration == 576000:
+            preds = np.exp(predictions)
+            true = np.exp(self.environment.testy)
+            with open("data2.txt", "w") as f:
+                for i in range(len(preds)):
+                    f.write(str(preds[i]) + "," + str(float(true[i])) + "\n")
 
     def rmsle(self, y_true, y_pred):
-        print(y_true.shape)
-        print(y_pred.shape)
+        y_true = np.exp(y_true)
+        y_pred = np.exp(y_pred)
+
         assert len(y_true) == len(y_pred)
         return np.square(np.log(y_pred + 1) - np.log(y_true + 1)).mean() ** 0.5
 
