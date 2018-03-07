@@ -11,7 +11,7 @@ from .AbstractState import State
 # from ..ml.agents.deeplearning.layers import Dense
 from ..ml.agents import ClassificationKNN as Agent
 # from ..ml.environments import MNIST as Environment
-from ..ml.environments import StockPrices as Environment
+from ..ml.environments import DigitRecognition as Environment
 
 
 class Simulation(State):
