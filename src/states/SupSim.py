@@ -41,8 +41,9 @@ class Simulation(State):
     def on_update(self, elapsed):
         self.agent.train(self.environment.trainX, self.environment.trainy)
 
-        print('k=', self.agent.k, ':', self.environment.get_perc_error(self.agent.predict))
-        self.agent.k += 1
+        self.agent.cross_validate(self.environment.crossX, self.environment.crossy, self.environment.get_perc_error)
+
+        print(':', self.environment.get_perc_error(self.environment.testX, self.environment.testy, self.agent.predict))
 
     def rmsle(self, y_true, y_pred):
         y_true = np.exp(y_true)

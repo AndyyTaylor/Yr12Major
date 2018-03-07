@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 from sortedcontainers import SortedList
 
@@ -18,6 +19,25 @@ class KNN():
     def train(self, X, y):
         self.X = X
         self.y = y
+
+    def cross_validate(self, X, y, score):
+        if not self.k_determined:
+            print("Determining k .. ", end='')
+            sys.stdout.flush()
+
+            best_score = float('-inf')
+            while True:
+                current_score = score(X, y, self.predict)
+
+                if current_score < best_score:
+                    self.k -= 1
+                    break
+
+                best_score = current_score
+                self.k += 1
+
+            print(self.k)
+            self.k_determined = True
 
     def predict(self, X):
         y = np.zeros(len(X))  # vector containing labels
