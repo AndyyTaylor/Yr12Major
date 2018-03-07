@@ -7,6 +7,8 @@ from .environment import Environment
 
 class DigitRecognition(Environment):
     def __init__(self, limit=2000):
+        super().__init__()
+
         self.X, self.y = self.get_data(limit)
 
         self.create_train_cross_test(self.X, self.y, 0.6, 0.8)
@@ -32,6 +34,3 @@ class DigitRecognition(Environment):
     def get_perc_error(self, X, y, predict):
         pred = predict(X)
         return np.mean(pred == y)
-
-    def on_render(self, screen):
-        pass

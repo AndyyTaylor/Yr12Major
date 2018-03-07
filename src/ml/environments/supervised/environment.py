@@ -2,6 +2,9 @@ import numpy as np
 
 
 class Environment():
+    def __init__(self):
+        self.transforms = {}
+
     def create_train_cross_test(self, X, y, train_perc, cross_perc):
         m = X.shape[0]
 
@@ -13,3 +16,5 @@ class Environment():
 
         self.testX = X[int(np.ceil(m*cross_perc)):, :]
         self.testy = y[int(np.ceil(m*cross_perc)):]
+
+    def on_render(self, screen): pass

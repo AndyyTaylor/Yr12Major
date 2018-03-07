@@ -11,7 +11,7 @@ from .AbstractState import State
 # from ..ml.agents.deeplearning.layers import Dense
 from ..ml.agents import KNN as Agent
 # from ..ml.environments import MNIST as Environment
-from ..ml.environments import DigitRecognition as Environment
+from ..ml.environments import HousingPrices as Environment
 
 
 class Simulation(State):
@@ -20,7 +20,7 @@ class Simulation(State):
     def __init__(self):
         super().__init__("Simulation", "MasterState")
 
-        self.environment = Environment()
+        self.environment = Environment(limit=None)
         self.agent = Agent(self.environment.num_features)
 
         self.num_iters = 3000
