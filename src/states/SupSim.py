@@ -9,9 +9,9 @@ from .AbstractState import State
 # from ..ml.environments import MNIST as Environment
 # from ..ml.agents import LinearRegression as Agent
 # from ..ml.agents.deeplearning.layers import Dense
-from ..ml.agents import KNN as Agent
+from ..ml.agents import ClassificationKNN as Agent
 # from ..ml.environments import MNIST as Environment
-from ..ml.environments import HousingPrices as Environment
+from ..ml.environments import StockPrices as Environment
 
 
 class Simulation(State):
@@ -20,7 +20,7 @@ class Simulation(State):
     def __init__(self):
         super().__init__("Simulation", "MasterState")
 
-        self.environment = Environment(limit=None)
+        self.environment = Environment()
         self.agent = Agent(self.environment.num_features)
 
         self.num_iters = 3000

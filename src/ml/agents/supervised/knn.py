@@ -1,6 +1,7 @@
 import sys
 import numpy as np
 from sortedcontainers import SortedList
+from scipy.spatial import distance
 
 # Shit to implement in other codes:
 # i, x in enumerate(X)
@@ -22,20 +23,22 @@ class KNN():
 
     def cross_validate(self, X, y, score):
         if not self.k_determined:
-            print("Determining k .. ", end='')
             sys.stdout.flush()
 
             best_score = float('-inf')
             while True:
+                print("Determining k ..", self.k, end='\r')
                 current_score = score(X, y, self.predict)
-
-                if current_score < best_score:
+                print(current_score)
+                # if current_score < best_score and self.k > 15:
+                if self.k > 15:
                     self.k -= 1
                     break
 
                 best_score = current_score
                 self.k += 1
 
+            print("Determining k ..", self.k)
             print(self.k)
             self.k_determined = True
 
@@ -44,8 +47,9 @@ class KNN():
         for i, x in enumerate(X):  # test points
             sl = SortedList()
             for j, xt in enumerate(self.X):  # train points
-                diff = x - xt
-                dist = diff.dot(diff)  # squared distance
+                # diff = x - xt
+                # dist = diff.dot(diff)  # squared difference
+                dist = distance.euclidean(x, xt)
 
                 if len(sl) < self.k:
                     sl.add((dist, self.y[j]))   # add tuple(distance, class)
@@ -54,18 +58,32 @@ class KNN():
                         del sl[-1]  # remove worst point as we only want k neighbours
                         sl.add((dist, self.y[j]))  # add if this point is closer
 
-            # Count votes by class to determine prediction
-            votes = {}
-            for _, v in sl:  # we don't care about the distance anymore
-                votes[v] = votes.get(v, 0) + 1  # super nice function - if v doesn't exist it returns 0
-
-            max_votes = 0
-            best_class = 0
-            for v, count in votes.items():
-                if count > max_votes:
-                    max_votes = count
-                    best_class = v
-
-            y[i] = best_class
+            y[i] = self._predict(sl)
 
         return y
+
+
+class ClassificationKNN(KNN):
+    def _predict(self, sl):
+        # Count votes by class to determine prediction
+        votes = {}
+        for _, v in sl:  # we don't care about the distance anymore
+            votes[v] = votes.get(v, 0) + 1  # super nice function - if v doesn't exist it returns 0
+
+        max_votes = 0
+        best_class = 0
+        for v, count in votes.items():
+            if count > max_votes:
+                max_votes = count
+                best_class = v
+
+        return best_class
+
+
+class RegressionKNN(KNN):
+    def _predict(self, sl):
+        values = []
+        for _, v in sl:
+            values.append(float(v))
+
+        return np.mean(values)
