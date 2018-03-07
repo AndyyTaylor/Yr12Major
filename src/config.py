@@ -1,5 +1,7 @@
 import os
-dir_path = os.path.dirname(os.path.realpath(__file__)).replace("src", "")
+
+DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("src", "")
+DATASET_PATH = DIR_PATH + "data/datasets/"
 
 # pylint: disable=C0326
 WHITE = (255, 255, 255)

@@ -9,9 +9,9 @@ from .AbstractState import State
 # from ..ml.environments import MNIST as Environment
 # from ..ml.agents import LinearRegression as Agent
 # from ..ml.agents.deeplearning.layers import Dense
-from ..ml.agents import LinearRegression as Agent
+from ..ml.agents import ClassificationKNN as Agent
 # from ..ml.environments import MNIST as Environment
-from ..ml.environments import HousingPrices as Environment
+from ..ml.environments import DigitRecognition as Environment
 
 
 class Simulation(State):
@@ -39,35 +39,11 @@ class Simulation(State):
         pass
 
     def on_update(self, elapsed):
-        self.agent.train(self.environment.trainX, self.environment.trainy, self.num_iters)
+        self.agent.train(self.environment.trainX, self.environment.trainy)
 
-        self.iteration += self.num_iters
+        self.agent.cross_validate(self.environment.crossX, self.environment.crossy, self.environment.get_perc_error)
 
-        print("-" * 30)
-        print("Iteration", self.iteration)
-        print("Cost:", self.agent.cost(np.insert(self.environment.trainX, 0, 1, axis=1), self.environment.trainy, len(self.environment.trainy)))
-        print("Rmsle:", self.rmsle(self.environment.testy, self.agent.predict(self.environment.testX)))
-        print("Train Perc Error:", self.environment.perc_error(self.agent.predict))
-        print("Test  Perc Error:", self.environment.perc_error(self.agent.predict, dataset='test'))
-
-        examples = np.random.randint(0, high=len(self.environment.testy), size=5)
-        predictions = self.agent.predict(self.environment.testX)
-        for i in examples:
-            print(int(np.exp(predictions[i])), "->", int(np.exp(self.environment.testy[i])))
-
-        if self.iteration == 3000:
-            preds = np.exp(predictions)
-            true = np.exp(self.environment.testy)
-            with open("data1.txt", "w") as f:
-                for i in range(len(preds)):
-                    f.write(str(preds[i]) + "," + str(float(true[i])) + "\n")
-
-        if self.iteration == 576000:
-            preds = np.exp(predictions)
-            true = np.exp(self.environment.testy)
-            with open("data2.txt", "w") as f:
-                for i in range(len(preds)):
-                    f.write(str(preds[i]) + "," + str(float(true[i])) + "\n")
+        print(':', self.environment.get_perc_error(self.environment.testX, self.environment.testy, self.agent.predict))
 
     def rmsle(self, y_true, y_pred):
         y_true = np.exp(y_true)
