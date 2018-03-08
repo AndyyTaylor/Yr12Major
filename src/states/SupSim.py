@@ -9,7 +9,7 @@ from .AbstractState import State
 # from ..ml.environments import MNIST as Environment
 # from ..ml.agents import LinearRegression as Agent
 # from ..ml.agents.deeplearning.layers import Dense
-from ..ml.agents import ClassificationKNN as Agent
+from ..ml.agents import Bayes as Agent
 # from ..ml.environments import MNIST as Environment
 from ..ml.environments import DigitRecognition as Environment
 
@@ -21,7 +21,7 @@ class Simulation(State):
         super().__init__("Simulation", "MasterState")
 
         self.environment = Environment()
-        self.agent = Agent(self.environment.num_features)
+        self.agent = Agent(num_features=self.environment.num_features)
 
         self.num_iters = 3000
         self.iteration = 0
