@@ -7,17 +7,23 @@ class Bayes():
 
     def train(self, X, y):
         N, D = X.shape  # Equiv to M, N from other ML
-        self.gaussians = {}
-        self.priors = {}
-        labels = set(y)
+        self.distributions = {}
 
+        labels = set(y)
         for c in labels:
-            current_x = X[y == c]  # all the training examples of class c
-            self.gaussians[c] = {
-                'mean': current_x.mean(axis=0),
-                'cov': np.cov(current_x.T) + np.eye(D) * self.smoothing  # covariance, smoothing prevents probabilities being 0
-            }                                                            # which is problematic since they're multiplied later
-            self.priors[c] = len(y[y == c]) / len(y)
+            samples_where_c = X[y == c]  # all the training examples of class c
+
+            self.distributions[c] = {
+                "mean": samples_where_c.mean(axis=0),
+                "cov": np.cov(samples_where_c.T) + np.eye(D) * self.smoothing,
+                "prior": len(samples_where_c) / len(y)
+            }
 
     def predict(self, X):
-        return 0
+        N, D = X.shape
+        K = len(self.distributions)
+        P = np.zeros((N, K))
+
+        for c, g in self.distributions.items():
+            mean, cov, prior = self.distributions[c]["mean"], self.distributions[c]["cov"], self.distributions[c]["prior"]
+            P[: , c] =
