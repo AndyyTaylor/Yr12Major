@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.stats import multivariate_normal as mvn  # This is just the multivariate gaussian equation
 
 
 class Bayes():
@@ -13,10 +14,10 @@ class Bayes():
         for c in labels:
             samples_where_c = X[y == c]  # all the training examples of class c
 
-            self.distributions[c] = {
+            self.distributions[c] = {   # Distribution of features for that class
                 "mean": samples_where_c.mean(axis=0),
-                "cov": np.cov(samples_where_c.T) + np.eye(D) * self.smoothing,
-                "prior": len(samples_where_c) / len(y)
+                "cov": np.cov(samples_where_c.T) + np.eye(D) * self.smoothing,  # Covariance, smoothing prevents just 0'ing out probabilities
+                "prior": len(samples_where_c) / len(y)  # Posterior = Likelihood * Prior / Scaling (Baye's Rule)
             }
 
     def predict(self, X):
@@ -25,5 +26,8 @@ class Bayes():
         P = np.zeros((N, K))
 
         for c, g in self.distributions.items():
-            mean, cov, prior = self.distributions[c]["mean"], self.distributions[c]["cov"], self.distributions[c]["prior"]
-            P[: , c] =
+            mean, cov, prior = self.distributions[c]["mean"], self.distributions[c]["cov"], self.distributions[c]["prior"]  # Unpack values
+            P[:, c] = mvn.logpdf(X, mean=mean, cov=cov) + np.log(prior)  # After a lot of debating to myself, I think some libraries are
+                                                                         # a must for implementing this stuff. More in README
+
+        return np.argmax(P, axis=1)

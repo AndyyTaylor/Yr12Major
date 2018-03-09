@@ -6,12 +6,12 @@ from .environment import Environment
 
 
 class DigitRecognition(Environment):
-    def __init__(self, limit=2000):
+    def __init__(self, limit=2000, train_perc=0.6, cross_perc=0.2):
         super().__init__()
 
         self.X, self.y = self.get_data(limit)
 
-        self.create_train_cross_test(self.X, self.y, 0.6, 0.8)
+        self.create_train_cross_test(self.X, self.y, train_perc, train_perc + cross_perc)
 
         self.num_features = self.X.shape[1]
 
