@@ -23,7 +23,7 @@ class _DynamicProgramming(RLAgent):
         if env is None:
             raise AttributeError("No environment found")
 
-        return self.policy.choose_action(self._get_state_id(state), self._choose_action, env=env)
+        return self.policy.choose_action(self.get_state_id(state), self._choose_action, env=env)
 
     def train(self, prev_state, action, reward, done, new_state, env=None):
         if env is None:
@@ -34,20 +34,20 @@ class _DynamicProgramming(RLAgent):
         self.policy.update(prev_state, action, reward, done, new_state)
 
     def get_val(self, state, **extras):
-        return self._get_val(self._get_state_id(state))
+        return self._get_val(self.get_state_id(state))
 
-    def _get_state_id(self, state):
+    def get_state_id(self, state):
         str_state = str(state)
 
         if str_state not in self.state_ids:
-            self.state_ids[str_state] = self._gen_state_id()
+            self.state_ids[str_state] = self.gen_state_id()
 
-        if self.state_ids[str_state] not in self._V:
-            self._V[self.state_ids[str_state]] = 0
+        if self.state_ids[str_state] not in self.V:
+            self.V[self.state_ids[str_state]] = 0
 
         return self.state_ids[str_state]
 
-    def _gen_state_id(self):
+    def gen_state_id(self):
         self.state_id += 1
 
         return self.state_id
@@ -57,45 +57,45 @@ class ValueFunction(_DynamicProgramming):
     def __init__(self, num_observations, num_actions, **kwargs):
         super().__init__(num_observations, num_actions, **kwargs)
 
-        self._V = {}
+        self.V = {}
 
     def _choose_action(self, state, env):
         best_action = 0
 
         for i in range(1, self.num_actions):
-            new_state = self._get_state_id(env.get_state_if_move(i))
-            best_state = self._get_state_id(env.get_state_if_move(best_action))
+            new_state = self.get_state_id(env.get_state_if_move(i))
+            best_state = self.get_state_id(env.get_state_if_move(best_action))
 
-            if best_state == state or (new_state != state and self._V[new_state] > self._V[best_state]):
+            if best_state == state or (new_state != state and self.V[new_state] > self.V[best_state]):
                 best_action = i
 
         return best_action
 
     def _get_val(self, sid):
-        return self._V[sid]
+        return self.V[sid]
 
     def _train(self, prev_state, action, reward, done, new_state, env):
-        self._remember_state(prev_state)
+        self.remember_state(prev_state)
 
         if done:
-            self._remember_state(new_state)
+            self.remember_state(new_state)
 
-            self._update(reward)
+            self.update(reward)
 
-    def _update(self, reward):
+    def update(self, reward):
         target = reward
         for prev in reversed(self.state_history):
-            value = self._V[prev] + self.alpha * (target - self._V[prev])
-            self._V[prev] = value
+            value = self.V[prev] + self.alpha * (target - self.V[prev])
+            self.V[prev] = value
             target = value * self.gamma
 
-        self._clear_history()
+        self.clear_history()
 
-    def _remember_state(self, state):
-        sid = self._get_state_id(state)
+    def remember_state(self, state):
+        sid = self.get_state_id(state)
         self.state_history.append(sid)
 
-    def _clear_history(self):
+    def clear_history(self):
         self.state_history = []
 
 
@@ -106,7 +106,7 @@ class PolicyIteration(_DynamicProgramming):
         self._THRESHOLD = 1e-3
 
         self._converged = False
-        self._V = {}
+        self.V = {}
         self._policy = {}
         self._state_history = []
 
@@ -123,7 +123,7 @@ class PolicyIteration(_DynamicProgramming):
             self.policy_iter(env, 1)
 
     def _get_val(self, sid):
-        return self._V[sid]
+        return self.V[sid]
 
     def policy_iter(self, env, max_iters=None):
         iters = 0
@@ -136,18 +136,18 @@ class PolicyIteration(_DynamicProgramming):
         while True:
             biggest_change = 0
             for s in env.get_all_states():
-                sid = self._get_state_id(s)
+                sid = self.get_state_id(s)
 
-                old_v = self._V[sid]
+                old_v = self.V[sid]
 
                 if sid in self._policy:
                     a = self._policy[sid]
                     env.set_state(s)
 
                     obvs, reward, done, _ = env.step(a)
-                    self._V[sid] = reward + self.gamma * self._V[self._get_state_id(obvs)]
+                    self.V[sid] = reward + self.gamma * self.V[self.get_state_id(obvs)]
 
-                    biggest_change = max(biggest_change, np.abs(old_v - self._V[sid]))
+                    biggest_change = max(biggest_change, np.abs(old_v - self.V[sid]))
 
             if biggest_change < self._THRESHOLD:
                 break
@@ -156,7 +156,7 @@ class PolicyIteration(_DynamicProgramming):
         is_converged = True
 
         for s in env.get_all_states():
-            sid = self._get_state_id(s)
+            sid = self.get_state_id(s)
 
             if sid in self._policy:
                 old_a = self._policy[sid]
@@ -166,7 +166,7 @@ class PolicyIteration(_DynamicProgramming):
                 for a in range(self.num_actions):
                     env.set_state(s)
                     obvs, reward, done, _ = env.step(a)
-                    v = reward + self.gamma * self._V[self._get_state_id(obvs)]
+                    v = reward + self.gamma * self.V[self.get_state_id(obvs)]
 
                     if v > best_val:
                         best_val = v
@@ -180,14 +180,14 @@ class PolicyIteration(_DynamicProgramming):
 
     def initV(self, env):
         for s in env.get_all_states():
-            sid = self._get_state_id(s)
+            sid = self.get_state_id(s)
 
             if not env.is_terminal(s):
-                self._V[sid] = np.random.random()
+                self.V[sid] = np.random.random()
 
     def init_policy(self, env):
         for s in env.get_all_states():
-            sid = self._get_state_id(s)
+            sid = self.get_state_id(s)
 
             if not env.is_terminal(s):
                 self._policy[sid] = env.sample_action()
