@@ -9,7 +9,7 @@ from .AbstractState import State
 # from ..ml.environments import MNIST as Environment
 # from ..ml.agents import LinearRegression as Agent
 from ..ml.agents.deeplearning.layers import Dense
-from ..ml.agents import PolicyIteration as Agent
+from ..ml.agents import ValueIteration as Agent
 # from ..ml.environments import MNIST as Environment
 from ..ml.environments import GridWorld as Environment
 from ..ml.agents.deeplearning.loss_functions import SquareLoss
