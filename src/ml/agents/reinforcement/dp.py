@@ -62,7 +62,7 @@ class ValueFunction(_DynamicProgramming):
     def _choose_action(self, state, env):
         best_action = 0
 
-        for i in range(1, self.num_actions):
+        for i in range(1, self.num_actions):  # Finds optimal action by looking at which action leads to which state
             new_state = self.get_state_id(env.get_state_if_move(i))
             best_state = self.get_state_id(env.get_state_if_move(best_action))
 
@@ -82,9 +82,9 @@ class ValueFunction(_DynamicProgramming):
     def update(self, reward):
         target = reward
         for prev in reversed(self.state_history):
-            value = self.V[prev] + self.alpha * (target - self.V[prev])
+            value = self.V[prev] + self.alpha * (target - self.V[prev])  # Updates old state values with learning rate
             self.V[prev] = value
-            target = value * self.gamma
+            target = value * self.gamma  # Discounts state values using time
 
         self.clear_history()
 
@@ -105,7 +105,7 @@ class _Iteration(_DynamicProgramming):
         self.converged = False
         self._policy = {}
 
-        self.init_policy_and_v(env)
+        self.init_policy_and_v(env)  # Requires ability to loop through all possible states
 
         self.loop(env)
 
@@ -124,27 +124,27 @@ class _Iteration(_DynamicProgramming):
                 self.V[sid] = np.random.random()
                 self._policy[sid] = env.sample_action()
 
-    def policy_improvement(self, env):
+    def policy_improvement(self, env):  # Improves policy based off value function
         is_converged = True
 
         for s in env.get_all_states():
             sid = self.get_state_id(s)
 
             if sid in self._policy:
-                old_a = self._policy[sid]
+                old_a = self._policy[sid]  # a = action
                 new_a = None
                 best_val = float('-inf')
 
                 for a in range(self.num_actions):
                     env.set_state(s)
-                    obvs, reward, done, _ = env.step(a)
-                    v = reward + self.gamma * self.V[self.get_state_id(obvs)]
+                    obvs, reward, done, _ = env.step(a)  # hypothetically go through each action
+                    v = reward + self.gamma * self.V[self.get_state_id(obvs)]  # Calculate expected return
 
                     if v > best_val:
                         best_val = v
                         new_a = a
 
-                self._policy[sid] = new_a
+                self._policy[sid] = new_a  # Update policy
                 if new_a != old_a:
                     is_converged = False
 
@@ -156,8 +156,8 @@ class PolicyIteration(_Iteration):
     def loop(self, env, max_iters=None):
         iters = 0
         while not self.converged and (max_iters is None or iters < max_iters):
-            self.policy_evaluation(env)
-            self.converged = self.policy_improvement(env)
+            self.policy_evaluation(env)  # Update value function given current policy (prediction problem)
+            self.converged = self.policy_improvement(env)  # Improve policy given new value function (control problem)
             iters += 1
 
     def policy_evaluation(self, env):
@@ -173,7 +173,7 @@ class PolicyIteration(_Iteration):
                     env.set_state(s)
 
                     obvs, reward, done, _ = env.step(a)
-                    self.V[sid] = reward + self.gamma * self.V[self.get_state_id(obvs)]
+                    self.V[sid] = reward + self.gamma * self.V[self.get_state_id(obvs)]  # Expected return given policy (E[G(t) | policy])
 
                     biggest_change = max(biggest_change, np.abs(old_v - self.V[sid]))
 
@@ -186,10 +186,10 @@ class ValueIteration(_Iteration):
     def loop(self, env, max_iters=None):
         num_iters = 0
         while not self.converged and (max_iters is None or num_iters < max_iters):
-            self.converged = self.value_iteration(env)
+            self.converged = self.value_iteration(env)  # Improve values, by looping through all actions rather than using policy (prediction)
             num_iters += 1
 
-        self.policy_improvement(env)
+        self.policy_improvement(env)  # Using converged values, update policy (control)
 
     def value_iteration(self, env):
         biggest_change = 0
