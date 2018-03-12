@@ -3,6 +3,15 @@ import numpy as np
 import time
 
 
+def get_policy(policy):
+    if policy == 'eps-greedy':
+        return EpsGreedy
+    elif policy == 'greedy':
+        return Greedy
+    else:
+        raise NotImplementedError("Unknown Policy: " + policy)
+
+
 class Policy():
     def __init__(self, num_observations, num_actions, **extras):
         self.num_actions = num_actions
