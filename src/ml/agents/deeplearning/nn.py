@@ -1,6 +1,11 @@
 import numpy as np
 
 
+def softmax(a):
+    expA = np.exp(a)
+    return expA / expA.sum(axis=1, keepdims=True)
+
+
 class NeuralNetwork():
     def __init__(self):
         self.layers = []
@@ -17,6 +22,24 @@ class NeuralNetwork():
 
     def feed_forward(self, X):
         for layer in self.layers:
-            X = layer._feed_forward(X)
+            X = layer.feed_forward(X)
 
-        return X
+        return softmax(X)
+
+    def back_propagate(self, X, y):
+        P = self.feed_forward(X)
+
+        t = np.zeros(P.shape)
+        for m in range(len(y)):
+            t[m, y[m]] = 1
+
+        cost = 0
+        for m in range(len(y)):
+            for i in range(len(t[0])):
+                cost += t[m, i] * np.log(P[m, i])
+        print(cost)
+
+        grad = (t - P)
+
+        for layer in reversed(self.layers):
+            grad = layer.back_propagate(grad)
