@@ -24,7 +24,7 @@ class NeuralNetwork():
         for layer in self.layers:
             X = layer.feed_forward(X)
 
-        return softmax(X)
+        return X
 
     def back_propagate(self, X, y):
         P = self.feed_forward(X)
@@ -36,10 +36,11 @@ class NeuralNetwork():
         cost = 0
         for m in range(len(y)):
             for i in range(len(t[0])):
-                cost += t[m, i] * np.log(P[m, i])
-        print(cost)
+                cost += t[m, i] * np.log(max(P[m, i], 1e-120)) + (1 - t[m, i]) * np.log(max(1 - P[m, i], 1e-120))
 
         grad = (t - P)
 
         for layer in reversed(self.layers):
             grad = layer.back_propagate(grad)
+
+        print(cost)
