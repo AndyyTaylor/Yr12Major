@@ -17,9 +17,9 @@ class Simulation(State):
         self.environment = Environment(train_perc=0.8, cross_perc=0.0, limit=3000)
         self.agent = NeuralNetwork()
         self.agent.add_layer(Dense(512, input_shape=self.environment.num_features))
-        self.agent.add_layer(Activation('sigmoid'))
+        self.agent.add_layer(Activation('tanh'))
         self.agent.add_layer(Dense(215))
-        self.agent.add_layer(Activation('sigmoid'))
+        self.agent.add_layer(Activation('tanh'))
         self.agent.add_layer(Dense(10))
         self.agent.add_layer(Activation('softmax'))
 

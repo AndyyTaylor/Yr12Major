@@ -1,11 +1,6 @@
 import numpy as np
 
 
-def softmax(a):
-    expA = np.exp(a)
-    return expA / expA.sum(axis=1, keepdims=True)
-
-
 class NeuralNetwork():
     def __init__(self):
         self.layers = []
@@ -33,12 +28,12 @@ class NeuralNetwork():
         for m in range(len(y)):
             t[m, y[m]] = 1
 
-        cost = 0
+        cost = 0    # terribly implemented cross entropy cost function
         for m in range(len(y)):
             for i in range(len(t[0])):
                 cost += t[m, i] * np.log(max(P[m, i], 1e-120)) + (1 - t[m, i]) * np.log(max(1 - P[m, i], 1e-120))
 
-        grad = (t - P)
+        grad = (1 / len(y)) * (t - P)   # normalized gradient
 
         for layer in reversed(self.layers):
             grad = layer.back_propagate(grad)
