@@ -5,7 +5,7 @@ import numpy as np
 from .AbstractState import State
 
 from ..ml.agents.deeplearning import *
-from ..ml.environments import Donut as Environment
+from ..ml.environments import XOR as Environment
 
 
 class Simulation(State):
