@@ -47,7 +47,7 @@ class Tanh():
 
 class ReLU():
     def __call__(self, a):
-        return np.max(a, 0)
+        return a * (a > 0)
 
     def grad(self, a):
-        return (x > 0) * 1
+        return (a > 0) * 1

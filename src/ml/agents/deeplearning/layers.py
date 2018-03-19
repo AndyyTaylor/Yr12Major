@@ -22,8 +22,8 @@ class Dense():
     def back_propagate(self, grad):
         weights = self.weights
 
-        self.weights += 0.001 * self.input_layer.T.dot(grad)
-        self.bias += 0.001 * np.sum(grad, axis=0)
+        self.weights += 0.01 * self.input_layer.T.dot(grad)
+        self.bias += 0.01 * np.sum(grad, axis=0)
 
         return grad.dot(weights.T)
 

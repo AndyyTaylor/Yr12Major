@@ -5,7 +5,7 @@ import numpy as np
 from .AbstractState import State
 
 from ..ml.agents.deeplearning import *
-from ..ml.environments import DigitRecognition as Environment
+from ..ml.environments import Donut as Environment
 
 
 class Simulation(State):
@@ -16,18 +16,18 @@ class Simulation(State):
 
         self.environment = Environment(train_perc=0.8, cross_perc=0.0, limit=3000)
         self.agent = NeuralNetwork()
-        self.agent.add_layer(Dense(512, input_shape=self.environment.num_features))
-        self.agent.add_layer(Activation('tanh'))
-        self.agent.add_layer(Dense(215))
-        self.agent.add_layer(Activation('tanh'))
+        self.agent.add_layer(Dense(10, input_shape=self.environment.num_features))
+        self.agent.add_layer(Activation('relu'))
         self.agent.add_layer(Dense(10))
+        self.agent.add_layer(Activation('relu'))
+        self.agent.add_layer(Dense(2))
         self.agent.add_layer(Activation('softmax'))
 
         self.num_iters = 3000
         self.iteration = 0
 
     def on_init(self):
-        pass
+        self.environment.init()
 
     def on_shutdown(self):
         pass
@@ -60,7 +60,7 @@ class Simulation(State):
         # print(y)
 
     def on_render(self, screen):
-        self.environment.on_render(screen)
+        self.environment.on_render(screen, self.agent.predict)
 
     def on_mouse_event(self, event):
         pass
