@@ -7,7 +7,7 @@ class ClassPlot():
     def __init__(self, num_classes):
         self.colors = [config.RED, config.BLUE]
 
-        self.scale = 200
+        self.scale = 600
 
         if len(self.colors) < num_classes:
             raise NotImplementedError("ClassPlot doesn't have enough colors")
