@@ -1,87 +1,47 @@
-import random
 import numpy as np
-from math import e, log
+from .functions import *
 
-class Layer():
-    def __init__(self, requires_init=False):
-        self.requires_init = requires_init
+
+class Dense():
+    def __init__(self, num_nodes, input_shape=None):
+        self.num_nodes = num_nodes
+        self.input_shape = input_shape
+
+    def init(self):
+        self.weights = 2 * np.random.random((self.input_shape, self.num_nodes)) - 1
+        self.bias = 2 * np.random.random(self.num_nodes) - 1
 
     def set_input_shape(self, input_shape):
         self.input_shape = input_shape
 
     def feed_forward(self, X):
-        raise NotImplementedError()
+        self.input_layer = X
 
-class Dense(Layer):
-    def __init__(self, num_nodes, activation, input_shape=None):
-        super().__init__(True)
+        return X.dot(self.weights) + self.bias
 
+    def back_propagate(self, grad):
+        weights = self.weights
+
+        self.weights += 0.001 * self.input_layer.T.dot(grad)
+        self.bias += 0.001 * np.sum(grad, axis=0)
+
+        return grad.dot(weights.T)
+
+
+class Activation():
+    def __init__(self, function):
+        self.func = get_function(function)()
+
+    def init(self):
+        pass
+
+    def set_input_shape(self, num_nodes):
         self.num_nodes = num_nodes
-        self.input_shape = input_shape
-        self.A = None
-        self.Z = None
-
-        if activation == 'relu':
-            self.func = self.relu
-            self.func_grad = self.relu_grad
-        else:
-            self.func = self.linear
-            self.func_grad = self.linear_grad
-
-    def initialize(self):
-        self.weights = self.init_weights(self.input_shape, self.num_nodes)
 
     def feed_forward(self, X):
-        self.A = X
-        X = np.insert(X, 0, 1, axis=1)
-        self.A2 = X
-        Z = X.dot(self.weights.T)
-        self.Z = self.func(Z)
+        self.input_layer = self.func(X)
 
-        return self.func(Z)
+        return self.input_layer
 
-    def back_prop(self, delta, alpha, m):
-        W = np.copy(self.weights)
-
-        if np.any(np.isnan(delta)):
-            print(self.weights.shape)
-        # print((1.0 / m) * alpha * self.A2.T.dot(delta.T).T)
-        self.weights -= (1.0 / m) * alpha * self.A2.T.dot(delta.T).T
-
-        delta = np.multiply(W.T.dot(delta)[1:], self.func_grad(self.A.T))
-
-        return delta
-
-    def init_weights(self, in_layer, out_layer):
-        epsilon_init = 0.12
-        W = np.random.rand(out_layer, in_layer + 1) * 2 * epsilon_init - epsilon_init
-
-        return W
-
-    def linear(self, x):
-        return x
-
-    def linear_grad(self, x):
-        return np.ones(x.shape)
-
-    def relu(self, x):
-        x[x<0] = 0
-        return x
-
-    def relu_grad(self, x):
-        return (x > 0) * 1
-
-    def tanh(self, x):
-        return np.tanh(x)
-
-    def tanh_grad(self, x):
-        return (1 - (x ** 2))
-
-    def sigmoid(self, z):
-        return np.divide(1.0, (1 + np.power(e, -z)))
-
-    def g_prime(self, a):
-        return np.multiply(a, np.subtract(1.0, a))
-
-    def sig_grad(self, z):
-        return np.multiply(self.sigmoid(z), (1 - self.sigmoid(z)))
+    def back_propagate(self, grad):
+        return grad * self.func.grad(self.input_layer)

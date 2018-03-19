@@ -1,77 +1,41 @@
-import random, sys, time
 import numpy as np
 
+
 class NeuralNetwork():
-
-    def __init__(self, loss):
-        self.loss_function = loss()
-
+    def __init__(self):
         self.layers = []
 
     def add_layer(self, layer):
-        if self.layers:     # by default, containers equate len(container) > 0
+        if self.layers:
             layer.set_input_shape(self.layers[-1].num_nodes)
 
-        if layer.requires_init:
-            layer.initialize()
-
+        layer.init()
         self.layers.append(layer)
 
     def predict(self, X):
-        if len(X.shape) < 2:
-            X = X.reshape(1, X.shape[0])
-        output = self.feed_forward(X)
-
-        if len(output.shape) > 1:
-            return np.argmax(output, axis=1)
-
-        return int(np.argmax(output))
-
-    def train(self, X, y, num_iters, alpha=0.01):
-        for i in range(num_iters):
-            out = self.feed_forward(X)
-            self.back_prop(X, y, alpha)
+        return np.argmax(self.feed_forward(X), axis=1)
 
     def feed_forward(self, X):
-        if len(X.shape) < 2:
-            X = X.reshape((1, X.shape[0]))
-
         for layer in self.layers:
             X = layer.feed_forward(X)
+
         return X
 
-    def back_prop(self, X, y, alpha):
-        m = len(y)
-        if len(X.shape) < 2:
-            X = X.reshape((1, X.shape[0]))
+    def back_propagate(self, X, y):
+        P = self.feed_forward(X)
 
-        for i in range(m):
-        # for l in range(6):
-        #     i = 0
-        #     if l % 3 == 0:
-        #         X[i] = np.array([0.2, 1])
-        #         y[i] = np.array([0, 1, 0])
-        #     elif l % 3 == 1:
-        #         X[i] = np.array([1, 1])
-        #         y[i] = np.array([0, 0, 1])
-        #     else:
-        #         X[i] = np.array([1, 0.2])
-        #         y[i] = np.array([1, 0, 0])
-            # y[i] = np.array([1, 0])
-            o = self.feed_forward(X[i])
+        t = np.zeros(P.shape)
+        for m in range(len(y)):
+            t[m, y[m]] = 1
 
-            delta = np.subtract(o[0], y[i]).reshape(1, y.shape[1]).T
-            if np.any(np.isnan(delta)):
-                print(delta)
-                print(o[0])
-                print(y[i])
-                time.sleep(10)
+        cost = 0    # terribly implemented cross entropy cost function
+        for m in range(len(y)):
+            for i in range(len(t[0])):
+                cost += t[m, i] * np.log(max(P[m, i], 1e-120)) + (1 - t[m, i]) * np.log(max(1 - P[m, i], 1e-120))
 
-            for layer in reversed(self.layers):
-                delta = layer.back_prop(delta, alpha, m)
-                # sys.exit()
+        grad = (1 / len(y)) * (t - P)   # normalized gradient
 
-    def cost(self, X, y):
-        # print(lbl)
-        o = self.feed_forward(X)
-        return (1.0/2) * np.sum(np.subtract(o, y) ** 2)
+        for layer in reversed(self.layers):
+            grad = layer.back_propagate(grad)
+
+        print(cost)
