@@ -26,7 +26,7 @@ class NeuralNetwork():
 
         t = np.zeros(P.shape)
         for m in range(len(y)):
-            t[m, y[m]] = 1
+            t[m, int(y[m])] = 1
 
         cost = 0    # terribly implemented cross entropy cost function
         for m in range(len(y)):
