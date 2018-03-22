@@ -17,7 +17,13 @@ class Dense():
     def feed_forward(self, X):
         self.input_layer = X
 
-        return X.dot(self.weights) + self.bias
+        if X.ndim == 3:
+            out = np.zeros((X.shape[0], X.shape[1], self.num_nodes))
+            for t in range(X.shape[1]):
+                out[:, t, :] = X[:, t, :].dot(self.weights) + self.bias
+            return out
+        else:
+            return X.dot(self.weights) + self.bias
 
     def back_propagate(self, grad):
         weights = self.weights
@@ -39,12 +45,18 @@ class Activation():
         self.num_nodes = num_nodes
 
     def feed_forward(self, X):
-        self.input_layer = self.func(X)
+        self.input_layer = X
 
-        return self.input_layer
+        if X.ndim == 3:
+            out = np.zeros_like(X)
+            for t in range(X.shape[1]):
+                out[:, t, :] = self.func(X[:, t, :])
+            return out
+        else:
+            return self.func(X)
 
     def back_propagate(self, grad):
-        return grad * self.func.grad(self.input_layer)
+        return grad * self.func.grad(self.input_layer, call=True)
 
 
 class Recurrent():
@@ -62,27 +74,31 @@ class Recurrent():
         self.bias = np.random.randn(self.num_nodes) * 2 - 1  # I think I only need 1 of these
 
     def feed_forward(self, X):
-        self.reset_time = 9
         self.o = []
+        self.reset_past_states(len(X))
 
-        for time in range(len(X)):
-            t = time % self.reset_time
-            if t == 0:
-                self.reset_past_states()
-
-            ret = X[t].dot(self.x_weights) + self.bias + self.past_states[-1].dot(self.h_weights)
-            self.past_states.append(ret)
+        for t in range(len(X)):
+            ret = X[t, :].dot(self.x_weights) + self.past_states[t-1].dot(self.h_weights)  # + self.bias
+            self.past_states[t] = ret
             self.o.append(ret)
 
-        print(len(self.all_past_states))
         return np.array(self.o)
 
     def back_propagate(self, grad):
+
+        grad_x_weights = np.zeros_like(self.x_weights)
+        grad_h_weights = np.zeros_like(self.h_weights)
+
+        grad_grad = np.zeros_like(grad)
+
+        for t in reversed(range(len(self.past_states))):
+            print(t)
+
         return grad
 
-    def reset_past_states(self):
+    def reset_past_states(self, t):
         self.all_past_states += self.past_states
-        self.past_states = [np.zeros(self.num_nodes)]
+        self.past_states = [0 for x in range(t-1)] + [np.zeros(self.num_nodes)]
 
     def set_input_shape(self, input_shape):
         self.input_shape = input_shape
