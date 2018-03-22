@@ -52,7 +52,9 @@ class Simulation(State):
         # print("Train Accuracy:", correct / len(y))
         #
         y = self.agent.feed_forward(self.environment.testX)
-        print(y[0, 0, :].sum())
+        print(y[0, 0, :])
+        y = self.agent.predict(self.environment.testX)
+        print(y[0, 0])
         # correct = 0
         # for m in range(len(y)):
         #     if y[m] == self.environment.testy[m]:

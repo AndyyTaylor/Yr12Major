@@ -13,7 +13,10 @@ class NeuralNetwork():
         self.layers.append(layer)
 
     def predict(self, X):
-        return np.argmax(self.feed_forward(X), axis=1)
+        if X.ndim == 3:
+            return np.argmax(self.feed_forward(X), axis=2)
+        else:
+            return np.argmax(self.feed_forward(X), axis=1)
 
     def feed_forward(self, X):
         for layer in self.layers:
