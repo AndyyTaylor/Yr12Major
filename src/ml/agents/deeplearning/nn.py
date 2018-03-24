@@ -13,10 +13,7 @@ class NeuralNetwork():
         self.layers.append(layer)
 
     def predict(self, X):
-        if X.ndim == 3:
-            return np.argmax(self.feed_forward(X), axis=2)
-        else:
-            return np.argmax(self.feed_forward(X), axis=1)
+        return np.argmax(self.feed_forward(X), axis=1)
 
     def feed_forward(self, X):
         for layer in self.layers:
@@ -27,12 +24,18 @@ class NeuralNetwork():
     def back_propagate(self, X, y):
         P = self.feed_forward(X)
 
-        grad = -(1 / y.shape[0]) * (y - P)   # normalized gradient
-        print('gmax', grad.max())
+        t = np.zeros(P.shape)
+        for m in range(len(y)):
+            t[m, y[m]] = 1
+
+        cost = 0    # terribly implemented cross entropy cost function
+        for m in range(len(y)):
+            for i in range(len(t[0])):
+                cost += t[m, i] * np.log(max(P[m, i], 1e-120)) + (1 - t[m, i]) * np.log(max(1 - P[m, i], 1e-120))
+
+        grad = (1 / len(y)) * (t - P)   # normalized gradient
+
         for layer in reversed(self.layers):
-            grad = layer.back_propagate(grad, 0.00001)
+            grad = layer.back_propagate(grad)
 
-        input()
-
-        print(P[0])
-        print(y[0])
+        print(cost)
