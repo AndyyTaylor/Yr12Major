@@ -20,7 +20,7 @@ class BinaryAddition(Environment):
         self.num_classes = 2
 
         self.X = np.zeros((limit, n_bits+1, n_numbers))
-        self.y = np.zeros((limit, n_bits+1))
+        self.y = np.zeros((limit, n_bits+1, n_numbers))
 
         for m in range(limit):
             a = '0'
@@ -36,7 +36,7 @@ class BinaryAddition(Environment):
 
             for bit in range(n_bits, -1, -1):
                 self.X[m, (n_bits - bit)] = np.array([int(a[bit]), int(b[bit])])
-                self.y[m, (n_bits - bit)] = int(c[bit])
+                self.y[m, (n_bits - bit)] = np.array([1-int(c[bit]), int(c[bit])])
 
         self.trainX = self.X[:int((limit*0.8)) - int((limit*0.8)) % 9]
         self.trainy = self.y[:int((limit*0.8)) - int((limit*0.8)) % 9]

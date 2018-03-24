@@ -49,5 +49,5 @@ class ReLU():
     def __call__(self, a):
         return a * (a > 0)
 
-    def grad(self, a):
+    def grad(self, a, call=False):
         return (a > 0) * 1

@@ -25,13 +25,22 @@ class Dense():
         else:
             return X.dot(self.weights) + self.bias
 
-    def back_propagate(self, grad):
+    def back_propagate(self, grad, learning_rate=0.01):
         weights = self.weights
+        print(weights.max())
 
-        self.weights += 0.1 * self.input_layer.T.dot(grad)
-        self.bias += 0.1 * np.sum(grad, axis=0)
+        if grad.ndim == 3:
+            new_grad = np.zeros((grad.shape[0], grad.shape[1], self.input_shape))
+            for t in range(grad.shape[1]):
+                self.weights += learning_rate * self.input_layer[:, t, :].T.dot(grad[:, t, :])
+                # self.bias += learning_rate * np.sum(grad[:, t, :], axis=0)
+                new_grad[:, t, :] = grad[:, t, :].dot(weights.T)
+            return new_grad
+        else:
+            self.weights += learning_rate * self.input_layer.T.dot(grad)
+            self.bias += learning_rate * np.sum(grad, axis=0)
 
-        return grad.dot(weights.T)
+            return grad.dot(weights.T)
 
 
 class Activation():
@@ -55,8 +64,14 @@ class Activation():
         else:
             return self.func(X)
 
-    def back_propagate(self, grad):
-        return grad * self.func.grad(self.input_layer, call=True)
+    def back_propagate(self, grad, _):
+        if grad.ndim == 3:
+            out = np.zeros_like(grad)
+            for t in range(grad.shape[1]):
+                out[:, t, :] = self.func(grad[:, t, :])
+            return out
+        else:
+            return grad * self.func.grad(self.input_layer, True)
 
 
 class Recurrent():

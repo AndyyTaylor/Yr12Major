@@ -19,7 +19,7 @@ class Simulation(State):
         self.agent.add_layer(Dense(48, input_shape=self.environment.num_features))
         # self.agent.add_layer(Recurrent(10, input_shape=self.environment.num_features))
         self.agent.add_layer(Activation('relu'))
-        self.agent.add_layer(Dense(2))
+        self.agent.add_layer(Dense(2, input_shape=self.environment.num_features))
         self.agent.add_layer(Activation('softmax'))
 
         self.num_iters = 3000
@@ -52,9 +52,7 @@ class Simulation(State):
         # print("Train Accuracy:", correct / len(y))
         #
         y = self.agent.feed_forward(self.environment.testX)
-        print(y[0, 0, :])
-        y = self.agent.predict(self.environment.testX)
-        print(y[0, 0])
+        self.agent.back_propagate(self.environment.trainX, self.environment.trainy)
         # correct = 0
         # for m in range(len(y)):
         #     if y[m] == self.environment.testy[m]:
