@@ -23,19 +23,16 @@ class NeuralNetwork():
 
     def back_propagate(self, X, y):
         P = self.feed_forward(X)
-
-        t = np.zeros(P.shape)
-        for m in range(len(y)):
-            t[m, y[m]] = 1
+        # print(P[0, 4])
 
         cost = 0    # terribly implemented cross entropy cost function
         for m in range(len(y)):
-            for i in range(len(t[0])):
-                cost += t[m, i] * np.log(max(P[m, i], 1e-120)) + (1 - t[m, i]) * np.log(max(1 - P[m, i], 1e-120))
+            for t in range(y.shape[1]):
+                for i in range(y.shape[2]):
+                    cost += y[m, t, i] * np.log(max(P[m, t, i], 1e-12))
 
-        grad = (1 / len(y)) * (t - P)   # normalized gradient
+        print(cost)
+        grad = (1 / len(y)) * (y - P)   # normalized gradient
 
         for layer in reversed(self.layers):
             grad = layer.back_propagate(grad)
-
-        print(cost)
