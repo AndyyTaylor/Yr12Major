@@ -5,9 +5,10 @@ import pygame
 from .. import config
 
 from .StateRegistry import StateRegistry
-from ..stategroups.StateGroup import StateGroup
+from .StateGroup import StateGroup
 from ..states.IntroState import IntroState
 from ..states.MainMenu import MainMenu
+from ..states.LevelSelector import LevelSelector
 
 from ..states.DLSim import Simulation
 # from ..states.SupSim import Simulation
@@ -30,6 +31,7 @@ class StateAppRunner():
         IntroState()
         MainMenu()
         Simulation()
+        LevelSelector()
 
         # print(StateRegistry.instance().get_state("Rawplot").parent.name)
 
@@ -51,7 +53,10 @@ class StateAppRunner():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.close()
-            elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP or event.type == pygame.MOUSEMOTION:
+            if event.type == pygame.MOUSEMOTION:
+                pos = pygame.mouse.get_pos()
+                StateRegistry.instance().get_group("MasterState").on_mouse_motion(event, pos)
+            elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()
                 StateRegistry.instance().get_group("MasterState").on_mouse_event(event)
             elif event.type == pygame.KEYDOWN:

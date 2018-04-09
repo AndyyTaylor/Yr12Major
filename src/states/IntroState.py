@@ -1,6 +1,7 @@
 " Andy "
 from .AbstractState import State
 
+
 class IntroState(State):
     " A "
 
@@ -25,7 +26,7 @@ class IntroState(State):
         self.total_time += elapsed
 
         if self.total_time > 1:
-            self.parent.change_state("Simulation")
+            self.parent.change_state("LevelSelector")
 
     def on_render(self, screen):
         pass

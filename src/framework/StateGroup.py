@@ -97,3 +97,8 @@ class StateGroup(State):
         state = self.get_current_state()
         if state:
             state.on_mouse_event(pos)
+
+    def on_mouse_motion(self, event, pos):
+        state = self.get_current_state()
+        if state:
+            state.on_mouse_motion(event, pos)

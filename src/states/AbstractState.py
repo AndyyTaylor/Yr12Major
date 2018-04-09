@@ -39,6 +39,9 @@ class State():
     def on_mouse_event(self, event):
         return
 
+    def on_mouse_motion(self, event, pos):
+        return
+
     # @abc.abstractmethod
     # def on_mouse_down(self, pos):
     #     " Passed the mouse position "

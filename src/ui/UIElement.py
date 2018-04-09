@@ -18,6 +18,9 @@ class UIElement(metaclass=abc.ABCMeta):
     def on_render(self, screen):
         pass
 
+    def on_mouse_motion(self, pos):
+        return
+
     def get_rect(self):
         return (self.x, self.y, self.w, self.h)
 
