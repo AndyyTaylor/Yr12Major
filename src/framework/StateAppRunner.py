@@ -9,7 +9,7 @@ from .StateGroup import StateGroup
 from ..states.IntroState import IntroState
 from ..states.MainMenu import MainMenu
 from ..states.LevelSelector import LevelSelector
-from ..states.Level import Level
+from ..states.Level import LevelState
 
 from ..states.DLSim import Simulation
 # from ..states.SupSim import Simulation
@@ -33,7 +33,7 @@ class StateAppRunner():
         MainMenu()
         Simulation()
         LevelSelector()
-        Level()
+        LevelState()
 
         # print(StateRegistry.instance().get_state("Rawplot").parent.name)
 
@@ -61,6 +61,9 @@ class StateAppRunner():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
                 StateRegistry.instance().get_group("MasterState").on_mouse_down(event, pos)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                pos = pygame.mouse.get_pos()
+                StateRegistry.instance().get_group("MasterState").on_mouse_up(event, pos)
             elif event.type == pygame.KEYDOWN:
                 StateRegistry.instance().get_group("MasterState").on_key_down(event.key)
 
