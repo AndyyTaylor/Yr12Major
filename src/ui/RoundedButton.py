@@ -1,15 +1,13 @@
 import pygame
 
 from .. import config
+from .UIElement import UIElement
 
 
-class RoundedButton():
+class RoundedButton(UIElement):
 
     def __init__(self, x, y, w, h, border, back_col, front_col, callback):
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
+        super().__init__(x, y, w, h)
         self.border = border
         self.back_col = back_col
         self.front_col = front_col
@@ -20,14 +18,19 @@ class RoundedButton():
         self.hover_alpha = 0
         self.max_hover_alpha = 100
 
-        self.animation_speed = 300
+        self.animation_speed = 150
 
         self.rectangle = None
         self.prev_hash = None
 
+        self.enabled = True
+
         self.cache = []
 
     def on_update(self, elapsed):
+        if not self.enabled:
+            return
+
         if self.hover and self.hover_time < self.animation_speed:
             dt = min(elapsed, self.animation_speed - self.hover_time)
             self.hover_alpha += dt / self.animation_speed * self.max_hover_alpha
@@ -38,19 +41,29 @@ class RoundedButton():
             self.hover_time -= dt
 
     def on_render(self, screen):
-        new_hash = hash((self.hover_alpha))
+        new_hash = hash((self.hover_alpha, self.enabled))
         if new_hash != self.prev_hash:
             self.cache = []
 
         self.draw_rounded_rect(screen, (self.x, self.y, self.w, self.h), self.back_col, 0, 0.4 + 0.6 * (self.hover_time / self.animation_speed))
         self.draw_rounded_rect(screen, (self.x+self.border, self.y+self.border, self.w-self.border*2, self.h-self.border*2), self.front_col, 1, 0.4 + 0.6 * (self.hover_time / self.animation_speed))
 
-        self.draw_rounded_rect(screen, (self.x, self.y, self.w, self.h), (*config.WHITE, int(self.hover_alpha)), 2, 0.4 + 0.6 * (self.hover_time / self.animation_speed))
+        if self.enabled:
+            self.draw_rounded_rect(screen, (self.x, self.y, self.w, self.h), (*config.WHITE, int(self.hover_alpha)), 2, 0.4 + 0.6 * (self.hover_time / self.animation_speed))
+        else:
+            self.draw_rounded_rect(screen, (self.x, self.y, self.w, self.h), (*config.BLACK, 50), 2)
 
         self.prev_hash = new_hash
 
     def on_mouse_motion(self, pos):
         self.hover = pygame.Rect(self.x, self.y, self.w, self.h).collidepoint(pos)
+
+    def on_click(self):
+        if self.enabled:
+            self.callback()
+
+    def disable(self):
+        self.enabled = False
 
     def draw_rounded_rect(self, surface, rect, color, cache_ind, radius=0.4):
         """

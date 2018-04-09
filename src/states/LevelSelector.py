@@ -1,10 +1,11 @@
 " Andy "
+import pygame
+
 from .. import config
 from ..ui import RoundedButton
 from ..ui import Textbox
 from .AbstractState import State
 
-import pygame
 
 class LevelSelector(State):
     " A "
@@ -30,15 +31,6 @@ class LevelSelector(State):
                 self.create_level_button(xx, yy, level_num)
                 level_num += 1
 
-    def on_shutdown(self):
-        print("Application closed.")
-
-    def on_enter(self):
-        print("Intro state entered")
-
-    def on_exit(self):
-        pass
-
     def on_update(self, elapsed):
         for element in self.elements:
             element.on_update(elapsed)
@@ -49,13 +41,20 @@ class LevelSelector(State):
         for element in self.elements:
             element.on_render(screen)
 
-    def on_mouse_down(self, pos):
-        pass
+    def on_mouse_down(self, event, pos):
+        for element in self.elements:
+            if isinstance(element, RoundedButton) and pygame.Rect(element.get_rect()).collidepoint(pos):
+                element.on_click()
+                return
 
     def on_mouse_motion(self, event, pos):
         for element in self.elements:
             element.on_mouse_motion(pos)
 
     def create_level_button(self, x, y, level_num):
-        self.elements.append(RoundedButton(x, y, self.box_width, self.box_height, self.box_border, config.SCHEME4, config.SCHEME3, False))
+        button = RoundedButton(x, y, self.box_width, self.box_height, self.box_border, config.SCHEME4, config.SCHEME3, lambda: self.parent.change_state("Level", level_num))
+        if level_num > config.MAX_LEVEL:
+            button.disable()
+
+        self.elements.append(button)
         self.elements.append(Textbox(x, y, self.box_width, self.box_height, str(level_num), config.SCHEME1, 72))

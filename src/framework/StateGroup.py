@@ -3,6 +3,7 @@
 from ..framework.StateRegistry import StateRegistry
 from ..states.AbstractState import State
 
+
 class StateGroup(State):
     " doc "
 
@@ -21,20 +22,21 @@ class StateGroup(State):
             self.parent = StateRegistry.instance().get_group("MasterState")
             self.parent.add_child(self)
 
-
     def add_child(self, child):
         if not self.children:
             self.default = child
         self.children[child.name] = child
 
-    def change_state(self, name):
+    def change_state(self, name, data=()):
+        StateRegistry.instance().push_stack(data)
+
         if self.state_stack:
             self.state_stack.pop().on_exit()
 
         self.state_stack = []
 
         if name in self.children:
-            self.children[name].on_enter()
+            self.children[name].on_enter(StateRegistry.instance().pop_stack())
             self.state_stack.append(self.children[name])
         else:
             self.parent.change_state(name)
@@ -102,3 +104,8 @@ class StateGroup(State):
         state = self.get_current_state()
         if state:
             state.on_mouse_motion(event, pos)
+
+    def on_mouse_down(self, event, pos):
+        state = self.get_current_state()
+        if state:
+            state.on_mouse_down(event, pos)

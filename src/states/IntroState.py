@@ -16,7 +16,7 @@ class IntroState(State):
     def on_shutdown(self):
         print("Application closed.")
 
-    def on_enter(self):
+    def on_enter(self, data):
         print("Intro state entered")
 
     def on_exit(self):
