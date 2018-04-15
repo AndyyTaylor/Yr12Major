@@ -1,6 +1,27 @@
 
 import pygame
 from ..ui.UIElement import UIElement
+from .. import config
+
+
+class Holder(UIElement):
+
+    def __init__(self, x, y, w, h):
+        super().__init__(x, y, w, h)
+
+        self.clicked = False
+
+    def on_mouse_down(self, pos):
+        self.clicked = Pygame.Rect(self.get_rect()).collidepoint(pos)
+
+    def on_mouse_motion(self, pos):
+        self.hover = Pygame.Rect(self.get_rect()).collidepoint(pos)
+
+    def on_render(self, screen):
+        pygame.draw.rect(screen, config.SCHEME3, self.get_rect())
+
+    def on_update(self, elapsed):
+        return
 
 
 class Component(UIElement):
@@ -14,6 +35,11 @@ class Component(UIElement):
         self.slot_width = 40
         self.slot_height = 30
 
+        self.inputs = []
+        self.input_pos = []
+        self.outputs = []
+        self.output_pos = []
+
         self.mouse_offset_x = None
         self.mouse_offset_y = None
 
@@ -23,7 +49,13 @@ class Component(UIElement):
         return
 
     def on_render(self, screen):
-        return
+        self.draw_rounded_rect(screen, self.get_rect(), config.SCHEME4)
+
+        for inp in self.inputs:
+            inp.on_render(screen)
+
+        for out in self.outputs:
+            out.on_render(screen)
 
     def set_pos(self, x, y):
         self.x = x
@@ -31,6 +63,25 @@ class Component(UIElement):
 
         self.text.x = x
         self.text.y = y
+
+        for o in range(len(self.outputs)):
+            out = self.outputs[o]
+
+            out.x = x + self.output_pos[o][0]
+            out.y = y + self.output_pos[o][1]
+
+        for i in range(len(self.inputs)):
+            inp = self.inputs[i]
+
+            inp.x = x + self.input_pos[i][0]
+            inp.y = y + self.input_pos[i][1]
+
+    def setup_inputs_and_outputs(self):
+        for out in self.output_pos:
+            self.outputs.append(Holder(*out, self.slot_width, self.slot_height))
+
+        for inp in self.input_pos:
+            self.inputs.append(Holder(*inp, self.slot_width, self.slot_height))
 
     def on_mouse_down(self, pos):
         if pygame.Rect(self.get_rect()).collidepoint(pos):

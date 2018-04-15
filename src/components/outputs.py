@@ -11,10 +11,11 @@ class ColorOutput(Component):
 
         self.text = Textbox(self.x, self.y, self.w, 40, "OUT", config.SCHEME1, 32)
 
+        self.input_pos.append((self.x, self.y + self.h/2 - self.slot_height/2))
+
+        self.setup_inputs_and_outputs()
+
     def on_render(self, screen):
-        self.draw_rounded_rect(screen, self.get_rect(), config.SCHEME4)
+        super().on_render(screen)
 
         self.text.on_render(screen)
-        pygame.draw.rect(screen, config.SCHEME3, (self.x
-                                                  , self.y + self.h/2 - self.slot_height/2
-                                                  , self.slot_width, self.slot_height))

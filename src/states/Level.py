@@ -3,9 +3,9 @@ from .AbstractState import State
 
 import pygame
 
-from .levels import Level
 from .. import config
 from ..components import *
+from ..ml.environments.game import *
 
 
 class LevelState(State):
@@ -16,12 +16,16 @@ class LevelState(State):
 
         self.components = []
 
+        self.input = None
+        self.output = None
+        self.environment = None
+
     def on_enter(self, data):
         print("Level " + str(data) + " entered")
 
-        self.level = Level(data)
-        self.components.append(self.level.input)
-        self.components.append(self.level.output)
+        self.load_level(data)
+        self.components.append(self.input)
+        self.components.append(self.output)
 
         cum_y = 0
         for i in range(len(self.components)):
@@ -49,3 +53,15 @@ class LevelState(State):
     def on_mouse_up(self, event, pos):
         for component in self.components:
             component.on_mouse_up(pos)
+
+    def load_level(self, level_num):
+        if level_num == 1:
+            self.input = ColorInput(2)
+            self.output = ColorOutput(2)
+            self.environment = ColorEnv(2)
+        elif level_num == 2:
+            self.input = ColorInput(3)
+            self.output = ColorOutput(3)
+            self.environment = ColorEnv(3)
+        else:
+            raise NotImplementedError("Don't got that level")
