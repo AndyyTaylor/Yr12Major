@@ -14,7 +14,7 @@ class LevelSelector(State):
         super().__init__("LevelSelector", "MasterState")
 
         self.x_margin = 50
-        self.y_margin = 120
+        self.y_margin = 150
 
         self.box_width = 150
         self.box_height = self.box_width
@@ -22,7 +22,7 @@ class LevelSelector(State):
 
         num_boxes_per_row = 6
         self.gap_size = int(((config.SCREEN_WIDTH - self.x_margin*2) - num_boxes_per_row * self.box_width) / (num_boxes_per_row-1))
-
+        print(self.gap_size)
         self.elements = []
 
         level_num = 1
@@ -31,12 +31,16 @@ class LevelSelector(State):
                 self.create_level_button(xx, yy, level_num)
                 level_num += 1
 
+        self.elements.append(Textbox(0, 0, config.SCREEN_WIDTH, 100, "Level Selection", config.BLACK, 72))
+
     def on_update(self, elapsed):
         for element in self.elements:
             element.on_update(elapsed)
 
     def on_render(self, screen):
         screen.fill(config.SCHEME5)
+
+        pygame.draw.rect(screen, config.SCHEME2, (0, 0, config.SCREEN_WIDTH, 100))
 
         for element in self.elements:
             element.on_render(screen)

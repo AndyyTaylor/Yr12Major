@@ -26,7 +26,7 @@ class IntroState(State):
         self.total_time += elapsed
 
         if self.total_time > 1:
-            self.parent.change_state("LevelSelector")
+            self.parent.change_state("MainMenu")
 
     def on_render(self, screen):
         pass

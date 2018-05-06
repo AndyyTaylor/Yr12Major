@@ -6,36 +6,25 @@ from .AbstractState import State
 from ..ui.Rectangle import Rectangle
 from ..ui.Button import Button
 from ..ui.Textbox import Textbox
+from ..ui import RoundedButton
+
 
 class MainMenu(State):
     " A "
 
     def __init__(self):
-        super().__init__("Main", "Menu")
+        super().__init__("MainMenu", "MasterState")
 
         self.total_time = 0
+        w = 400
+        h = 100
         self.elements = [
-            Textbox(100, 10, 400, 50, "What would you like to see today?", config.BLACK, 32),
-            Button(50, 80, 500, 110,
-                   config.BLACK, config.WHITE,
-                   "Supervised", config.BLACK, 42,
-                   lambda: self.parent.change_state("Simulation")),
-            Button(50, 210, 500, 110,
-                   config.BLACK, config.WHITE,
-                   "Unsupervised", config.BLACK, 42,
-                   lambda: self.parent.change_state("Simulation")),
-            Button(50, 340, 500, 110,
-                   config.BLACK, config.WHITE,
-                   "Reinforcement", config.BLACK, 42,
-                   lambda: self.parent.change_state("Simulation")),
-            Button(50, 470, 235, 110,
-                   config.BLACK, config.WHITE,
-                   "", config.BLACK, 42,
-                   lambda: self.parent.change_state("Simulation")),
-            Button(315, 470, 235, 110,
-                   config.BLACK, config.WHITE,
-                   "", config.BLACK, 42,
-                   lambda: self.parent.change_state("Simulation"))
+            RoundedButton(50, 330, w, h, 3, config.BLACK, config.SCHEME2, lambda: self.parent.change_state("LevelSelector")),
+            Textbox(50, 330, w, h, "Resume", config.BLACK, 62),
+            RoundedButton(50, 450, w, h, 3, config.BLACK, config.SCHEME2, lambda: print("Not Implemented")),
+            Textbox(50, 450, w, h, "Load", config.BLACK, 62),
+            RoundedButton(40, 560, w+20, h+20, 3, config.BLACK, config.SCHEME2, lambda: print("Not Implemented")),
+            Textbox(40, 560, w+20, h+20, "About", config.BLACK, 74)
         ]
 
     def on_init(self):
@@ -44,7 +33,7 @@ class MainMenu(State):
     def on_shutdown(self):
         print("Application closed.")
 
-    def on_enter(self):
+    def on_enter(self, _):
         print("Intro state entered")
 
     def on_exit(self):
@@ -54,11 +43,13 @@ class MainMenu(State):
         self.total_time += elapsed
 
     def on_render(self, screen):
+        pygame.draw.rect(screen, config.SCHEME5, (0, 0, config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
         for elem in self.elements:
             elem.on_render(screen)
 
-    def on_mouse_down(self, pos):
-        for elem in self.elements:
-            if isinstance(elem, Button) and pygame.Rect(elem.get_rect()).collidepoint(pos):
-                elem.on_click()
-                return
+    def on_mouse_down(self, event, pos):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            for elem in self.elements:
+                if isinstance(elem, Button) and pygame.Rect(elem.get_rect()).collidepoint(pos):
+                    elem.on_click()
+                    return

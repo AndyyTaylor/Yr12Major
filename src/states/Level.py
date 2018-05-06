@@ -15,10 +15,14 @@ class LevelState(State):
         super().__init__("Level", "MasterState")
 
         self.components = []
+        self.elements = []
 
         self.input = None
         self.output = None
         self.environment = None
+
+        self.elements.append(Textbox(0, 0, config.SCREEN_WIDTH, 100, "LEVEL 1", config.BLACK, 72))  # HARDCODED
+        self.elements.append(Textbox(0, 130, 300, 50, "Components", config.BLACK, 36))
 
     def on_enter(self, data):
         print("Level " + str(data) + " entered")
@@ -29,7 +33,7 @@ class LevelState(State):
 
         cum_y = 0
         for i in range(len(self.components)):
-            self.components[i].set_pos(50, 50 + cum_y)
+            self.components[i].set_pos(50, 180 + cum_y)
             cum_y += 50 + self.components[i].h
 
     def on_update(self, elapsed):
@@ -37,7 +41,14 @@ class LevelState(State):
 
     def on_render(self, screen):
         screen.fill(config.SCHEME5)
+
+        pygame.draw.rect(screen, config.SCHEME2, (0, 0, config.SCREEN_WIDTH, 100))
         pygame.draw.rect(screen, config.SCHEME2, (0, 0, 300, config.SCREEN_HEIGHT))
+
+        pygame.draw.rect(screen, config.SCHEME5, (0, 100, 500, 20))
+
+        for elem in self.elements:
+            elem.on_render(screen)
 
         for comp in self.components:
             comp.on_render(screen)
