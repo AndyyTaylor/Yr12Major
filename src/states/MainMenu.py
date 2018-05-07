@@ -19,12 +19,12 @@ class MainMenu(State):
         w = 400
         h = 100
         self.elements = [
-            RoundedButton(50, 330, w, h, 3, config.BLACK, config.SCHEME2, lambda: self.parent.change_state("LevelSelector")),
-            Textbox(50, 330, w, h, "Resume", config.BLACK, 62),
-            RoundedButton(50, 450, w, h, 3, config.BLACK, config.SCHEME2, lambda: print("Not Implemented")),
-            Textbox(50, 450, w, h, "Load", config.BLACK, 62),
-            RoundedButton(50, 570, w, h, 3, config.BLACK, config.SCHEME2, lambda: print("Not Implemented")),
-            Textbox(50, 570, w, h, "About", config.BLACK, 62)
+            RoundedButton(50, 470, w, h, 3, config.BLACK, config.SCHEME2, lambda: self.parent.change_state("LevelSelector")),
+            Textbox(50, 470, w, h, "Resume", config.BLACK, 62),
+            RoundedButton(50, 590, w, h, 3, config.BLACK, config.SCHEME2, lambda: print("Not Implemented")),
+            Textbox(50, 590, w, h, "Load", config.BLACK, 62),
+            RoundedButton(50, 710, w, h, 3, config.BLACK, config.SCHEME2, lambda: print("Not Implemented")),
+            Textbox(50, 710, w, h, "About", config.BLACK, 62)
         ]
 
     def on_init(self):

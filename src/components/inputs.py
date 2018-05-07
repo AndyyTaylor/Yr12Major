@@ -5,6 +5,13 @@ from .component import Component
 from .component import Holder
 from .. import config
 from ..ui.Textbox import Textbox
+from src.ml.environments.game import *
+
+
+class Sample:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
 
 class ColorInput(Component):
@@ -12,6 +19,7 @@ class ColorInput(Component):
     def __init__(self, num_colors):
         super().__init__(0, 0, 200, 150)
         self.text = Textbox(self.x, self.y, self.w, 40, "Colour", config.SCHEME1, 32)
+        self.environment = ColorEnv(num_colors)
 
         self.colors = [config.RED, config.GREEN, config.BLUE, config.YELLOW, config.WHITE][:num_colors]
 

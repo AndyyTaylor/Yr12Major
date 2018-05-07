@@ -61,6 +61,10 @@ class RoundedButton(UIElement):
     def on_mouse_up(self, pos):
         pass
 
+    def on_mouse_down(self, pos):
+        if pygame.Rect(self.get_rect()).collidepoint(pos):
+            self.on_click()
+
     def on_click(self):
         if self.enabled:
             self.callback()

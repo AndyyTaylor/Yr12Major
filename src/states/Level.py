@@ -6,6 +6,7 @@ import pygame
 from .. import config
 from ..components import *
 from ..ml.environments.game import *
+from ..ui import RoundedButton
 
 
 class LevelState(State):
@@ -21,9 +22,14 @@ class LevelState(State):
         self.input = None
         self.output = None
         self.environment = None
+        self.playing = False
 
         self.elements.append(Textbox(0, 0, config.SCREEN_WIDTH, 100, "LEVEL 1", config.BLACK, 72))  # HARDCODED
         self.elements.append(Textbox(0, 130, 300, 50, "Components", config.BLACK, 36))
+
+        self.elements.append(RoundedButton(1360, 110, 70, 70, 3, config.BLACK, config.SCHEME2, lambda: print("Stop")))
+        self.elements.append(RoundedButton(1280, 110, 70, 70, 3, config.BLACK, config.SCHEME2, self.pause))
+        self.elements.append(RoundedButton(1200, 110, 70, 70, 3, config.BLACK, config.SCHEME2, self.play))
 
     def on_enter(self, data):
         print("Level " + str(data) + " entered")
@@ -38,7 +44,12 @@ class LevelState(State):
             cum_y += 50 + self.components[i].h
 
     def on_update(self, elapsed):
-        pass
+        for elem in self.elements:
+            elem.on_update(elapsed)
+
+        if self.playing:
+            print(self.input.environment.trainX.shape)
+            print(self.input.environment.testX.shape)
 
     def on_render(self, screen):
         screen.fill(config.SCHEME5)
@@ -51,12 +62,18 @@ class LevelState(State):
         for elem in self.connections + self.elements + self.components:
             elem.on_render(screen)
 
+    def play(self):
+        self.playing = True
+
+    def pause(self):
+        self.playing = False
+
     def on_mouse_down(self, event, pos):
-        for component in self.components:
+        for component in self.components + self.elements:
             component.on_mouse_down(pos)
 
     def on_mouse_motion(self, event, pos):
-        for component in self.components:
+        for component in self.components + self.elements:
             component.on_mouse_motion(pos)
 
     def on_mouse_up(self, event, pos):

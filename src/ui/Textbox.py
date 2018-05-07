@@ -33,3 +33,6 @@ class Textbox(UIElement):
 
     def on_mouse_up(self, pos):
         pass
+
+    def on_mouse_down(self, pos):
+        pass

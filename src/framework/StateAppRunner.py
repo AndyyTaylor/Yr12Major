@@ -21,7 +21,7 @@ class StateAppRunner():
     def __init__(self):
         pygame.init()
 
-        self.screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT), 0, 32)
+        self.screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
         pygame.display.set_caption("Andy's Machine Learning")
         self.last_update = datetime.datetime.now()
 
