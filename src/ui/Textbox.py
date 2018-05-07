@@ -30,3 +30,6 @@ class Textbox(UIElement):
         self.text_col = val
 
         self.rendered_text = self.font.render(self.text, True, self.text_col)
+
+    def on_mouse_up(self, pos):
+        pass

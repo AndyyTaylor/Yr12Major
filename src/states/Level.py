@@ -15,6 +15,7 @@ class LevelState(State):
         super().__init__("Level", "MasterState")
 
         self.components = []
+        self.connections = []
         self.elements = []
 
         self.input = None
@@ -47,11 +48,8 @@ class LevelState(State):
 
         pygame.draw.rect(screen, config.SCHEME5, (0, 100, 500, 20))
 
-        for elem in self.elements:
+        for elem in self.connections + self.elements + self.components:
             elem.on_render(screen)
-
-        for comp in self.components:
-            comp.on_render(screen)
 
     def on_mouse_down(self, event, pos):
         for component in self.components:
@@ -62,8 +60,18 @@ class LevelState(State):
             component.on_mouse_motion(pos)
 
     def on_mouse_up(self, event, pos):
+        input_holder = None
+        output_holder = None
         for component in self.components:
-            component.on_mouse_up(pos)
+            input, output = component.on_mouse_up(pos)
+
+            if input is not None:  # does this implicitly check if not none?
+                input_holder = input
+            if output is not None:
+                output_holder = output
+
+        if input_holder is not None and output_holder is not None:
+            self.connections.append(Connection(input_holder, output_holder))
 
     def load_level(self, level_num):
         if level_num == 1:

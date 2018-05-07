@@ -23,8 +23,8 @@ class MainMenu(State):
             Textbox(50, 330, w, h, "Resume", config.BLACK, 62),
             RoundedButton(50, 450, w, h, 3, config.BLACK, config.SCHEME2, lambda: print("Not Implemented")),
             Textbox(50, 450, w, h, "Load", config.BLACK, 62),
-            RoundedButton(40, 560, w+20, h+20, 3, config.BLACK, config.SCHEME2, lambda: print("Not Implemented")),
-            Textbox(40, 560, w+20, h+20, "About", config.BLACK, 74)
+            RoundedButton(50, 570, w, h, 3, config.BLACK, config.SCHEME2, lambda: print("Not Implemented")),
+            Textbox(50, 570, w, h, "About", config.BLACK, 62)
         ]
 
     def on_init(self):
@@ -40,7 +40,8 @@ class MainMenu(State):
         print("Intro state exited")
 
     def on_update(self, elapsed):
-        self.total_time += elapsed
+        for elem in self.elements:
+            elem.on_update(elapsed)
 
     def on_render(self, screen):
         pygame.draw.rect(screen, config.SCHEME5, (0, 0, config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
@@ -48,8 +49,14 @@ class MainMenu(State):
             elem.on_render(screen)
 
     def on_mouse_down(self, event, pos):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            for elem in self.elements:
-                if isinstance(elem, Button) and pygame.Rect(elem.get_rect()).collidepoint(pos):
-                    elem.on_click()
-                    return
+        for elem in self.elements:
+            if isinstance(elem, RoundedButton) and pygame.Rect(elem.get_rect()).collidepoint(pos):
+                elem.on_click()
+                return
+
+    def on_mouse_up(self, event, pos):
+        pass
+
+    def on_mouse_motion(self, event, pos):
+        for element in self.elements:
+            element.on_mouse_motion(pos)

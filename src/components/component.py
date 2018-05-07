@@ -10,18 +10,33 @@ class Holder(UIElement):
         super().__init__(x, y, w, h)
 
         self.clicked = False
+        self.hover = False
+        self.alphaCover = pygame.Surface((self.w, self.h))
+        self.alphaCover.set_alpha(128)
+        self.alphaCover.fill(config.WHITE)
 
     def on_mouse_down(self, pos):
-        self.clicked = Pygame.Rect(self.get_rect()).collidepoint(pos)
+        self.clicked = pygame.Rect(self.get_rect()).collidepoint(pos)
+        return self.clicked
+
+    def on_mouse_up(self, pos):
+        ret = self.clicked or pygame.Rect(self.get_rect()).collidepoint(pos)
+
+        self.clicked = False
+
+        return ret
 
     def on_mouse_motion(self, pos):
-        self.hover = Pygame.Rect(self.get_rect()).collidepoint(pos)
+        self.hover = pygame.Rect(self.get_rect()).collidepoint(pos)
 
     def on_render(self, screen):
         pygame.draw.rect(screen, config.SCHEME3, self.get_rect())
 
+        if self.hover or self.clicked:
+            screen.blit(self.alphaCover, (self.x, self.y))
+
     def on_update(self, elapsed):
-        return
+        pass
 
 
 class Component(UIElement):
@@ -46,7 +61,8 @@ class Component(UIElement):
         self.text = None
 
     def on_update(self, elapsed):
-        return
+        for holder in self.inputs + self.outputs:
+            holder.on_update(elapsed)
 
     def on_render(self, screen):
         self.draw_rounded_rect(screen, self.get_rect(), config.SCHEME4)
@@ -84,7 +100,13 @@ class Component(UIElement):
             self.inputs.append(Holder(*inp, self.slot_width, self.slot_height))
 
     def on_mouse_down(self, pos):
-        if pygame.Rect(self.get_rect()).collidepoint(pos):
+        clicked_holder = False
+        for holder in self.inputs + self.outputs:
+            clicked_holder = holder.on_mouse_down(pos)
+            if clicked_holder:
+                return
+
+        if not clicked_holder and pygame.Rect(self.get_rect()).collidepoint(pos):
             self.clicked = True
             self.mouse_offset_x = pos[0] - self.x
             self.mouse_offset_y = pos[1] - self.y
@@ -92,9 +114,24 @@ class Component(UIElement):
     def on_mouse_up(self, pos):
         self.clicked = False
 
+        input = None  # is this necessary
+        output = None
+        for holder in self.inputs:
+            if holder.on_mouse_up(pos):
+                input = holder
+
+        for holder in self.outputs:
+            if holder.on_mouse_up(pos):
+                output = holder
+
+        return input, output
+
     def on_mouse_motion(self, pos):
         if self.clicked:
             self.set_pos(pos[0] - self.mouse_offset_x, pos[1] - self.mouse_offset_y)
+
+        for holder in self.inputs + self.outputs:
+            holder.on_mouse_motion(pos)
 
     def draw_rounded_rect(self, surface, rect, color, radius=0.1):
         """

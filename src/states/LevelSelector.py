@@ -52,7 +52,8 @@ class LevelSelector(State):
                 return
 
     def on_mouse_up(self, event, pos):
-        return  # TODO proper clicking
+        for element in self.elements:
+            element.on_mouse_up(pos)
 
     def on_mouse_motion(self, event, pos):
         for element in self.elements:
