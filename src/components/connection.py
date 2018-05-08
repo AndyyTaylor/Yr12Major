@@ -15,11 +15,19 @@ class Connection(UIElement):
         self.data = []
 
     def on_update(self, elapsed):
-        if not self.data:
-            self.data.append(self.in_holder.take_data())
+        if not self.data and self.in_holder.has_data():
+            sample = self.in_holder.take_data()
+            sample.progress = 0
+            self.data.append(sample)
 
+        data_clone = self.data[:]
         for sample in self.data:
             sample.progress += 0.01
+            if sample.progress >= 1:
+                self.out_holder.add_data(sample)
+                data_clone.remove(sample)
+
+        self.data = data_clone
 
     def on_render(self, screen):
         pygame.draw.line(screen, config.GREEN, self.in_holder.get_center(), self.out_holder.get_center(), 5)

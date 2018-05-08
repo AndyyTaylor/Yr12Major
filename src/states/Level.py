@@ -1,4 +1,3 @@
-" Andy "
 from .AbstractState import State
 
 import pygame
@@ -36,6 +35,7 @@ class LevelState(State):
         self.load_level(data)
         self.components.append(self.input)
         self.components.append(self.output)
+        self.components.append(KNN())
 
         cum_y = 0
         for i in range(len(self.components)):
@@ -49,6 +49,9 @@ class LevelState(State):
         if self.playing:
             for conn in self.connections:
                 conn.on_update(elapsed)
+
+            for comp in self.components:
+                comp.on_update(elapsed)
 
     def on_render(self, screen):
         screen.fill(config.SCHEME5)
