@@ -15,6 +15,20 @@ class Holder(UIElement):
         self.alphaCover.set_alpha(128)
         self.alphaCover.fill(config.WHITE)
 
+        self.data = []
+
+    def on_update(self, elapsed):
+        pass
+
+    def add_data(self, data):
+        if isinstance(data, list):
+            self.data += data
+        else:
+            self.data.append(data)
+
+    def take_data(self):
+        return self.data.pop()
+
     def on_mouse_down(self, pos):
         self.clicked = pygame.Rect(self.get_rect()).collidepoint(pos)
         return self.clicked
@@ -34,9 +48,6 @@ class Holder(UIElement):
 
         if self.hover or self.clicked:
             screen.blit(self.alphaCover, (self.x, self.y))
-
-    def on_update(self, elapsed):
-        pass
 
 
 class Component(UIElement):

@@ -5,7 +5,7 @@ from .environment import Environment
 
 class ColorEnv(Environment):
 
-    def __init__(self, num_colors, num_samples=10):
+    def __init__(self, num_colors, num_samples=100):
         colors = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0], [1, 1, 1]]
 
         self.X = np.zeros((num_samples, 3))

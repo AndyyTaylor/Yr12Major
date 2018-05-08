@@ -21,7 +21,6 @@ class LevelState(State):
 
         self.input = None
         self.output = None
-        self.environment = None
         self.playing = False
 
         self.elements.append(Textbox(0, 0, config.SCREEN_WIDTH, 100, "LEVEL 1", config.BLACK, 72))  # HARDCODED
@@ -48,8 +47,8 @@ class LevelState(State):
             elem.on_update(elapsed)
 
         if self.playing:
-            print(self.input.environment.trainX.shape)
-            print(self.input.environment.testX.shape)
+            for conn in self.connections:
+                conn.on_update(elapsed)
 
     def on_render(self, screen):
         screen.fill(config.SCHEME5)
@@ -83,12 +82,12 @@ class LevelState(State):
             input, output = component.on_mouse_up(pos)
 
             if input is not None:  # does this implicitly check if not none?
-                input_holder = input
+                output_holder = input
             if output is not None:
-                output_holder = output
+                input_holder = output
 
         if input_holder is not None and output_holder is not None:
-            self.connections.append(Connection(input_holder, output_holder))
+            self.connections.append(Connection(input_holder, output_holder, self.input.render_data))
 
     def load_level(self, level_num):
         if level_num == 1:
