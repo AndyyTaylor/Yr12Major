@@ -68,6 +68,7 @@ class Component(UIElement):
         self.input_pos = []
         self.outputs = []
         self.output_pos = []
+        self.output_labels = []
 
         self.mouse_offset_x = None
         self.mouse_offset_y = None
@@ -81,11 +82,13 @@ class Component(UIElement):
     def on_render(self, screen):
         self.draw_rounded_rect(screen, self.get_rect(), config.SCHEME4)
 
-        for inp in self.inputs:
-            inp.on_render(screen)
+        for input in self.inputs:
+            input.on_render(screen)
 
-        for out in self.outputs:
-            out.on_render(screen)
+        for i, output in enumerate(self.outputs):
+            output.on_render(screen)
+            if i < len(self.output_labels):
+                self.render_data(screen, output.x + output.w/2, output.y + output.h/2, self.output_labels[i], 10)
 
     def set_pos(self, x, y):
         self.x = x

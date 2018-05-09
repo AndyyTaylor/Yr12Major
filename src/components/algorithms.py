@@ -9,14 +9,19 @@ from src.ml.agents import *
 
 class KNN(Component):
 
-    def __init__(self):
+    def __init__(self, labels, render_data):
         super().__init__(0, 0, 200, 150)
+        self.labels = labels
+        self.render_data = render_data
 
         self.text = Textbox(self.x, self.y, self.w, 40, "KNN", config.SCHEME1, 32)
-        self.algorithm = ClassificationKNN()
+        self.algorithm = ClassificationKNN(0)
 
         self.input_pos.append((self.x, self.y + self.h/2 - self.slot_height/2))
-        self.output_pos.append((self.x + self.w - self.slot_width, self.y + self.h/2 - self.slot_height/2))
+        slot_x = self.x + self.w - self.slot_width
+        for i, label in enumerate(labels):
+            self.output_pos.append((slot_x, self.y - self.slot_height/2 + self.h/(labels.shape[0]+1)*(i+1)))
+            self.output_labels.append(label)
 
         self.setup_inputs_and_outputs()
 

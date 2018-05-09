@@ -35,7 +35,7 @@ class LevelState(State):
         self.load_level(data)
         self.components.append(self.input)
         self.components.append(self.output)
-        self.components.append(KNN())
+        self.components.append(KNN(self.input.get_labels(), self.input.render_data))
 
         cum_y = 0
         for i in range(len(self.components)):

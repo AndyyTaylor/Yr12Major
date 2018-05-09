@@ -56,7 +56,13 @@ class ColorInput(Component):
 
         self.text.on_render(screen)
 
-    def render_data(self, screen, x, y, data):
-        label = int(data.y)
+    def render_data(self, screen, x, y, data, size=20):
+        if hasattr(data, 'y'):
+            label = int(data.y)
+        else:
+            label = int(data)
 
-        pygame.draw.circle(screen, self.colors[label-1], (x, y), 20)
+        pygame.draw.circle(screen, self.colors[label-1], (int(x), int(y)), size)
+
+    def get_labels(self):
+        return self.environment.get_labels()

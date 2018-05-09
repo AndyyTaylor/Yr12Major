@@ -17,4 +17,9 @@ class Environment():
         self.testX = X[int(np.ceil(m*cross_perc)):, :]
         self.testy = y[int(np.ceil(m*cross_perc)):]
 
+        self.labels = np.array(tuple(set(y)))
+
+    def get_labels(self):
+        return self.labels
+
     def on_render(self, screen): pass
