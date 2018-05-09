@@ -20,9 +20,16 @@ class Connection(UIElement):
             sample.progress = 0
             self.data.append(sample)
 
+        out_comp = self.out_holder.component
+        if hasattr(out_comp, 'get_avg_cool_down'):
+            travel_time = out_comp.get_avg_cool_down()
+            print(travel_time)
+        else:
+            travel_time = 1000
+
         data_clone = self.data[:]
         for sample in self.data:
-            sample.progress += 0.01
+            sample.progress += 1 * (elapsed / travel_time)
             if sample.progress >= 1:
                 self.out_holder.add_data(sample)
                 data_clone.remove(sample)

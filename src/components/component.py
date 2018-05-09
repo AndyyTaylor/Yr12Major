@@ -6,9 +6,10 @@ from .. import config
 
 class Holder(UIElement):
 
-    def __init__(self, x, y, w, h):
+    def __init__(self, x, y, w, h, component):
         super().__init__(x, y, w, h)
 
+        self.component = component
         self.clicked = False
         self.hover = False
         self.alphaCover = pygame.Surface((self.w, self.h))
@@ -111,10 +112,10 @@ class Component(UIElement):
 
     def setup_inputs_and_outputs(self):
         for out in self.output_pos:
-            self.outputs.append(Holder(*out, self.slot_width, self.slot_height))
+            self.outputs.append(Holder(*out, self.slot_width, self.slot_height, self))
 
         for inp in self.input_pos:
-            self.inputs.append(Holder(*inp, self.slot_width, self.slot_height))
+            self.inputs.append(Holder(*inp, self.slot_width, self.slot_height, self))
 
     def on_mouse_down(self, pos):
         clicked_holder = False
