@@ -2,6 +2,7 @@
 from .AbstractState import State
 
 import pygame
+import copy
 
 from .. import config
 from ..components import *
@@ -23,7 +24,7 @@ class LevelState(State):
         self.output = None
         self.playing = False
 
-        self.elements.append(Textbox(0, 0, config.SCREEN_WIDTH, 100, "LEVEL 1", config.BLACK, 72))  # HARDCODED
+        # self.elements.append(Textbox(0, 0, config.SCREEN_WIDTH, 100, "LEVEL 1", config.BLACK, 72))  # HARDCODED
         self.elements.append(Textbox(0, 130, 300, 50, "Components", config.BLACK, 36))
 
         self.elements.append(RoundedButton(1360, 110, 70, 70, 3, config.BLACK, config.SCHEME2, lambda: print("Stop")))
@@ -32,10 +33,12 @@ class LevelState(State):
 
     def on_enter(self, data):
         print("Level " + str(data) + " entered")
+        self.elements.append(Textbox(0, 0, config.SCREEN_WIDTH, 100, "LEVEL " + str(data), config.BLACK, 72))
 
         self.load_level(data)
         self.components.append(self.input)
         self.components.append(self.output)
+        self.components.append(Trash())
         self.components.append(KNN(self.input.get_labels(), self.input.render_data))
 
         cum_y = 0
@@ -80,7 +83,22 @@ class LevelState(State):
 
     def on_mouse_motion(self, event, pos):
         for component in self.components + self.elements:
-            component.on_mouse_motion(pos)
+            if isinstance(component, Component) and component.clicked and component.clone:
+                component.clicked = False
+                if isinstance(component, Algorithm):
+                    new_comp = component.__class__(self.input.get_labels(), self.input.render_data)
+                else:
+                    new_comp = component.__class__()
+                new_comp.clicked = True
+                new_comp.clone = False
+                new_comp.set_pos(*component.get_pos())
+                new_comp.mouse_offset_x = pos[0] - new_comp.x
+                new_comp.mouse_offset_y = pos[1] - new_comp.y
+
+                self.components.append(new_comp)
+                print("Cloned")
+            else:
+                component.on_mouse_motion(pos)
 
     def on_mouse_up(self, event, pos):
         input_holder = None
@@ -99,11 +117,9 @@ class LevelState(State):
     def load_level(self, level_num):
         if level_num == 1:
             self.input = ColorInput(2)
-            self.output = ColorOutput(2)
-            self.environment = ColorEnv(2)
+            self.output = ColorOutput(2, self.input.render_data)
         elif level_num == 2:
             self.input = ColorInput(3)
-            self.output = ColorOutput(3)
-            self.environment = ColorEnv(3)
+            self.output = ColorOutput(3, self.input.render_data)
         else:
             raise NotImplementedError("Don't got that level")

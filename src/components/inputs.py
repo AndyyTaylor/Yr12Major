@@ -18,7 +18,7 @@ class Sample:
 class ColorInput(Component):
 
     def __init__(self, num_colors):
-        super().__init__(0, 0, 200, 150)
+        super().__init__(0, 0, 200, 150, False)
         self.text = Textbox(self.x, self.y, self.w, 40, "Colour", config.SCHEME1, 32)
         self.environment = ColorEnv(num_colors)
 

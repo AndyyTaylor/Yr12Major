@@ -56,10 +56,10 @@ class Holder(UIElement):
 
 class Component(UIElement):
 
-    def __init__(self, x, y, w, h, draggable=True):
+    def __init__(self, x, y, w, h, clone=True):
         super().__init__(x, y, w, h)
 
-        self.draggable = draggable
+        self.clone = clone
         self.clicked = False
 
         self.slot_width = 40
@@ -67,6 +67,7 @@ class Component(UIElement):
 
         self.inputs = []
         self.input_pos = []
+        self.input_labels = []
         self.outputs = []
         self.output_pos = []
         self.output_labels = []
@@ -83,8 +84,10 @@ class Component(UIElement):
     def on_render(self, screen):
         self.draw_rounded_rect(screen, self.get_rect(), config.SCHEME4)
 
-        for input in self.inputs:
+        for i, input in enumerate(self.inputs):
             input.on_render(screen)
+            if i < len(self.input_labels):
+                self.render_data(screen, input.x + input.w/2, input.y + input.h/2, self.input_labels[i], 10)
 
         for i, output in enumerate(self.outputs):
             output.on_render(screen)
@@ -145,7 +148,7 @@ class Component(UIElement):
         return input, output
 
     def on_mouse_motion(self, pos):
-        if self.clicked:
+        if self.clicked and not self.clone:
             self.set_pos(pos[0] - self.mouse_offset_x, pos[1] - self.mouse_offset_y)
 
         for holder in self.inputs + self.outputs:

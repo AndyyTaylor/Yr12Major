@@ -21,6 +21,9 @@ class UIElement(metaclass=abc.ABCMeta):
     def on_mouse_motion(self, pos):
         return
 
+    def get_pos(self):
+        return (self.x, self.y)
+
     def get_rect(self):
         return (self.x, self.y, self.w, self.h)
 

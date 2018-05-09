@@ -8,7 +8,11 @@ from .component import Component
 from src.ml.agents import *
 
 
-class KNN(Component):
+class Algorithm(Component):
+    pass
+
+
+class KNN(Algorithm):
 
     def __init__(self, labels, render_data):
         super().__init__(0, 0, 200, 150)
