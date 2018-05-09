@@ -1,3 +1,4 @@
+
 from .AbstractState import State
 
 import pygame
@@ -66,6 +67,9 @@ class LevelState(State):
 
     def play(self):
         self.playing = True
+
+        for comp in self.components:
+            comp.train(*self.input.get_train_data())
 
     def pause(self):
         self.playing = False

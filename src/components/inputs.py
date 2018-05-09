@@ -64,5 +64,8 @@ class ColorInput(Component):
 
         pygame.draw.circle(screen, self.colors[label-1], (int(x), int(y)), size)
 
+    def get_train_data(self):
+        return (self.environment.trainX, self.environment.trainy)
+
     def get_labels(self):
         return self.environment.get_labels()

@@ -11,7 +11,7 @@ from scipy.spatial import distance
 class KNN():
     def __init__(self, _, k=4):  # in knn we don't care about the number of features
         # self.k_determined = (k is not None)
-
+        #
         # if k is None:
         #     self.k = 1
         # else:

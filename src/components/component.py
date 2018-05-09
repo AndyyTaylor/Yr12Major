@@ -150,6 +150,9 @@ class Component(UIElement):
         for holder in self.inputs + self.outputs:
             holder.on_mouse_motion(pos)
 
+    def train(self, trainX, trainy):
+        pass
+
     def draw_rounded_rect(self, surface, rect, color, radius=0.1):
         """
         AAfilledRoundedRect(surface,rect,color,radius=0.4)

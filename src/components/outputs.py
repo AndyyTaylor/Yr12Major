@@ -13,9 +13,23 @@ class ColorOutput(Component):
 
         self.input_pos.append((self.x, self.y + self.h/2 - self.slot_height/2))
 
+        self.correct = 0
+        self.total = 0
+
         self.setup_inputs_and_outputs()
+
+    def on_update(self, elapsed):
+        in_holder = self.inputs[0]
+        if in_holder.has_data():
+            sample = in_holder.take_data()
+            if sample.y == 0:
+                self.correct += 1
+            self.total += 1
 
     def on_render(self, screen):
         super().on_render(screen)
 
+        if self.total > 0:
+            perc = Textbox(self.x, self.y + 50, self.w, 40, str(int(self.correct / self.total * 100)) + "%", config.SCHEME1, 32)
+            perc.on_render(screen)
         self.text.on_render(screen)

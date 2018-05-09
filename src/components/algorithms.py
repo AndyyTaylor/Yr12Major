@@ -25,6 +25,9 @@ class KNN(Component):
 
         self.setup_inputs_and_outputs()
 
+    def train(self, trainX, trainy):
+        self.algorithm.train(trainX, trainy)
+
     def on_render(self, screen):
         super().on_render(screen)
 
@@ -36,4 +39,6 @@ class KNN(Component):
         in_holder = self.inputs[0]
         out_holder = self.outputs[0]
         if in_holder.has_data():
-            out_holder.add_data(in_holder.take_data())
+            sample = in_holder.take_data()
+            predicted_label = int(self.algorithm.predict(np.array([sample.x])))
+            self.outputs[predicted_label].add_data(sample)
