@@ -28,8 +28,11 @@ class LevelState(State):
         self.elements.append(Textbox(0, 130, 300, 50, "Components", config.BLACK, 36))
 
         self.elements.append(RoundedButton(1360, 110, 70, 70, 3, config.BLACK, config.SCHEME2, lambda: print("Stop")))
+        self.elements.append(Image(1380, 130, 30, 30, "data/assets/stop.png"))
         self.elements.append(RoundedButton(1280, 110, 70, 70, 3, config.BLACK, config.SCHEME2, self.pause))
+        self.elements.append(Image(1300, 130, 30, 30, "data/assets/pause.png"))
         self.elements.append(RoundedButton(1200, 110, 70, 70, 3, config.BLACK, config.SCHEME2, self.play))
+        self.elements.append(Image(1220, 130, 30, 30, "data/assets/play.png"))
 
     def on_enter(self, data):
         print("Level " + str(data) + " entered")
