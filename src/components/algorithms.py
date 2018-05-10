@@ -9,13 +9,9 @@ from src.ml.agents import *
 
 
 class Algorithm(Component):
-    pass
 
-
-class KNN(Algorithm):
-
-    def __init__(self, labels, render_data):
-        super().__init__(0, 0, 200, 150)
+    def __init__(self, x, y, w, h, title, labels, render_data):
+        super().__init__(x, y, w, h)
         self.labels = labels
         self.render_data = render_data
 
@@ -24,10 +20,9 @@ class KNN(Algorithm):
         self.avg_cool_down = 0
         self.total_runs = 0
 
-        self.text = Textbox(self.x, self.y, self.w, 40, "KNN", config.SCHEME1, 32)
-        self.algorithm = ClassificationKNN(0)
-
+        self.text = Textbox(self.x, self.y, self.w, 40, title, config.SCHEME1, 32)
         self.input_pos.append((self.x, self.y + self.h/2 - self.slot_height/2))
+
         slot_x = self.x + self.w - self.slot_width
         for i, label in enumerate(labels):
             self.output_pos.append((slot_x, self.y - self.slot_height/2 + self.h/(labels.shape[0]+1)*(i+1)))
@@ -73,3 +68,18 @@ class KNN(Algorithm):
         if self.total_runs == 0:
             return 1000
         return self.avg_cool_down / self.total_runs
+
+
+class KNN(Algorithm):
+
+    def __init__(self, labels, render_data):
+        super().__init__(0, 0, 200, 150, "KNN", labels, render_data)
+
+        self.algorithm = ClassificationKNN(0)
+
+
+class NaiveBayes(Algorithm):
+    def __init__(self, labels, render_data):
+        super().__init__(0, 0, 200, 150, "NBayes", labels, render_data)
+
+        self.algorithm = Bayes()

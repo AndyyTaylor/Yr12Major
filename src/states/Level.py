@@ -39,12 +39,13 @@ class LevelState(State):
         self.components.append(self.input)
         self.components.append(self.output)
         self.components.append(Trash())
+        self.components.append(NaiveBayes(self.input.get_labels(), self.input.render_data))
         self.components.append(KNN(self.input.get_labels(), self.input.render_data))
 
-        cum_y = 0
+        cum_y = 20
         for i in range(len(self.components)):
             self.components[i].set_pos(50, 180 + cum_y)
-            cum_y += 50 + self.components[i].h
+            cum_y += 10 + self.components[i].h
 
     def on_update(self, elapsed):
         for elem in self.elements:
