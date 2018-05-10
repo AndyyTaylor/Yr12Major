@@ -36,7 +36,7 @@ class Algorithm(Component):
     def on_render(self, screen):
         super().on_render(screen)
 
-        if self.total_runs > 0:
+        if self.total_runs > 1:
             pygame.draw.rect(screen, config.YELLOW, (self.x + 50, self.y + 35, int((self.w - 100) * (self.cool_down / self.max_cool_down)), 5))
         self.text.on_render(screen)
 
@@ -57,7 +57,8 @@ class Algorithm(Component):
             predicted_label = int(self.algorithm.predict(structured_sample))
             t1 = time.clock()
 
-            self.cool_down = (t1 - t0) * config.COOLDOWN_MODIFIER
+            if self.total_runs > 0:
+                self.cool_down = (t1 - t0) * config.COOLDOWN_MODIFIER
             self.max_cool_down = max(self.max_cool_down, self.cool_down)
             self.avg_cool_down += self.cool_down
             self.total_runs += 1
@@ -65,7 +66,7 @@ class Algorithm(Component):
             self.outputs[predicted_label].add_data(sample)
 
     def get_avg_cool_down(self):
-        if self.total_runs == 0:
+        if self.total_runs < 2:
             return 1000
         return self.avg_cool_down / self.total_runs
 

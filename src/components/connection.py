@@ -23,7 +23,6 @@ class Connection(UIElement):
         out_comp = self.out_holder.component
         if hasattr(out_comp, 'get_avg_cool_down'):
             travel_time = out_comp.get_avg_cool_down()
-            print(travel_time)
         else:
             travel_time = 1000
 
