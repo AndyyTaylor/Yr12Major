@@ -1,6 +1,7 @@
 
 import pygame
 import numpy as np
+from .algorithms import Algorithm
 from ..ui.UIElement import UIElement
 from .. import config
 
@@ -15,7 +16,7 @@ class Connection(UIElement):
         self.data = []
 
     def on_update(self, elapsed):
-        if not self.data and self.in_holder.has_data():
+        if (not self.data or not isinstance(self.out_holder.component, Algorithm)) and self.in_holder.has_data():
             sample = self.in_holder.take_data()
             sample.progress = 0
             self.data.append(sample)
@@ -44,6 +45,9 @@ class Connection(UIElement):
         for sample in self.data:
             pos = tuple(np.add(start_pos, np.multiply(travel, sample.progress)))
             self.render_data(screen, int(pos[0]), int(pos[1]), self.data[0])
+
+    def has_data(self):
+        return len(self.data) > 0  # This could be implicit, but this is more readable
 
     def on_mouse_motion(self, pos):
         pass

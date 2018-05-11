@@ -22,6 +22,9 @@ class UIElement(metaclass=abc.ABCMeta):
     def on_mouse_motion(self, pos):
         return
 
+    def reset_animation(self):
+        return
+
     def get_pos(self):
         return (self.x, self.y)
 

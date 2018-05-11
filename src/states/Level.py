@@ -23,8 +23,8 @@ class LevelState(State):
         self.input = None
         self.output = None
         self.playing = False
+        self.past_level = None
 
-        # self.elements.append(Textbox(0, 0, config.SCREEN_WIDTH, 100, "LEVEL 1", config.BLACK, 72))  # HARDCODED
         self.elements.append(Textbox(0, 130, 300, 50, "Components", config.BLACK, 36))
 
         self.elements.append(RoundedButton(1360, 110, 70, 70, 3, config.BLACK, config.SCHEME2, lambda: print("Stop")))
@@ -35,20 +35,25 @@ class LevelState(State):
         self.elements.append(Image(1220, 130, 30, 30, "data/assets/play.png"))
 
     def on_enter(self, data):
-        print("Level " + str(data) + " entered")
-        self.elements.append(Textbox(0, 0, config.SCREEN_WIDTH, 100, "LEVEL " + str(data), config.BLACK, 72))
+        assert isinstance(data, int)
 
-        self.load_level(data)
-        self.components.append(self.input)
-        self.components.append(self.output)
-        self.components.append(Trash())
-        self.components.append(NaiveBayes(self.input.get_labels(), self.input.render_data))
-        self.components.append(KNN(self.input.get_labels(), self.input.render_data))
+        if self.past_level is None or self.past_level != data:
+            self.past_level = data
+            self.playing = False
 
-        cum_y = 20
-        for i in range(len(self.components)):
-            self.components[i].set_pos(50, 180 + cum_y)
-            cum_y += 10 + self.components[i].h
+            if self.past_level is not None:
+                self.elements.pop()  # The last 'element' should always be the level title
+            self.elements.append(Textbox(0, 0, config.SCREEN_WIDTH, 100, "LEVEL " + str(data), config.BLACK, 72))
+
+            self.components = []
+            self.connections = []
+            self.load_level(data)
+            self.load_components()
+
+            cum_y = 20
+            for i in range(len(self.components)):
+                self.components[i].set_pos(50, 180 + cum_y)
+                cum_y += 10 + self.components[i].h
 
     def on_update(self, elapsed):
         for elem in self.elements:
@@ -60,6 +65,18 @@ class LevelState(State):
 
             for comp in self.components:
                 comp.on_update(elapsed)
+
+            if self.game_finished():
+                config.MAX_LEVEL += 1
+                self.parent.change_state("LevelSelector")
+
+    def game_finished(self):
+        # Game is finished if everything is empty
+        for c in self.connections + self.components:
+            if c.has_data():
+                return False
+
+        return True
 
     def on_render(self, screen):
         screen.fill(config.SCHEME5)
@@ -87,20 +104,10 @@ class LevelState(State):
 
     def on_mouse_motion(self, event, pos):
         for component in self.components + self.elements:
-            if isinstance(component, Component) and component.clicked and component.clone:
+            if isinstance(component, Component) and component.clicked and component.cloneable:
                 component.clicked = False
-                if isinstance(component, Algorithm):
-                    new_comp = component.__class__(self.input.get_labels(), self.input.render_data)
-                else:
-                    new_comp = component.__class__()
-                new_comp.clicked = True
-                new_comp.clone = False
-                new_comp.set_pos(*component.get_pos())
-                new_comp.mouse_offset_x = pos[0] - new_comp.x
-                new_comp.mouse_offset_y = pos[1] - new_comp.y
 
-                self.components.append(new_comp)
-                print("Cloned")
+                self.components.append(component.clone(pos, self.input.get_labels(), self.input.render_data))
             else:
                 component.on_mouse_motion(pos)
 
@@ -118,12 +125,22 @@ class LevelState(State):
         if input_holder is not None and output_holder is not None:
             self.connections.append(Connection(input_holder, output_holder, self.input.render_data))
 
+    def load_components(self):
+        self.components.append(self.input)
+        self.components.append(self.output)
+        self.components.append(Trash())
+        self.components.append(NaiveBayes(self.input.get_labels(), self.input.render_data))
+        self.components.append(KNN(self.input.get_labels(), self.input.render_data))
+
     def load_level(self, level_num):
         if level_num == 1:
             self.input = ColorInput(2)
-            self.output = ColorOutput(2, self.input.render_data)
+            self.output = Output(0, self.input.render_data)
         elif level_num == 2:
             self.input = ColorInput(3)
-            self.output = ColorOutput(3, self.input.render_data)
+            self.output = Output(1, self.input.render_data)
+        elif level_num == 3:
+            self.input = ShapeInput(4)
+            self.output = Output(4, self.input.render_data)
         else:
             raise NotImplementedError("Don't got that level")

@@ -65,6 +65,9 @@ class RoundedButton(UIElement):
         if pygame.Rect(self.get_rect()).collidepoint(pos):
             self.on_click()
 
+    def reset_animation(self):
+        self.hover_time = 0
+
     def on_click(self):
         if self.enabled:
             self.callback()

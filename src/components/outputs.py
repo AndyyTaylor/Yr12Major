@@ -5,16 +5,19 @@ from .. import config
 from ..ui.Textbox import Textbox
 
 
-class ColorOutput(Component):
-    def __init__(self, num_colors, render_data):
+class Output(Component):
+    def __init__(self, label, render_data):
         super().__init__(0, 0, 200, 150, False)
+
+        self.label = label
+        self.render_data = render_data
 
         self.render_data = render_data
 
         self.text = Textbox(self.x, self.y, self.w, 40, "OUT", config.SCHEME1, 32)
 
         self.input_pos.append((self.x, self.y + self.h/2 - self.slot_height/2))
-        self.input_labels.append(0)
+        self.input_labels.append(label)
 
         self.correct = 0
         self.total = 0
@@ -25,7 +28,7 @@ class ColorOutput(Component):
         in_holder = self.inputs[0]
         if in_holder.has_data():
             sample = in_holder.take_data()
-            if sample.y == 0:
+            if sample.y == self.label:
                 self.correct += 1
             self.total += 1
 
@@ -38,6 +41,15 @@ class ColorOutput(Component):
         self.text.on_render(screen)
 
 
+# class ColorOutput(Output):
+#     def __init__(self, num_colors, render_data):
+#         super().__init__(0, 0, 200, 150, 0, render_data)
+#
+#
+# class ShapeOutput(Output):
+#     def __init__(self, num_shapes, render_data):
+
+
 class Trash(Component):
 
     def __init__(self):
@@ -46,6 +58,10 @@ class Trash(Component):
 
         self.input_pos.append((self.x, self.y + self.h/2 - self.slot_height/2))
         self.setup_inputs_and_outputs()
+
+    def on_update(self, elapsed):
+        while self.has_data():
+            self.inputs[0].take_data()
 
     def on_render(self, screen):
         super().on_render(screen)

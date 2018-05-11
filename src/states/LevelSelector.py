@@ -22,16 +22,23 @@ class LevelSelector(State):
 
         num_boxes_per_row = 6
         self.gap_size = int(((config.SCREEN_WIDTH - self.x_margin*2) - num_boxes_per_row * self.box_width) / (num_boxes_per_row-1))
-        print(self.gap_size)
         self.elements = []
 
-        level_num = 1
-        for yy in range(self.y_margin, config.SCREEN_HEIGHT, self.box_height + self.gap_size):
-            for xx in range(self.x_margin, config.SCREEN_WIDTH - self.x_margin, self.box_width + self.gap_size):
-                self.create_level_button(xx, yy, level_num)
-                level_num += 1
+        self.past_level = config.MAX_LEVEL
+        self.create_level_buttons()
+        self.create_title()
 
-        self.elements.append(Textbox(0, 0, config.SCREEN_WIDTH, 100, "Level Selection", config.BLACK, 72))
+    def on_enter(self, data):
+        print("Selector entered")
+        if self.past_level != config.MAX_LEVEL:
+            self.past_level = config.MAX_LEVEL
+
+            self.elements = []
+            self.create_level_buttons()
+            self.create_title()
+        else:
+            for element in self.elements:
+                element.reset_animation()
 
     def on_update(self, elapsed):
         for element in self.elements:
@@ -59,6 +66,13 @@ class LevelSelector(State):
         for element in self.elements:
             element.on_mouse_motion(pos)
 
+    def create_level_buttons(self):
+        level_num = 1
+        for yy in range(self.y_margin, config.SCREEN_HEIGHT, self.box_height + self.gap_size):
+            for xx in range(self.x_margin, config.SCREEN_WIDTH - self.x_margin, self.box_width + self.gap_size):
+                self.create_level_button(xx, yy, level_num)
+                level_num += 1
+
     def create_level_button(self, x, y, level_num):
         button = RoundedButton(x, y, self.box_width, self.box_height, self.box_border, config.SCHEME4, config.SCHEME3, lambda: self.parent.change_state("Level", level_num))
         if level_num > config.MAX_LEVEL:
@@ -66,3 +80,6 @@ class LevelSelector(State):
 
         self.elements.append(button)
         self.elements.append(Textbox(x, y, self.box_width, self.box_height, str(level_num), config.SCHEME1, 72))
+
+    def create_title(self):
+        self.elements.append(Textbox(0, 0, config.SCREEN_WIDTH, 100, "Level Selection", config.BLACK, 72))

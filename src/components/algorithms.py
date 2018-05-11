@@ -14,6 +14,7 @@ class Algorithm(Component):
         super().__init__(x, y, w, h)
         self.labels = labels
         self.render_data = render_data
+        self.isalgorithm = True
 
         self.cool_down = 0
         self.max_cool_down = 0

@@ -56,11 +56,12 @@ class Holder(UIElement):
 
 class Component(UIElement):
 
-    def __init__(self, x, y, w, h, clone=True):
+    def __init__(self, x, y, w, h, cloneable=True):
         super().__init__(x, y, w, h)
 
-        self.clone = clone
+        self.cloneable = cloneable
         self.clicked = False
+        self.isalgorithm = False
 
         self.slot_width = 40
         self.slot_height = 30
@@ -148,11 +149,32 @@ class Component(UIElement):
         return input, output
 
     def on_mouse_motion(self, pos):
-        if self.clicked and not self.clone:
+        if self.clicked and not self.cloneable:
             self.set_pos(pos[0] - self.mouse_offset_x, pos[1] - self.mouse_offset_y)
 
         for holder in self.inputs + self.outputs:
             holder.on_mouse_motion(pos)
+
+    def clone(self, mpos, labels, render_data):
+        if self.isalgorithm:
+            new_comp = self.__class__(labels, render_data)
+        else:
+            new_comp = self.__class__()
+
+        new_comp.clicked = True
+        new_comp.cloneable = False
+        new_comp.set_pos(*self.get_pos())
+        new_comp.mouse_offset_x = mpos[0] - new_comp.x
+        new_comp.mouse_offset_y = mpos[1] - new_comp.y
+
+        return new_comp
+
+    def has_data(self):
+        for holder in self.inputs + self.outputs:
+            if holder.has_data():
+                return True
+
+        return False
 
     def train(self, trainX, trainy):
         pass
