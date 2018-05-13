@@ -38,12 +38,14 @@ class LevelState(State):
         assert isinstance(data, int)
 
         if self.past_level is None or self.past_level != data:
+            if self.past_level is not None:
+                self.elements.pop()  # The last 'element' should always be the level title
+
             self.past_level = data
             self.playing = False
 
-            if self.past_level is not None:
-                self.elements.pop()  # The last 'element' should always be the level title
-            self.elements.append(Textbox(0, 0, config.SCREEN_WIDTH, 100, "LEVEL " + str(data), config.BLACK, 72))
+            self.elements.append(Textbox(0, 0, config.SCREEN_WIDTH, 100,
+                                         "LEVEL " + str(data), config.BLACK, 72))
 
             self.components = []
             self.connections = []
