@@ -2,8 +2,10 @@
 import pygame
 
 from src import config
-from ..elements import RoundedButton
 from ..elements import Textbox
+from ..elements import Rectangle
+from ..screen_components import Button
+from ..screen_components import Header
 from .screen import Screen
 
 
@@ -22,7 +24,7 @@ class LevelSelector(Screen):
 
         num_boxes_per_row = 6
         self.gap_size = int(((config.SCREEN_WIDTH - self.x_margin*2) - num_boxes_per_row * self.box_width) / (num_boxes_per_row-1))
-        self.elements = []
+        self.components = []
 
         self.past_level = config.MAX_LEVEL
         self.create_level_buttons()
@@ -31,46 +33,37 @@ class LevelSelector(Screen):
         self.fps = Textbox(1300, 10, 140, 80, "00", config.BLACK, 72)
 
     def on_enter(self, data, screen):
-        print("Selector entered")
+        super().on_enter(data, screen)
+        # pygame.draw.rect(screen, config.SCHEME2, (0, 200, config.SCREEN_WIDTH, 100))
         if self.past_level != config.MAX_LEVEL:
             self.past_level = config.MAX_LEVEL
 
-            self.elements = []
+            self.components = []
             self.create_level_buttons()
             self.create_title()
         else:
-            for element in self.elements:
-                element.reset_animation()
+            for comp in self.components:
+                comp.reset_animation()
 
     def on_update(self, elapsed):
-        for element in self.elements:
-            element.on_update(elapsed)
-
-        self.fps.set_text(str(int(1000 / elapsed)))
+        super().on_update(elapsed)
 
     def on_render(self, screen):
-        screen.fill(config.SCHEME5)
-
-        pygame.draw.rect(screen, config.SCHEME2, (0, 0, config.SCREEN_WIDTH, 100))
-
-        for element in self.elements:
-            element.on_render(screen)
-
-        self.fps.on_render(screen)
+        super().on_render(screen)
 
     def on_mouse_down(self, event, pos):
-        for element in self.elements:
-            if isinstance(element, RoundedButton) and pygame.Rect(element.get_rect()).collidepoint(pos):
-                element.on_click()
+        for comp in self.components:
+            if isinstance(comp, Button) and pygame.Rect(comp.get_rect()).collidepoint(pos):
+                comp.on_click()
                 return
 
     def on_mouse_up(self, event, pos):
-        for element in self.elements:
-            element.on_mouse_up(pos)
+        for comp in self.components:
+            comp.on_mouse_up(pos)
 
     def on_mouse_motion(self, event, pos):
-        for element in self.elements:
-            element.on_mouse_motion(pos)
+        for comp in self.components:
+            comp.on_mouse_motion(pos)
 
     def create_level_buttons(self):
         level_num = 1
@@ -80,12 +73,20 @@ class LevelSelector(Screen):
                 level_num += 1
 
     def create_level_button(self, x, y, level_num):
-        button = RoundedButton(x, y, self.box_width, self.box_height, self.box_border, config.SCHEME4, config.SCHEME3, lambda: self.parent.change_state("Level", level_num))
+        button = Button.create_rounded_button(
+                    x, y, self.box_width, self.box_height,
+                    config.SCHEME4, config.SCHEME3, self.box_border,
+                    str(level_num), config.SCHEME1, 72,
+                    lambda: self.parent.change_state("Level", level_num)
+                 )
+
         if level_num > config.MAX_LEVEL:
             button.disable()
 
-        self.elements.append(button)
-        self.elements.append(Textbox(x, y, self.box_width, self.box_height, str(level_num), config.SCHEME1, 72))
+        self.components.append(button)
 
     def create_title(self):
-        self.elements.append(Textbox(0, 0, config.SCREEN_WIDTH, 100, "Level Selection", config.BLACK, 72))
+        self.components.append(Header.create_rectangle_header(
+                                0, 0, config.SCREEN_WIDTH, 100, config.SCHEME2,
+                                "Level Selection", config.BLACK, 72)
+                              )

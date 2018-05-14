@@ -21,6 +21,12 @@ class UIElement():
     def on_mouse_motion(self, pos):
         return
 
+    def on_mouse_up(self, pos):
+        return
+
+    def on_mouse_down(self, pos):
+        return
+
     def reset_animation(self):
         return
 
@@ -29,6 +35,9 @@ class UIElement():
 
     def get_pos(self):
         return (self.x, self.y)
+
+    def get_size(self):
+        return (self.w, self.h)
 
     def get_rect(self):
         return (self.x, self.y, self.w, self.h)

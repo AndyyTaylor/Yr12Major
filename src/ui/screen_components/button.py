@@ -19,6 +19,7 @@ class Button(ScreenComponent):
             front_shape,
             textbox
         ]
+        self.disabled_cover = RoundedRect(*back_shape.get_rect(), config.BLACK)
 
         self.hover = False
         self.hover_time = 0
@@ -54,7 +55,10 @@ class Button(ScreenComponent):
             elem.on_render(screen, animation_progress=animation_progress)
 
         if not self.enabled:
-            self.draw_rounded_rect(screen, (self.x, self.y, self.w, self.h), (*config.BLACK, 50), 2)
+            s = pygame.Surface(self.disabled_cover.get_size())
+            s.set_alpha(128)
+            self.disabled_cover.on_render(s)
+            screen.blit(s, self.get_pos())
 
     def on_mouse_motion(self, pos):
         self.hover = pygame.Rect(self.get_rect()).collidepoint(pos)

@@ -18,7 +18,6 @@ class ScreenComponent(UIElement):
     def on_render(self, screen):
         surf = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
 
-
         if self.x_shift != 0 or self.y_shift != 0:
             max_width = surf.get_width() + abs(self.x_shift)
             max_heigth = surf.get_height() + abs(self.y_shift)
@@ -30,6 +29,7 @@ class ScreenComponent(UIElement):
             self._on_render(surf)
 
         screen.blit(surf, (self.x, self.y))
+        self.changed = False
 
     def on_scroll_wheel(self, direction):
         if self.scrollable:
