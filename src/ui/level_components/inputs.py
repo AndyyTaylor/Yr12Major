@@ -3,8 +3,8 @@ import pygame
 import numpy as np
 from .component import Component
 from .component import Holder
-from .. import config
-from ..ui.Textbox import Textbox
+from src import config
+from src.ui.elements import *
 from src.ml.environments.game import *
 
 

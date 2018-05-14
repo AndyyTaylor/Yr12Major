@@ -1,7 +1,7 @@
 
 import pygame
-from ..ui.UIElement import UIElement
-from .. import config
+from ..uielement import UIElement
+from src import config
 
 
 class Holder(UIElement):

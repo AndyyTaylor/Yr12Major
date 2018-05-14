@@ -1,11 +1,12 @@
 
 import pygame
 import time
-from ..ui.UIElement import UIElement
-from ..ui import *
-from .. import config
+from ..uielement import UIElement
+from .. import *
+from src import config
 from .component import Component
 from src.ml.agents import *
+from src.ui.elements import *
 
 
 class Algorithm(Component):

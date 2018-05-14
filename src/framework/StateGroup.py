@@ -1,10 +1,10 @@
 " doc "
 
 from ..framework.StateRegistry import StateRegistry
-from ..states.AbstractState import State
+from ..ui.screens.screen import Screen
 
 
-class StateGroup(State):
+class StateGroup(Screen):
     " doc "
 
     def __init__(self, name, parent=False):
@@ -36,7 +36,7 @@ class StateGroup(State):
         self.state_stack = []
 
         if name in self.children:
-            self.children[name].on_enter(StateRegistry.instance().pop_stack())
+            self.children[name].on_enter(*StateRegistry.instance().pop_stack())
             self.state_stack.append(self.children[name])
         else:
             self.parent.change_state(name)

@@ -1,8 +1,8 @@
 
 import pygame
 from .component import Component
-from .. import config
-from ..ui.Textbox import Textbox
+from src import config
+from src.ui.elements import *
 
 
 class Output(Component):

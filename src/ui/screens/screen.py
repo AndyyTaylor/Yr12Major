@@ -1,9 +1,8 @@
-" Andy "
 
-from ..framework.StateRegistry import StateRegistry
+from src.framework.StateRegistry import StateRegistry
 
 
-class State():
+class Screen():
     " The abstract class that all states inherit "
 
     def __init__(self, name, parent):
@@ -18,7 +17,7 @@ class State():
         " Called when the application is closed "
         return
 
-    def on_enter(self, data):
+    def on_enter(self, data, screen):
         " Called when the state is entered "
         return
 
@@ -45,8 +44,3 @@ class State():
 
     def on_mouse_down(self, event, pos):
         return
-
-    # @abc.abstractmethod
-    # def on_mouse_down(self, pos):
-    #     " Passed the mouse position "
-    #     return

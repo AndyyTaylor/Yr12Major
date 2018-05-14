@@ -1,8 +1,8 @@
 " Andy "
-from .AbstractState import State
+from .screen import Screen
 
 
-class IntroState(State):
+class IntroState(Screen):
     " A "
 
     def __init__(self):
@@ -16,7 +16,7 @@ class IntroState(State):
     def on_shutdown(self):
         print("Application closed.")
 
-    def on_enter(self, data):
+    def on_enter(self, data, screen):
         print("Intro state entered")
 
     def on_exit(self):

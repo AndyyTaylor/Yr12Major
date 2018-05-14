@@ -1,8 +1,7 @@
 " Andy "
-import abc
 
 
-class UIElement(metaclass=abc.ABCMeta):
+class UIElement():
     " This class is inherited by all ui elements "
 
     def __init__(self, x, y, w, h):
@@ -11,19 +10,22 @@ class UIElement(metaclass=abc.ABCMeta):
         self.w = w
         self.h = h
 
-    @abc.abstractmethod
+        self.changed = True
+
     def on_update(self, elapsed):
         pass
 
-    @abc.abstractmethod
     def on_render(self, screen):
-        pass
+        self.changed = False
 
     def on_mouse_motion(self, pos):
         return
 
     def reset_animation(self):
         return
+
+    def has_changed(self):
+        return self.changed
 
     def get_pos(self):
         return (self.x, self.y)

@@ -36,7 +36,10 @@ class StateRegistry():
         self.data_stack.append(data)
 
     def pop_stack(self):
-        return self.data_stack.pop()
+        return self.data_stack.pop(), self.screen
+
+    def set_screen(self, screen):
+        self.screen = screen
 
     @staticmethod
     def instance():

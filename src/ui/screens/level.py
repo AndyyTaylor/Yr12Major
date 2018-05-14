@@ -1,16 +1,16 @@
 
-from .AbstractState import State
+from .screen import Screen
 
 import pygame
 import copy
 
-from .. import config
-from ..components import *
-from ..ml.environments.game import *
-from ..ui import RoundedButton
+from src import config
+from src.ui.level_components import *
+from src.ml.environments.game import *
+from ..elements import *
 
 
-class LevelState(State):
+class LevelState(Screen):
     " A "
 
     def __init__(self):
@@ -34,7 +34,9 @@ class LevelState(State):
         self.elements.append(RoundedButton(1200, 110, 70, 70, 3, config.BLACK, config.SCHEME2, self.play))
         self.elements.append(Image(1220, 130, 30, 30, "data/assets/play.png"))
 
-    def on_enter(self, data):
+        self.fps = Textbox(1300, 10, 140, 80, "00", config.BLACK, 72)
+
+    def on_enter(self, data, screen):
         assert isinstance(data, int)
 
         if self.past_level is None or self.past_level != data:
@@ -72,6 +74,8 @@ class LevelState(State):
                 config.MAX_LEVEL += 1
                 self.parent.change_state("LevelSelector")
 
+        self.fps.set_text(str(int(1000 / elapsed)))
+
     def game_finished(self):
         # Game is finished if everything is empty
         for c in self.connections + self.components:
@@ -90,6 +94,8 @@ class LevelState(State):
 
         for elem in self.connections + self.elements + self.components:
             elem.on_render(screen)
+
+        self.fps.on_render(screen)
 
     def play(self):
         self.playing = True

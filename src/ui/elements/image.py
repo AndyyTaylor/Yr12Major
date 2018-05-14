@@ -1,7 +1,7 @@
 
 import pygame
 
-from .UIElement import UIElement
+from ..uielement import UIElement
 
 
 class Image(UIElement):

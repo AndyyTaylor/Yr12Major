@@ -2,8 +2,8 @@
 import pygame
 import numpy as np
 from .algorithms import Algorithm
-from ..ui.UIElement import UIElement
-from .. import config
+from ..uielement import UIElement
+from src import config
 
 
 class Connection(UIElement):

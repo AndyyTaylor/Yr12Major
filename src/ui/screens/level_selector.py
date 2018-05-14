@@ -1,13 +1,13 @@
 " Andy "
 import pygame
 
-from .. import config
-from ..ui import RoundedButton
-from ..ui import Textbox
-from .AbstractState import State
+from src import config
+from ..elements import RoundedButton
+from ..elements import Textbox
+from .screen import Screen
 
 
-class LevelSelector(State):
+class LevelSelector(Screen):
     " A "
 
     def __init__(self):
@@ -28,7 +28,9 @@ class LevelSelector(State):
         self.create_level_buttons()
         self.create_title()
 
-    def on_enter(self, data):
+        self.fps = Textbox(1300, 10, 140, 80, "00", config.BLACK, 72)
+
+    def on_enter(self, data, screen):
         print("Selector entered")
         if self.past_level != config.MAX_LEVEL:
             self.past_level = config.MAX_LEVEL
@@ -44,6 +46,8 @@ class LevelSelector(State):
         for element in self.elements:
             element.on_update(elapsed)
 
+        self.fps.set_text(str(int(1000 / elapsed)))
+
     def on_render(self, screen):
         screen.fill(config.SCHEME5)
 
@@ -51,6 +55,8 @@ class LevelSelector(State):
 
         for element in self.elements:
             element.on_render(screen)
+
+        self.fps.on_render(screen)
 
     def on_mouse_down(self, event, pos):
         for element in self.elements:
