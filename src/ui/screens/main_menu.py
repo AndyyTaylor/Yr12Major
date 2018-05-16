@@ -67,7 +67,3 @@ class MainMenu(Screen):
 
     def on_mouse_up(self, event, pos):
         pass
-
-    def on_mouse_motion(self, event, pos):
-        for comp in self.components:
-            comp.on_mouse_motion(pos)

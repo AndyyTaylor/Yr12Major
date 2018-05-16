@@ -60,10 +60,6 @@ class LevelSelector(Screen):
         for comp in self.components:
             comp.on_mouse_up(pos)
 
-    def on_mouse_motion(self, event, pos):
-        for comp in self.components:
-            comp.on_mouse_motion(pos)
-
     def create_level_buttons(self):
         level_num = 1
         for yy in range(self.y_margin, config.SCREEN_HEIGHT, self.box_height + self.gap_size):
