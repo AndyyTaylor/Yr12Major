@@ -3,7 +3,7 @@
 import pygame
 from .screen import Screen
 from ..elements import *
-from ..screen_components import *
+from ..components import *
 from src import config
 
 

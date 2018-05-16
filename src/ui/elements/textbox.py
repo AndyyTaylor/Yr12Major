@@ -1,10 +1,10 @@
 import pygame
 
 from src import config
-from ..uielement import UIElement
+from ..components.component import Component
 
 
-class Textbox(UIElement):
+class Textbox(Component):
     def __init__(self, x, y, w, h, text, text_col, size):  # pylint: disable=R0913
         super().__init__(x, y, w, h)
 
@@ -21,8 +21,6 @@ class Textbox(UIElement):
             self.changed = True
 
     def on_render(self, screen, animation_progress=0):
-        super().on_render(screen)
-
         t_w, t_h = self.font.size(self.text)
         screen.blit(self.rendered_text, self.get_adj_center(t_w / 2, t_h / 2))
 
@@ -41,3 +39,9 @@ class Textbox(UIElement):
 
     def on_mouse_down(self, pos):
         pass
+
+    def _on_render(self, screen):
+        return
+
+    def get_prev_rect(self):
+        return self.get_rect()

@@ -2,7 +2,7 @@
 import pygame
 
 from src import config
-from ..screen_components import *
+from ..components import *
 from ..elements import Textbox
 from src.framework.StateRegistry import StateRegistry
 
@@ -24,9 +24,14 @@ class Screen():
         " Called when the application is closed "
         return
 
-    def on_enter(self, data, screen):
+    def on_enter(self, data, screen, arr=None):
         pygame.draw.rect(screen, config.SCHEME5, (0, 0, config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
-        for comp in self.components + [self.fps]:
+
+        if arr is None:
+            arr = self.components
+
+        arr += [self.fps]
+        for comp in arr:
             comp.changed = True
 
     def on_exit(self):
@@ -39,16 +44,20 @@ class Screen():
 
         self.fps.set_text(str(int(1000 / elapsed)))
 
-    def on_render(self, screen):
+    def on_render(self, screen, components=None):
+        if components is None:
+            components = self.components
+
         changed_rectangles = []
-        for comp in self.components + [self.fps]:
+        for comp in components + [self.fps]:
+
             if comp.has_changed():
-                changed_rectangles.append(comp.get_rect())
+                changed_rectangles.append(comp.get_prev_rect())
 
         for rect in changed_rectangles:
             pygame.draw.rect(screen, config.SCHEME5, rect)
 
-        for comp in self.components + [self.fps]:
+        for comp in components + [self.fps]:
             if comp.has_changed():
                 comp.on_render(screen)
 

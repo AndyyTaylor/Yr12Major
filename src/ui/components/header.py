@@ -1,11 +1,11 @@
 import pygame
 
 from src import config
-from .component import ScreenComponent
+from .component import Component
 from ..elements import *
 
 
-class Header(ScreenComponent):
+class Header(Component):
 
     def __init__(self, x, y, w, h, background, textbox):
         super().__init__(x, y, w, h)

@@ -1,15 +1,15 @@
 
 import pygame
-from ..uielement import UIElement
+from ..components.component import Component
 from src import config
 
 
-class Holder(UIElement):
+class Holder(Component):
 
-    def __init__(self, x, y, w, h, component):
+    def __init__(self, x, y, w, h, machine):
         super().__init__(x, y, w, h)
 
-        self.component = component
+        self.machine = machine
         self.clicked = False
         self.hover = False
         self.alphaCover = pygame.Surface((self.w, self.h))
@@ -54,7 +54,7 @@ class Holder(UIElement):
             screen.blit(self.alphaCover, (self.x, self.y))
 
 
-class Component(UIElement):
+class Machine(Component):
 
     def __init__(self, x, y, w, h, cloneable=True):
         super().__init__(x, y, w, h)
@@ -82,7 +82,7 @@ class Component(UIElement):
         for holder in self.inputs + self.outputs:
             holder.on_update(elapsed)
 
-    def on_render(self, screen):
+    def on_render(self, screen, **kwargs):
         self.draw_rounded_rect(screen, self.get_rect(), config.SCHEME4)
 
         for i, input in enumerate(self.inputs):

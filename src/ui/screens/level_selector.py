@@ -3,9 +3,8 @@ import pygame
 
 from src import config
 from ..elements import Textbox
-from ..elements import Rectangle
-from ..screen_components import Button
-from ..screen_components import Header
+from ..components import Button
+from ..components import Header
 from .screen import Screen
 
 

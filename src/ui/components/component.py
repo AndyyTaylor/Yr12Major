@@ -3,19 +3,18 @@ import pygame
 from ..uielement import UIElement
 
 
-class ScreenComponent(UIElement):
+class Component(UIElement):
 
     def __init__(self, x, y, w, h, scrollable=False):
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
+        super().__init__(x, y, w, h)
         self.scrollable = scrollable
 
         self.x_shift = 0
         self.y_shift = 0
 
-    def on_render(self, screen):
+        self.prev_rect = self.get_rect()
+
+    def on_render(self, screen, **kwargs):
         surf = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
 
         if self.x_shift != 0 or self.y_shift != 0:
@@ -29,8 +28,12 @@ class ScreenComponent(UIElement):
             self._on_render(surf)
 
         screen.blit(surf, (self.x, self.y))
+        self.prev_rect = self.get_rect()
         self.changed = False
 
     def on_scroll_wheel(self, direction):
         if self.scrollable:
             self.y_shift += 40 * direction
+
+    def get_prev_rect(self):
+        return self.prev_rect

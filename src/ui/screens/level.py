@@ -5,18 +5,19 @@ import pygame
 import copy
 
 from src import config
-from src.ui.level_components import *
-from src.ml.environments.game import *
-from ..elements import *
+from ..elements import Textbox
+from ..components import *
+from ..machines import *
+from ..machines.machine import Machine
+from .screen import Screen
 
 
-class LevelState(Screen):
+class LevelState(Screen):  # Download CLION's Python IDE, they also do a C/C++ one
     " A "
 
     def __init__(self):
         super().__init__("Level", "MasterState")
 
-        self.components = []
         self.connections = []
         self.elements = []
 
@@ -25,130 +26,136 @@ class LevelState(Screen):
         self.playing = False
         self.past_level = None
 
-        self.elements.append(Textbox(0, 130, 300, 50, "Components", config.BLACK, 36))
+        play_button = Button.create_rounded_image_button(
+                        1200, 110, 70, 70, config.BLACK, config.SCHEME2, 3,
+                        1220, 130, 30, 30, "data/assets/play.png", self.play
+        )
+        pause_button = Button.create_rounded_image_button(
+                        1280, 110, 70, 70, config.BLACK, config.SCHEME2, 3,
+                        1300, 130, 30, 30, "data/assets/pause.png", self.pause
+        )
+        stop_button = Button.create_rounded_image_button(
+                        1360, 110, 70, 70, config.BLACK, config.SCHEME2, 3,
+                        1380, 130, 30, 30, "data/assets/stop.png", self.stop
+        )
 
-        self.elements.append(RoundedButton(1360, 110, 70, 70, 3, config.BLACK, config.SCHEME2, lambda: print("Stop")))
-        self.elements.append(Image(1380, 130, 30, 30, "data/assets/stop.png"))
-        self.elements.append(RoundedButton(1280, 110, 70, 70, 3, config.BLACK, config.SCHEME2, self.pause))
-        self.elements.append(Image(1300, 130, 30, 30, "data/assets/pause.png"))
-        self.elements.append(RoundedButton(1200, 110, 70, 70, 3, config.BLACK, config.SCHEME2, self.play))
-        self.elements.append(Image(1220, 130, 30, 30, "data/assets/play.png"))
-
-        self.fps = Textbox(1300, 10, 140, 80, "00", config.BLACK, 72)
+        self.components = [
+            play_button,
+            pause_button,
+            stop_button
+        ]
 
     def on_enter(self, data, screen):
         assert isinstance(data, int)
+        super().on_enter(data, screen)
 
         if self.past_level is None or self.past_level != data:
             if self.past_level is not None:
-                self.elements.pop()  # The last 'element' should always be the level title
+                for i in range(2):
+                    self.components.pop()  # The last 'element' should always be the level title
+                                           # and the second last should be the workshop
 
             self.past_level = data
             self.playing = False
 
-            self.elements.append(Textbox(0, 0, config.SCREEN_WIDTH, 100,
-                                         "LEVEL " + str(data), config.BLACK, 72))
+            self.create_title(data)
 
-            self.components = []
             self.connections = []
-            self.load_level(data)
-            self.load_components()
-
-            cum_y = 20
-            for i in range(len(self.components)):
-                self.components[i].set_pos(50, 180 + cum_y)
-                cum_y += 10 + self.components[i].h
+            self.components.append(self.create_workshop(data))
 
     def on_update(self, elapsed):
-        for elem in self.elements:
-            elem.on_update(elapsed)
+        super().on_update(elapsed)
 
         if self.playing:
             for conn in self.connections:
                 conn.on_update(elapsed)
 
-            for comp in self.components:
-                comp.on_update(elapsed)
-
             if self.game_finished():
                 config.MAX_LEVEL += 1
                 self.parent.change_state("LevelSelector")
 
-        self.fps.set_text(str(int(1000 / elapsed)))
-
     def game_finished(self):
         # Game is finished if everything is empty
-        for c in self.connections + self.components:
-            if c.has_data():
-                return False
-
-        return True
+        # for c in self.connections + self.machines:
+        #     if c.has_data():
+        #         return False
+        # return True
+        return False
 
     def on_render(self, screen):
-        screen.fill(config.SCHEME5)
-
-        pygame.draw.rect(screen, config.SCHEME2, (0, 0, config.SCREEN_WIDTH, 100))
-        pygame.draw.rect(screen, config.SCHEME2, (0, 0, 300, config.SCREEN_HEIGHT))
-
-        pygame.draw.rect(screen, config.SCHEME5, (0, 100, 500, 20))
-
-        for elem in self.connections + self.elements + self.components:
-            elem.on_render(screen)
-
-        self.fps.on_render(screen)
+        super().on_render(screen)
 
     def play(self):
         self.playing = True
-
-        for comp in self.components:
-            comp.train(*self.input.get_train_data())
+        print("play")
+        # for comp in self.machines:
+        #     comp.train(*self.input.get_train_data())
 
     def pause(self):
         self.playing = False
 
+    def stop(self):
+        print("Stop not implemented")
+
     def on_mouse_down(self, event, pos):
-        for component in self.components + self.elements:
+        for component in self.components:
             component.on_mouse_down(pos)
 
     def on_mouse_motion(self, event, pos):
-        for component in self.components + self.elements:
-            if isinstance(component, Component) and component.clicked and component.cloneable:
-                component.clicked = False
-
-                self.components.append(component.clone(pos, self.input.get_labels(), self.input.render_data))
-            else:
-                component.on_mouse_motion(pos)
+        for component in self.components:
+            # if isinstance(component, Machine) and component.clicked and component.cloneable:
+            #     component.clicked = False
+            #
+            #     self.machines.append(component.clone(pos, self.input.get_labels(), self.input.render_data))
+            # else:
+            component.on_mouse_motion(pos)
 
     def on_mouse_up(self, event, pos):
-        input_holder = None
-        output_holder = None
-        for component in self.components:
-            input, output = component.on_mouse_up(pos)
+        return
+        # input_holder = None
+        # output_holder = None
+        # for machine in self.machines:
+        #     input, output = machine.on_mouse_up(pos)
+        #
+        #     if input is not None:  # does this implicitly check if not none?
+        #         output_holder = input
+        #     if output is not None:
+        #         input_holder = output
+        #
+        # if input_holder is not None and output_holder is not None:
+        #     self.connections.append(Connection(input_holder, output_holder, self.input.render_data))
 
-            if input is not None:  # does this implicitly check if not none?
-                output_holder = input
-            if output is not None:
-                input_holder = output
+    def create_title(self, level_num):
+        self.components.append(Header.create_rectangle_header(
+                                0, 0, config.SCREEN_WIDTH, 100, config.SCHEME2,
+                                "Level " + str(level_num), config.BLACK, 72)
+                              )
 
-        if input_holder is not None and output_holder is not None:
-            self.connections.append(Connection(input_holder, output_holder, self.input.render_data))
+    def create_workshop(self, level_num):
+        input, output = self.load_level(level_num)
 
-    def load_components(self):
-        self.components.append(self.input)
-        self.components.append(self.output)
-        self.components.append(Trash())
-        self.components.append(NaiveBayes(self.input.get_labels(), self.input.render_data))
-        self.components.append(KNN(self.input.get_labels(), self.input.render_data))
+        trash = Trash()
+        naivebayes = NaiveBayes(input.get_labels(), input.render_data)
+        knn = KNN(input.get_labels(), input.render_data)
+
+        algorithms = [
+            trash,
+            naivebayes,
+            knn
+        ]
+        return Workshop(0, 120, 300, 740, input, output, algorithms)
 
     def load_level(self, level_num):
         if level_num == 1:
-            self.input = ColorInput(2)
-            self.output = Output(0, self.input.render_data)
+            input = ColorInput(2)
+            output = Output(0, input.render_data)
         elif level_num == 2:
-            self.input = ColorInput(3)
-            self.output = Output(1, self.input.render_data)
+            input = ColorInput(3)
+            output = Output(1, input.render_data)
         elif level_num == 3:
-            self.input = ShapeInput(4)
-            self.output = Output(4, self.input.render_data)
+            input = ShapeInput(4)
+            output = Output(4, input.render_data)
         else:
             raise NotImplementedError("Don't got that level")
+
+        return input, output

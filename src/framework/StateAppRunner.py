@@ -28,7 +28,7 @@ class StateAppRunner():
         IntroState()
         MainMenu()
         LevelSelector()
-        # LevelState()
+        LevelState()
 
 
         self.closed = False

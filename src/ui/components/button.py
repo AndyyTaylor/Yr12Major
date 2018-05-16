@@ -1,11 +1,11 @@
 import pygame
 
 from src import config
-from .component import ScreenComponent
+from .component import Component
 from ..elements import *
 
 
-class Button(ScreenComponent):
+class Button(Component):
 
     def __init__(self, x, y, w, h, back_shape, front_shape, textbox, callback):
         super().__init__(x, y, w, h)
@@ -14,7 +14,7 @@ class Button(ScreenComponent):
         self.textbox = textbox
         self.callback = callback
 
-        self.all_elements = [
+        self.elements = [
             back_shape,
             front_shape,
             textbox
@@ -51,7 +51,7 @@ class Button(ScreenComponent):
     def _on_render(self, screen):
         animation_progress = self.hover_time / self.animation_speed
 
-        for elem in self.all_elements:
+        for elem in self.elements:
             elem.on_render(screen, animation_progress=animation_progress)
 
         if not self.enabled:
@@ -85,4 +85,13 @@ class Button(ScreenComponent):
         back_shape = RoundedRect(0, 0, w, h, back_col)
         front_shape = RoundedRect(border_width, border_width, w - border_width*2, h - border_width*2, front_col)
         textbox = Textbox(0, 0, w, h, text, text_col, text_size)
+
         return Button(x, y, w, h, back_shape, front_shape, textbox, callback)
+
+    @staticmethod
+    def create_rounded_image_button(x, y, w, h, back_col, front_col, border_width, img_x, img_y, img_w, img_h, file_name, callback):
+        back_shape = RoundedRect(0, 0, w, h, back_col)
+        front_shape = RoundedRect(border_width, border_width, w - border_width*2, h - border_width*2, front_col)
+        image = Image(img_x - x, img_y - y, img_w, img_h, file_name)
+
+        return Button(x, y, w, h, back_shape, front_shape, image, callback)

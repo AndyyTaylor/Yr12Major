@@ -4,12 +4,12 @@ import time
 from ..uielement import UIElement
 from .. import *
 from src import config
-from .component import Component
+from .machine import Machine
 from src.ml.agents import *
 from src.ui.elements import *
 
 
-class Algorithm(Component):
+class Algorithm(Machine):
 
     def __init__(self, x, y, w, h, title, labels, render_data):
         super().__init__(x, y, w, h)

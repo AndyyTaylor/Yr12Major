@@ -1,8 +1,8 @@
 
 import pygame
 import numpy as np
-from .component import Component
-from .component import Holder
+from .machine import Machine
+from .machine import Holder
 from src import config
 from src.ui.elements import *
 from src.ml.environments.game import *
@@ -15,7 +15,7 @@ class Sample:
         self.progress = 0
 
 
-class ColorInput(Component):
+class ColorInput(Machine):
 
     def __init__(self, num_colors):
         super().__init__(0, 0, 200, 150, False)
@@ -38,7 +38,7 @@ class ColorInput(Component):
             sample = Sample(self.environment.testX[i], self.environment.testy[i])
             self.outputs[0].add_data(sample)
 
-    def on_render(self, screen):
+    def on_render(self, screen, **kwargs):
         super().on_render(screen)
 
         row_width = 110/1.2

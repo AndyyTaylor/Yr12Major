@@ -1,11 +1,11 @@
 
 import pygame
-from .component import Component
+from .machine import Machine
 from src import config
 from src.ui.elements import *
 
 
-class Output(Component):
+class Output(Machine):
     def __init__(self, label, render_data):
         super().__init__(0, 0, 200, 150, False)
 
@@ -32,7 +32,7 @@ class Output(Component):
                 self.correct += 1
             self.total += 1
 
-    def on_render(self, screen):
+    def on_render(self, screen, **kwargs):
         super().on_render(screen)
 
         if self.total > 0:
@@ -50,7 +50,7 @@ class Output(Component):
 #     def __init__(self, num_shapes, render_data):
 
 
-class Trash(Component):
+class Trash(Machine):
 
     def __init__(self):
         super().__init__(0, 0, 200, 150)

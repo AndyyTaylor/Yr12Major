@@ -3,10 +3,11 @@ import pygame
 import numpy as np
 from .algorithms import Algorithm
 from ..uielement import UIElement
+from ..components.component import Component
 from src import config
 
 
-class Connection(UIElement):
+class Connection(Component):
 
     def __init__(self, in_holder, out_holder, render_data):
         self.in_holder = in_holder
@@ -16,12 +17,12 @@ class Connection(UIElement):
         self.data = []
 
     def on_update(self, elapsed):
-        if (not self.data or not isinstance(self.out_holder.component, Algorithm)) and self.in_holder.has_data():
+        if (not self.data or not isinstance(self.out_holder.machine, Algorithm)) and self.in_holder.has_data():
             sample = self.in_holder.take_data()
             sample.progress = 0
             self.data.append(sample)
 
-        out_comp = self.out_holder.component
+        out_comp = self.out_holder.machine
         if hasattr(out_comp, 'get_avg_cool_down'):
             travel_time = out_comp.get_avg_cool_down()
         else:
@@ -36,7 +37,7 @@ class Connection(UIElement):
 
         self.data = data_clone
 
-    def on_render(self, screen):
+    def on_render(self, screen, **kwargs):
         pygame.draw.line(screen, config.GREEN, self.in_holder.get_center(), self.out_holder.get_center(), 5)
 
         start_pos = self.in_holder.get_center()
