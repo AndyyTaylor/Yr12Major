@@ -1,4 +1,5 @@
 import pygame
+import numpy as np
 
 from src import config
 from .component import Component
@@ -32,3 +33,17 @@ class Workshop(Component):
             machine.on_render(surf)
 
         self.title.on_render(surf)
+
+    def _on_mouse_motion(self, pos):
+        for machine in self.algorithms:
+            machine._on_mouse_motion(np.subtract(pos, self.get_pos()))
+
+    def has_changed(self):
+        mach_changed = False
+        for machine in self.algorithms:
+            if machine.has_changed():
+                mach_changed = True
+                break
+
+        return self.changed or mach_changed
+

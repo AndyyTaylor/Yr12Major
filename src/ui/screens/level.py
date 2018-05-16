@@ -101,14 +101,14 @@ class LevelState(Screen):  # Download CLION's Python IDE, they also do a C/C++ o
         for component in self.components:
             component.on_mouse_down(pos)
 
-    def on_mouse_motion(self, event, pos):
-        for component in self.components:
-            # if isinstance(component, Machine) and component.clicked and component.cloneable:
-            #     component.clicked = False
-            #
-            #     self.machines.append(component.clone(pos, self.input.get_labels(), self.input.render_data))
-            # else:
-            component.on_mouse_motion(pos)
+    # def on_mouse_motion(self, event, pos):
+    #     for component in self.components:
+    #         # if isinstance(component, Machine) and component.clicked and component.cloneable:
+    #         #     component.clicked = False
+    #         #
+    #         #     self.machines.append(component.clone(pos, self.input.get_labels(), self.input.render_data))
+    #         # else:
+    #         component.on_mouse_motion(pos)
 
     def on_mouse_up(self, event, pos):
         return

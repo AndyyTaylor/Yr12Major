@@ -1,5 +1,6 @@
 
 import pygame
+import numpy as np
 
 from src import config
 from ..components import *
@@ -13,6 +14,8 @@ class Screen():
     def __init__(self, name, parent):
         self.name = name
         self.parent = StateRegistry.instance().register(self, parent)
+
+        self.components = []
 
         self.fps = Textbox(1300, 10, 140, 80, "00", config.BLACK, 72)
 
@@ -68,7 +71,8 @@ class Screen():
         return
 
     def on_mouse_motion(self, event, pos):
-        return
+        for comp in self.components:
+            comp._on_mouse_motion(pos)
 
     def on_mouse_down(self, event, pos):
         return

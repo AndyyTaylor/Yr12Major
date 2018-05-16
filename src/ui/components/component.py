@@ -37,3 +37,6 @@ class Component(UIElement):
 
     def get_prev_rect(self):
         return self.prev_rect
+
+    def _on_mouse_motion(self, pos):
+        return

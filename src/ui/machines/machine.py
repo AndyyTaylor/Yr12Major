@@ -18,8 +18,15 @@ class Holder(Component):
 
         self.data = []
 
+        self.prev_hash = None
+
     def on_update(self, elapsed):
-        pass
+        new_hash = hash((self.hover))
+
+        if new_hash != self.prev_hash:
+            self.changed = True
+
+            self.prev_hash = new_hash
 
     def add_data(self, data):
         if isinstance(data, list):
@@ -44,7 +51,7 @@ class Holder(Component):
 
         return ret
 
-    def on_mouse_motion(self, pos):
+    def _on_mouse_motion(self, pos):
         self.hover = pygame.Rect(self.get_rect()).collidepoint(pos)
 
     def on_render(self, screen):
@@ -148,12 +155,12 @@ class Machine(Component):
 
         return input, output
 
-    def on_mouse_motion(self, pos):
+    def _on_mouse_motion(self, pos):
         if self.clicked and not self.cloneable:
             self.set_pos(pos[0] - self.mouse_offset_x, pos[1] - self.mouse_offset_y)
 
         for holder in self.inputs + self.outputs:
-            holder.on_mouse_motion(pos)
+            holder._on_mouse_motion(pos)
 
     def clone(self, mpos, labels, render_data):
         if self.isalgorithm:
@@ -168,6 +175,16 @@ class Machine(Component):
         new_comp.mouse_offset_y = mpos[1] - new_comp.y
 
         return new_comp
+
+    def has_changed(self):
+        holder_changed = False
+        for holder in self.inputs + self.outputs:
+            holder_changed = holder.has_changed()
+
+            if holder_changed:
+                break
+
+        return self.changed or holder_changed
 
     def has_data(self):
         for holder in self.inputs + self.outputs:

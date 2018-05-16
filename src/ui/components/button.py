@@ -60,7 +60,7 @@ class Button(Component):
             self.disabled_cover.on_render(s)
             screen.blit(s, self.get_pos())
 
-    def on_mouse_motion(self, pos):
+    def _on_mouse_motion(self, pos):
         self.hover = pygame.Rect(self.get_rect()).collidepoint(pos)
 
     def on_mouse_up(self, pos):
