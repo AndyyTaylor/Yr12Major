@@ -1,8 +1,9 @@
 import pygame
 
 from src import config
-from .component import Component
-from ..elements import *
+from .
+from .rounded_rect import RoundedRect
+from .textbox import Textbox
 
 
 class Button(Component):

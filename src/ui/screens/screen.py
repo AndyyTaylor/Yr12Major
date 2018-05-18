@@ -9,15 +9,14 @@ from src.framework.StateRegistry import StateRegistry
 
 
 class Screen():
-    " The abstract class that all states inherit "
 
-    def __init__(self, name, parent):
+    def __init__(self, name, parent, back_color=config.SCHEME5):
         self.name = name
+        self.back_color = back_color  # default back color for screen
         self.parent = StateRegistry.instance().register(self, parent)
 
+        # Will contain all screen components ~3-4
         self.components = []
-
-        self.fps = Textbox(1300, 10, 140, 80, "00", config.BLACK, 72)
 
     def on_init(self):
         " Called when the application is run "
@@ -27,14 +26,11 @@ class Screen():
         " Called when the application is closed "
         return
 
-    def on_enter(self, data, screen, arr=None):
-        pygame.draw.rect(screen, config.SCHEME5, (0, 0, config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
+    def on_enter(self, data, screen):
+        pygame.draw.rect(screen, self.back_color, screen.get_rect())
 
-        if arr is None:
-            arr = self.components
-
-        arr += [self.fps]
-        for comp in arr:
+        # Every component must initially render
+        for comp in self.components:
             comp.changed = True
 
     def on_exit(self):
@@ -42,25 +38,21 @@ class Screen():
         return
 
     def on_update(self, elapsed):
-        for comp in self.components + [self.fps]:
+        for comp in self.components:
             comp.on_update(elapsed)
 
-        self.fps.set_text(str(int(1000 / elapsed)))
-
-    def on_render(self, screen, components=None):
-        if components is None:
-            components = self.components
-
+    def on_render(self, screen):
         changed_rectangles = []
-        for comp in components + [self.fps]:
-
+        for comp in self.components:
             if comp.has_changed():
-                changed_rectangles.append((comp.get_prev_rect(), comp.back_color or config.SCHEME5))
+                # (back color defaults to screen back color, rectangle to draw)
+                changed_rectangles.append((comp.back_color or self.back_color
+                                         , comp.get_prev_rect()))
 
         for rect in changed_rectangles:
-            pygame.draw.rect(screen, rect[1], rect[0])
+            pygame.draw.rect(screen, *rect)
 
-        for comp in components + [self.fps]:
+        for comp in components:
             if comp.has_changed():
                 comp.on_render(screen)
 
@@ -72,7 +64,11 @@ class Screen():
 
     def on_mouse_motion(self, event, pos):
         for comp in self.components:
-            comp._on_mouse_motion(pos)
+            comp.on_mouse_motion(pos)
 
+    # This has to be handled here to prevent clicking multiple elements at once
     def on_mouse_down(self, event, pos):
-        return
+        for comp in reversed(self.components):  # Reversed to respect depth properly
+            if isinstance(comp, Button) and pygame.Rect(comp.get_rect()).collidepoint(pos):
+                comp.on_click()
+                return

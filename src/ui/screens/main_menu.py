@@ -13,10 +13,9 @@ class MainMenu(Screen):
     def __init__(self):
         super().__init__("MainMenu", "MasterState")
 
-        self.total_time = 0
+        # Button w & h
         w = 400
         h = 100
-
         play_button = Button.create_rounded_button(
                         50, 470, w, h, config.BLACK, config.SCHEME2, 3,
                         "Play", config.BLACK, 62,
@@ -40,30 +39,3 @@ class MainMenu(Screen):
             load_button,
             about_button
         ]
-
-    def on_init(self):
-        print("Application started.")
-
-    def on_shutdown(self):
-        print("Application closed.")
-
-    def on_enter(self, _, screen):
-        super().on_enter(_, screen)
-
-    def on_exit(self):
-        print("Intro state exited")
-
-    def on_update(self, elapsed):
-        super().on_update(elapsed)
-
-    def on_render(self, screen):
-        super().on_render(screen)
-
-    def on_mouse_down(self, event, pos):
-        for comp in self.components:
-            if isinstance(comp, Button) and pygame.Rect(comp.get_rect()).collidepoint(pos):
-                comp.on_click()
-                return
-
-    def on_mouse_up(self, event, pos):
-        pass
