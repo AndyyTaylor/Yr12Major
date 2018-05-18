@@ -60,6 +60,8 @@ class Holder(Component):
         if self.hover or self.clicked:
             screen.blit(self.alphaCover, (self.x, self.y))
 
+        self.changed = False
+
 
 class Machine(Component):
 
@@ -101,6 +103,8 @@ class Machine(Component):
             output.on_render(screen)
             if i < len(self.output_labels):
                 self.render_data(screen, output.x + output.w/2, output.y + output.h/2, self.output_labels[i], 10)
+
+        self.changed = False
 
     def set_pos(self, x, y):
         self.x = x

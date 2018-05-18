@@ -9,7 +9,7 @@ from ..elements import *
 class Workshop(Component):
 
     def __init__(self, x, y, w, h, input, output, algorithms):
-        super().__init__(x, y, w, h, True)
+        super().__init__(x, y, w, h, True, config.SCHEME2)
 
         self.input = input
         self.output = output
@@ -22,17 +22,22 @@ class Workshop(Component):
             mach.set_pos(50, cum_y)
             cum_y += 10 + mach.h
 
+    def on_enter(self, data, surf):
+        surf.fill(config.SCHEME2)
+
     def on_update(self, elapsed):
         for machine in self.algorithms:
             machine.on_update(elapsed)
 
     def _on_render(self, surf):
-        surf.fill(config.SCHEME2)
-
         for machine in self.algorithms:
-            machine.on_render(surf)
+            if machine.has_changed():
+                machine.on_render(surf)
 
-        self.title.on_render(surf)
+        if self.title.has_changed():
+            self.title.on_render(surf)
+
+        self.changed = False
 
     def _on_mouse_motion(self, pos):
         for machine in self.algorithms:
@@ -46,4 +51,3 @@ class Workshop(Component):
                 break
 
         return self.changed or mach_changed
-

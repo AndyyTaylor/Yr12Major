@@ -1,13 +1,14 @@
 
-import pygame
+import pygame, random
 from ..uielement import UIElement
 
 
 class Component(UIElement):
 
-    def __init__(self, x, y, w, h, scrollable=False):
+    def __init__(self, x, y, w, h, scrollable=False, back_color=None):
         super().__init__(x, y, w, h)
         self.scrollable = scrollable
+        self.back_color = back_color
 
         self.x_shift = 0
         self.y_shift = 0
@@ -25,6 +26,7 @@ class Component(UIElement):
             self._on_render(temp_surf)
             surf.blit(temp_surf, (self.x_shift, self.y_shift))
         else:
+            print('RENDERING:', random.randint(0, 10), self.changed)
             self._on_render(surf)
 
         screen.blit(surf, (self.x, self.y))

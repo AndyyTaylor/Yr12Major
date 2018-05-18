@@ -55,10 +55,10 @@ class Screen():
         for comp in components + [self.fps]:
 
             if comp.has_changed():
-                changed_rectangles.append(comp.get_prev_rect())
+                changed_rectangles.append((comp.get_prev_rect(), comp.back_color or config.SCHEME5))
 
         for rect in changed_rectangles:
-            pygame.draw.rect(screen, config.SCHEME5, rect)
+            pygame.draw.rect(screen, rect[1], rect[0])
 
         for comp in components + [self.fps]:
             if comp.has_changed():
