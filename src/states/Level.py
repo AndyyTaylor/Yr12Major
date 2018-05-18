@@ -134,10 +134,10 @@ class LevelState(State):
 
     def load_level(self, level_num):
         if level_num == 1:
-            self.input = ColorInput(2)
+            self.input = ColorInput(2, 200)
             self.output = Output(0, self.input.render_data)
         elif level_num == 2:
-            self.input = ColorInput(3)
+            self.input = ColorInput(3, 200)
             self.output = Output(1, self.input.render_data)
         elif level_num == 3:
             self.input = ShapeInput(4)
