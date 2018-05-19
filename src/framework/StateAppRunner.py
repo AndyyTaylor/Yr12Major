@@ -5,9 +5,11 @@ import pygame
 from .. import config
 
 from .StateRegistry import StateRegistry
-from ..stategroups.StateGroup import StateGroup
+from .StateGroup import StateGroup
 from ..states.IntroState import IntroState
 from ..states.MainMenu import MainMenu
+from ..states.LevelSelector import LevelSelector
+from ..states.Level import LevelState
 
 from ..states.DLSim import Simulation
 # from ..states.SupSim import Simulation
@@ -19,7 +21,7 @@ class StateAppRunner():
     def __init__(self):
         pygame.init()
 
-        self.screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT), 0, 32)
+        self.screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
         pygame.display.set_caption("Andy's Machine Learning")
         self.last_update = datetime.datetime.now()
 
@@ -30,6 +32,8 @@ class StateAppRunner():
         IntroState()
         MainMenu()
         Simulation()
+        LevelSelector()
+        LevelState()
 
         # print(StateRegistry.instance().get_state("Rawplot").parent.name)
 
@@ -51,9 +55,15 @@ class StateAppRunner():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.close()
-            elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP or event.type == pygame.MOUSEMOTION:
+            if event.type == pygame.MOUSEMOTION:
                 pos = pygame.mouse.get_pos()
-                StateRegistry.instance().get_group("MasterState").on_mouse_event(event)
+                StateRegistry.instance().get_group("MasterState").on_mouse_motion(event, pos)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                StateRegistry.instance().get_group("MasterState").on_mouse_down(event, pos)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                pos = pygame.mouse.get_pos()
+                StateRegistry.instance().get_group("MasterState").on_mouse_up(event, pos)
             elif event.type == pygame.KEYDOWN:
                 StateRegistry.instance().get_group("MasterState").on_key_down(event.key)
 

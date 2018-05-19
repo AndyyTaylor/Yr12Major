@@ -12,6 +12,7 @@ class Bayes():
 
         labels = set(y)
         for c in labels:
+            c = int(c)
             samples_where_c = X[y == c]  # all the training examples of class c
 
             self.distributions[c] = {   # Distribution of features for that class

@@ -1,6 +1,7 @@
 " Andy "
 from .AbstractState import State
 
+
 class IntroState(State):
     " A "
 
@@ -15,7 +16,7 @@ class IntroState(State):
     def on_shutdown(self):
         print("Application closed.")
 
-    def on_enter(self):
+    def on_enter(self, data):
         print("Intro state entered")
 
     def on_exit(self):
@@ -25,7 +26,7 @@ class IntroState(State):
         self.total_time += elapsed
 
         if self.total_time > 1:
-            self.parent.change_state("Simulation")
+            self.parent.change_state("MainMenu")
 
     def on_render(self, screen):
         pass

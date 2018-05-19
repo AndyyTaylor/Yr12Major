@@ -2,6 +2,7 @@
 
 from ..framework.StateRegistry import StateRegistry
 
+
 class State():
     " The abstract class that all states inherit "
 
@@ -17,7 +18,7 @@ class State():
         " Called when the application is closed "
         return
 
-    def on_enter(self):
+    def on_enter(self, data):
         " Called when the state is entered "
         return
 
@@ -37,6 +38,12 @@ class State():
         return
 
     def on_mouse_event(self, event):
+        return
+
+    def on_mouse_motion(self, event, pos):
+        return
+
+    def on_mouse_down(self, event, pos):
         return
 
     # @abc.abstractmethod

@@ -1,6 +1,7 @@
 " Andy "
 import abc
 
+
 class UIElement(metaclass=abc.ABCMeta):
     " This class is inherited by all ui elements "
 
@@ -17,6 +18,15 @@ class UIElement(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def on_render(self, screen):
         pass
+
+    def on_mouse_motion(self, pos):
+        return
+
+    def reset_animation(self):
+        return
+
+    def get_pos(self):
+        return (self.x, self.y)
 
     def get_rect(self):
         return (self.x, self.y, self.w, self.h)

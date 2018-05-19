@@ -1,5 +1,6 @@
 " doc "
 
+
 class StateRegistry():
     _instance = None
 
@@ -7,6 +8,7 @@ class StateRegistry():
         self.all_states = {}
         self.all_groups = {}
         self.state_stack = []
+        self.data_stack = []
 
     def register(self, state, parent_name):
         self.all_states[state.name] = state
@@ -29,6 +31,12 @@ class StateRegistry():
             return self.all_groups[name]
 
         return False
+
+    def push_stack(self, data):
+        self.data_stack.append(data)
+
+    def pop_stack(self):
+        return self.data_stack.pop()
 
     @staticmethod
     def instance():
