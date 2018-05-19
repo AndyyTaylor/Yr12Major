@@ -8,7 +8,7 @@ from ..elements import Textbox
 from src.framework.StateRegistry import StateRegistry
 
 
-class Screen():
+class Screen():  # Screen (1) -> Components (3-4) -> Elements -> (5 each) -> Primitives (2-3 each)
 
     def __init__(self, name, parent, back_color=config.SCHEME5):
         self.name = name
