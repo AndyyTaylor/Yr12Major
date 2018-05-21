@@ -74,7 +74,14 @@ class LevelSelector(State):
                 level_num += 1
 
     def create_level_button(self, x, y, level_num):
-        button = RoundedButton(x, y, self.box_width, self.box_height, self.box_border, config.SCHEME4, config.SCHEME3, lambda: self.parent.change_state("Level", level_num))
+        if level_num <= config.NUM_SUP_LEVELS:
+            back_color = config.SCHEME4
+            load_state = "Level"
+        else:
+            back_color = config.SCHEME1
+            load_state = "RLLevel"
+
+        button = RoundedButton(x, y, self.box_width, self.box_height, self.box_border, back_color, config.SCHEME3, lambda: self.parent.change_state(load_state, level_num))
         if level_num > config.MAX_LEVEL:
             button.disable()
 

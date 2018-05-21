@@ -10,6 +10,7 @@ from ..states.IntroState import IntroState
 from ..states.MainMenu import MainMenu
 from ..states.LevelSelector import LevelSelector
 from ..states.Level import LevelState
+from ..states.RLLevel import RLLevelState
 
 from ..states.DLSim import Simulation
 # from ..states.SupSim import Simulation
@@ -34,6 +35,7 @@ class StateAppRunner():
         Simulation()
         LevelSelector()
         LevelState()
+        RLLevelState()
 
         # print(StateRegistry.instance().get_state("Rawplot").parent.name)
 
