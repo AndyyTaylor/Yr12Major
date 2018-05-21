@@ -52,7 +52,7 @@ class Screen():  # Screen (1) -> Components (3-4) -> Elements -> (5 each) -> Pri
         for rect in changed_rectangles:
             pygame.draw.rect(screen, *rect)
 
-        for comp in components:
+        for comp in self.components:
             if comp.has_changed():
                 comp.on_render(screen)
 

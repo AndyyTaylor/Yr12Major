@@ -1,12 +1,12 @@
 import pygame
 
 from src import config
-from ..uielement import UIElement
+from ..basicelement import BasicElement
 from .rounded_rect import RoundedRect
 from .textbox import Textbox
 
 
-class Button(UIElement):
+class Button(BasicElement):
 
     def __init__(self, x, y, w, h, back_shape, front_shape, textbox, callback):
         super().__init__(x, y, w, h)

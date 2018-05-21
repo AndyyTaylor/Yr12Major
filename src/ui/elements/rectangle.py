@@ -1,10 +1,10 @@
 import pygame
 
 from src import config
-from ..uielement import UIElement
+from ..basicelement import BasicElement
 
 
-class Rectangle(UIElement):
+class Rectangle(BasicElement):
 
     def __init__(self, x, y, w, h, color):
         super().__init__(x, y, w, h)

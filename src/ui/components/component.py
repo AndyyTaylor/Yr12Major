@@ -1,9 +1,9 @@
 
 import pygame, random
-from ..uielement import UIElement
+from ..basicelement import BasicElement
 
 
-class Component(UIElement):
+class Component(BasicElement):
 
     def __init__(self, x, y, w, h, scrollable=False, back_color=None):
         super().__init__(x, y, w, h)

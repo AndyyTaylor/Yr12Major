@@ -1,10 +1,10 @@
 import pygame
 
 from src import config
-from ..components.component import Component
+from ..basicelement import BasicElement
 
 
-class Textbox(Component):
+class Textbox(BasicElement):  # CHANGED PARENT CLASS, THIS WILL BREAK
     def __init__(self, x, y, w, h, text, text_col, size):  # pylint: disable=R0913
         super().__init__(x, y, w, h)
 

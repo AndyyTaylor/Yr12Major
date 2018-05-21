@@ -1,7 +1,7 @@
 " Andy "
 
 
-class UIElement():
+class BasicElement():
     " This class is inherited by all ui elements "
 
     def __init__(self, x, y, w, h):
@@ -10,10 +10,13 @@ class UIElement():
         self.w = w
         self.h = h
 
+        self.back_color = None
         self.changed = True
 
+        self.prev_rect = self.get_rect()
+
     def on_update(self, elapsed):
-        pass
+        self.prev_rect = self.get_rect()
 
     def on_render(self, screen):
         self.changed = False
@@ -41,6 +44,9 @@ class UIElement():
 
     def get_rect(self):
         return (self.x, self.y, self.w, self.h)
+
+    def get_prev_rect(self):
+        return self.prev_rect
 
     def get_center(self):
         return (self.x + self.w / 2, self.y + self.h / 2)

@@ -1,10 +1,10 @@
 
 import pygame
 
-from ..uielement import UIElement
+from ..basicelement import BasicElement
 
 
-class Image(UIElement):
+class Image(BasicElement):
 
     def __init__(self, x, y, w, h, file_name):
         super().__init__(x, y, w, h)
