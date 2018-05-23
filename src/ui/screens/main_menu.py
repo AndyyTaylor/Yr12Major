@@ -13,4 +13,4 @@ class MainMenu(Screen):
     def __init__(self):
         super().__init__("MainMenu", "MasterState")
 
-        self.components.append(MainMenuButtons(0, 0, 400, 400))
+        self.components.append(MainMenuButtons(100, 100, 800, 700))

@@ -9,33 +9,50 @@ from ..elements import *
 class MainMenuButtons(Component):
 
     def __init__(self, x, y, w, h):
-        super().__init__(x, y, w, h, False, config.SCHEME2)
+        super().__init__(x, y, w, h, False, config.SCHEME5)
+
+        w = 400
+        h = 100
+        play_button = Button.create_rounded_button(
+                        0, 0, w, h, config.BLACK, config.SCHEME2, 3,
+                        "Play", config.BLACK, 62,
+                        lambda: self.parent.change_state("LevelSelector")
+                      )
+
+        load_button = Button.create_rounded_button(
+                        0, 120, w, h, config.BLACK, config.SCHEME2, 3,
+                        "Load", config.BLACK, 62,
+                        lambda: print("Not Implemented")
+                      )
+
+        about_button = Button.create_rounded_button(
+                        0, 240, w, h, config.BLACK, config.SCHEME2, 3,
+                        "About", config.BLACK, 62,
+                        lambda: print("Not Implemented")
+                       )
+
+        self.elements = [
+            play_button,
+            load_button,
+            about_button
+        ]
 
     def on_enter(self, data, surf):
-        surf.fill(config.SCHEME2)
+        super().on_enter(data, surf)
 
-    def on_update(self, elapsed):
-        for machine in self.algorithms:
-            machine.on_update(elapsed)
+    def update(self, elapsed):
+        for elem in self.elements:
+            elem.update(elapsed)
 
-    def on_render(self, surf):
-        super().on_render(surf)
-        # for machine in self.algorithms:
-        #     if machine.has_changed():
-        #         machine.on_render(surf)
-        #
-        # if self.title.has_changed():
-            # self.title.on_render(surf)
-
-    def _on_mouse_motion(self, pos):
-        for machine in self.algorithms:
-            machine._on_mouse_motion(np.subtract(pos, self.get_pos()))
+    def render(self, surf):
+        for elem in self.elements:
+            elem.render(surf)
 
     def has_changed(self):
-        mach_changed = False
-        for machine in self.algorithms:
-            if machine.has_changed():
-                mach_changed = True
+        elem_changed = False
+        for elem in self.elements:
+            if elem.has_changed():
+                elem_changed = True
                 break
 
-        return self.changed or mach_changed
+        return self.changed or elem_changed

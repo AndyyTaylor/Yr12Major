@@ -1,5 +1,6 @@
 
 import pygame, random
+import numpy as np
 from ..basicelement import BasicElement
 
 
@@ -13,7 +14,21 @@ class Component(BasicElement):
         self.x_shift = 0
         self.y_shift = 0
 
+        self.elements = []
+
         self.prev_rect = self.get_rect()
+
+    def on_render(self, data, surf):
+        if back_color is not None:
+            surf.fill(self.back_color)
+
+        for elem in self.elements:
+            elem.changed = True
+
+    def on_update(self, elapsed):
+        self.update(elapsed)
+
+        print(int(1000 / elapsed))
 
     def on_render(self, screen, **kwargs):
         surf = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
@@ -23,11 +38,11 @@ class Component(BasicElement):
             max_heigth = surf.get_height() + abs(self.y_shift)
             temp_surf = pygame.Surface((max_width, max_height))
 
-            self._on_render(temp_surf)
+            self.render(temp_surf)
             surf.blit(temp_surf, (self.x_shift, self.y_shift))
         else:
             print('RENDERING:', random.randint(0, 10), self.changed)
-            self._on_render(surf)
+            self.render(surf)
 
         screen.blit(surf, (self.x, self.y))
         self.prev_rect = self.get_rect()
@@ -40,5 +55,6 @@ class Component(BasicElement):
     def get_prev_rect(self):
         return self.prev_rect
 
-    def _on_mouse_motion(self, pos):
-        return
+    def on_mouse_motion(self, pos):
+        for elem in self.elements:
+            elem.on_mouse_motion(np.subtract(pos, (self.x, self.y)))
