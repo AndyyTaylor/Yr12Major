@@ -27,7 +27,7 @@ class StateAppRunner():
 
         IntroState()
         MainMenu()
-        # LevelSelector()
+        LevelSelector()
         # LevelState()
 
 

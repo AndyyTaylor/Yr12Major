@@ -8,15 +8,15 @@ from ..elements import *
 
 class MainMenuButtons(Component):
 
-    def __init__(self, x, y, w, h):
-        super().__init__(x, y, w, h, False, config.SCHEME5)
+    def __init__(self, x, y, w, h, screen):
+        super().__init__(x, y, w, h, screen, False, config.SCHEME5)
 
         w = 400
         h = 100
         play_button = Button.create_rounded_button(
                         0, 0, w, h, config.BLACK, config.SCHEME2, 3,
                         "Play", config.BLACK, 62,
-                        lambda: self.parent.change_state("LevelSelector")
+                        lambda: self.screen.parent.change_state("LevelSelector")
                       )
 
         load_button = Button.create_rounded_button(

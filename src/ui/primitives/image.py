@@ -12,7 +12,7 @@ class Image(BasicElement):
         self.file_name = file_name
         self.img_surf = pygame.transform.smoothscale(pygame.image.load(file_name), (self.w, self.h))
 
-    def on_render(self, screen, animation_progress=0):
+    def render(self, screen, animation_progress=0):
         screen.blit(self.img_surf, self.get_pos())
 
     def on_update(self, elapsed):

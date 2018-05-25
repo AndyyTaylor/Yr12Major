@@ -4,7 +4,7 @@ import numpy as np
 
 from src import config
 from ..components import *
-from ..elements import Textbox
+from ..elements import *
 from src.framework.StateRegistry import StateRegistry
 
 
@@ -38,6 +38,7 @@ class Screen():  # Screen (1) -> Components (3-4) -> Elements -> (5 each) -> Pri
         return
 
     def on_update(self, elapsed):
+        print(int(1000 / elapsed))
         for comp in self.components:
             comp.on_update(elapsed)
 
@@ -64,11 +65,12 @@ class Screen():  # Screen (1) -> Components (3-4) -> Elements -> (5 each) -> Pri
 
     def on_mouse_motion(self, event, pos):
         for comp in self.components:
-            comp.on_mouse_motion(pos)
+            comp.on_mouse_motion(np.subtract(pos, (comp.x, comp.y)))
 
     # This has to be handled here to prevent clicking multiple elements at once
     def on_mouse_down(self, event, pos):
-        for comp in reversed(self.components):  # Reversed to respect depth properly
-            if isinstance(comp, Button) and pygame.Rect(comp.get_rect()).collidepoint(pos):
-                comp.on_click()
-                return
+        for comp in self.components:
+            comp.on_mouse_down(np.subtract(pos, (comp.x, comp.y)))
+
+    def on_mouse_up(self, event, pos):
+        return

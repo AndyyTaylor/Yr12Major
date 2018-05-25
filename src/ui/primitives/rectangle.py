@@ -11,5 +11,5 @@ class Rectangle(BasicElement):
 
         self.color = color
 
-    def on_render(self, screen, animation_progress=0):
+    def render(self, screen, animation_progress=0):
         pygame.draw.rect(screen, self.color, self.get_rect())

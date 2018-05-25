@@ -20,7 +20,7 @@ class RoundedRect(BasicElement):
 
         self.cache = []
 
-    def on_render(self, screen, animation_progress=0):
+    def render(self, screen, animation_progress=0):
         new_hash = hash((animation_progress))
         if new_hash != self.prev_hash:
             self.cache = []

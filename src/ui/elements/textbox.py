@@ -15,12 +15,12 @@ class Textbox(BasicElement):  # CHANGED PARENT CLASS, THIS WILL BREAK
         self.font = pygame.font.Font('%s/data/fonts/%s' % (config.DIR_PATH, 'Square.ttf'), size)
         self.rendered_text = self.font.render(self.text, True, self.text_col)
 
-    def on_update(self, elapsed):
+    def update(self, elapsed):
         if self.text != self.prev_text:
             self.prev_text = self.text
             self.changed = True
 
-    def on_render(self, screen, animation_progress=0):
+    def render(self, screen, animation_progress=0):
         t_w, t_h = self.font.size(self.text)
         screen.blit(self.rendered_text, self.get_adj_center(t_w / 2, t_h / 2))
 

@@ -53,7 +53,7 @@ class Button(BasicElement):
         animation_progress = self.hover_time / self.animation_speed
 
         for primitive in self.primitives:
-            primitive.on_render(screen, animation_progress=animation_progress)
+            primitive.render(screen, animation_progress=animation_progress)
 
         if not self.enabled:
             s = pygame.Surface(self.disabled_cover.get_size())

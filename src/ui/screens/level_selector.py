@@ -2,9 +2,9 @@
 import pygame
 
 from src import config
-from ..elements import Textbox
-from ..components import Button
-from ..components import Header
+# from ..elements import Textbox
+# from ..components import Button
+from ..components import *
 from .screen import Screen
 
 
@@ -23,13 +23,12 @@ class LevelSelector(Screen):
 
         num_boxes_per_row = 6
         self.gap_size = int(((config.SCREEN_WIDTH - self.x_margin*2) - num_boxes_per_row * self.box_width) / (num_boxes_per_row-1))
+
         self.components = []
 
         self.past_level = config.MAX_LEVEL
         self.create_level_buttons()
         self.create_title()
-
-        self.fps = Textbox(1300, 10, 140, 80, "00", config.BLACK, 72)
 
     def on_enter(self, data, screen):
         super().on_enter(data, screen)
@@ -60,28 +59,11 @@ class LevelSelector(Screen):
         for comp in self.components:
             comp.on_mouse_up(pos)
 
-    def create_level_buttons(self):
-        level_num = 1
-        for yy in range(self.y_margin, config.SCREEN_HEIGHT, self.box_height + self.gap_size):
-            for xx in range(self.x_margin, config.SCREEN_WIDTH - self.x_margin, self.box_width + self.gap_size):
-                self.create_level_button(xx, yy, level_num)
-                level_num += 1
-
-    def create_level_button(self, x, y, level_num):
-        button = Button.create_rounded_button(
-                    x, y, self.box_width, self.box_height,
-                    config.SCHEME4, config.SCHEME3, self.box_border,
-                    str(level_num), config.SCHEME1, 72,
-                    lambda: self.parent.change_state("Level", level_num)
-                 )
-
-        if level_num > config.MAX_LEVEL:
-            button.disable()
-
-        self.components.append(button)
-
     def create_title(self):
         self.components.append(Header.create_rectangle_header(
                                 0, 0, config.SCREEN_WIDTH, 100, config.SCHEME2,
-                                "Level Selection", config.BLACK, 72)
+                                "Level Selection", config.BLACK, 72, self)
                               )
+
+    def create_level_buttons(self):
+        self.components.append(LevelButtons(self.x_margin, self.y_margin, config.SCREEN_WIDTH - self.x_margin * 2, config.SCREEN_HEIGHT - self.y_margin * 2, self, self.box_width, self.box_height, self.gap_size, 3))
