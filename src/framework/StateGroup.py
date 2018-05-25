@@ -1,7 +1,7 @@
 " doc "
 
 from ..framework.StateRegistry import StateRegistry
-from ..ui.screens.screen import Screen
+from ..screens.screen import Screen
 
 
 class StateGroup(Screen):
@@ -68,7 +68,7 @@ class StateGroup(Screen):
         " Called when the application is closed "
         return
 
-    def on_enter(self):
+    def on_enter(self, _, __):
         " Called when the state is entered "
         return
 

@@ -6,7 +6,7 @@ from .. import config
 from pygame.locals import *
 from .StateRegistry import StateRegistry
 from .StateGroup import StateGroup
-from ..ui.screens import *
+from ..screens import *
 
 
 class StateAppRunner():
@@ -15,21 +15,21 @@ class StateAppRunner():
     def __init__(self):
         pygame.init()
 
-        self.screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT), DOUBLEBUF)
-        self.screen.set_alpha(None)
+        self.window = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT), DOUBLEBUF)
+        self.window.set_alpha(None)
         pygame.display.set_caption("Andy's Machine Learning")
         self.last_update = datetime.datetime.now()
 
-        StateRegistry.instance().set_screen(self.screen)
-        StateRegistry.instance().register_group(StateGroup("MasterState"))
-        StateRegistry.instance().register_group(StateGroup("IntroGroup"))
-        StateRegistry.instance().register_group(StateGroup("Menu"))
+        StateRegistry.instance().set_screen(self.window)
 
-        IntroState()
+        # Fix stategroup order
+        master_group = StateGroup("MasterState")
+        StateRegistry.instance().register_group(master_group)
+
+
         MainMenu()
-        LevelSelector()
-        # LevelState()
 
+        master_group.change_state("MainMenu")
 
         self.closed = False
         self.now = None
@@ -65,7 +65,7 @@ class StateAppRunner():
         StateRegistry.instance().get_group("MasterState").on_update(elapsed)
 
     def render(self):
-        StateRegistry.instance().get_group("MasterState").on_render(self.screen)
+        StateRegistry.instance().get_group("MasterState").on_render(self.window)
 
         pygame.display.update()
 
