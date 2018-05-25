@@ -45,8 +45,7 @@ class Screen():  # Screen (1) -> Components (3-4) -> Elements -> (5 each) -> Pri
     def on_render(self, screen):
         changed_rectangles = []
         for comp in self.components:
-            if comp.has_changed():
-                # (back color defaults to screen back color, rectangle to draw)
+            if comp.has_changed(): # (back color defaults to screen back color, rectangle to draw)
                 changed_rectangles.append((comp.back_color or self.back_color
                                          , comp.get_prev_rect()))
 
