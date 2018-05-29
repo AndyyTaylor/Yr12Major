@@ -26,8 +26,7 @@ class Screen():
 
     def on_enter(self, data, screen):
         pygame.draw.rect(screen, self.back_color, screen.get_rect())
-        print("Entered")
-        # Every component must initially render
+
         for widget in self.widgets:
             widget.on_render(screen)
 
@@ -41,7 +40,8 @@ class Screen():
 
     def on_render(self, screen):
         for widget in self.widgets:
-            widget.on_render(screen, back_fill=self.back_coloro)
+            if widget.has_changed():
+                widget.on_render(screen, self.back_color)
 
     def on_key_down(self, key):
         for widget in self.widgets:
