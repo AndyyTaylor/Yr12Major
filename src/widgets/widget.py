@@ -50,6 +50,9 @@ class Widget(UIElement):
     def on_mouse_up(self, pos):
         return
 
+    def on_click(self, pos):
+        return
+
     def has_changed(self):
         temp = self.changed
         self.changed = False

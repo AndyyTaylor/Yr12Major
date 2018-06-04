@@ -28,6 +28,8 @@ class StateAppRunner():
 
 
         MainMenu()
+        LevelSelector()
+
 
         master_group.change_state("MainMenu")
 

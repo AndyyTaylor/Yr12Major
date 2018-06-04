@@ -46,9 +46,9 @@ class RoundedRect(Shape):
             self.prev_animation = animation
 
         if self.alpha_enabled:
-            self.draw_rounded_rect(screen, adj_rect, (*self.color, int(animation*50)), 0.0+animation*0.6)
+            self.draw_rounded_rect(screen, adj_rect, (*self.color, int(animation*50)), 0.4+animation*0.6)
         else:
-            self.draw_rounded_rect(screen, adj_rect, self.color, 0.0+animation*0.6)
+            self.draw_rounded_rect(screen, adj_rect, self.color, 0.4+animation*0.6)
 
     def draw_rounded_rect(self, surface, rect, color, radius=0.4):
         """
@@ -95,7 +95,7 @@ class RoundedRect(Shape):
 
 class Button(Widget):
 
-    def __init__(self, x, y, w, h, text, font_size, font_col, back_color, front_color, border_width, shape='rounded_rect'):
+    def __init__(self, x, y, w, h, text, font_size, font_col, back_color, front_color, border_width, callback, shape='rounded_rect'):
         super().__init__(x, y, w, h, back_color, "label")
 
         self.back_color = back_color
@@ -105,6 +105,8 @@ class Button(Widget):
         self.text = text
         self.font_size = font_size
         self.font_col = font_col
+
+        self.callback = callback
 
         self.font = pygame.font.Font('%s/data/fonts/%s' % (config.DIR_PATH, 'Square.ttf'), self.font_size)
         self.rendered_text = self.font.render(self.text, True, self.font_col)
@@ -156,3 +158,6 @@ class Button(Widget):
 
     def on_mouse_motion(self, pos):
         self.hover = pygame.Rect(self.get_rect()).collidepoint(pos)
+
+    def on_click(self, pos):
+        self.callback()
