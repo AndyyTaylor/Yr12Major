@@ -63,3 +63,7 @@ class Screen():
     def on_mouse_up(self, event, pos):
         for widget in self.widgets:
             widget.on_mouse_up(pos)
+
+    def on_scroll(self, is_down):
+        for widget in self.widgets:
+            widget.on_scroll(is_down)

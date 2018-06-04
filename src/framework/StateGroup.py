@@ -114,3 +114,8 @@ class StateGroup(Screen):
         state = self.get_current_state()
         if state:
             state.on_mouse_up(event, pos)
+
+    def on_scroll(self, is_down):
+        state = self.get_current_state()
+        if state:
+            state.on_scroll(is_down)

@@ -53,6 +53,9 @@ class Widget(UIElement):
     def on_click(self, pos):
         return
 
+    def on_scroll(self, is_down):
+        return
+
     def has_changed(self):
         # temp = self.changed
         # self.changed = False

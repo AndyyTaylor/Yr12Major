@@ -55,8 +55,11 @@ class StateAppRunner():
                 pos = pygame.mouse.get_pos()
                 StateRegistry.instance().get_group("MasterState").on_mouse_motion(event, pos)
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                pos = pygame.mouse.get_pos()
-                StateRegistry.instance().get_group("MasterState").on_mouse_down(event, pos)
+                if event.button == 4 or event.button == 5:
+                    StateRegistry.instance().get_group("MasterState").on_scroll(int(event.button == 5))
+                else:
+                    pos = pygame.mouse.get_pos()
+                    StateRegistry.instance().get_group("MasterState").on_mouse_down(event, pos)
             elif event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()
                 StateRegistry.instance().get_group("MasterState").on_mouse_up(event, pos)
