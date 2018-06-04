@@ -50,7 +50,16 @@ class Frame(Widget):
 
     def on_mouse_motion(self, pos):
         for child in self.children:
-            child.on_mouse_motion(np.subtract(np.subtract(pos, (self.x, self.y)), (self.scroll_x, self.scroll_y)))
+            child.on_mouse_motion(self.adj_pos(pos))
+
+    def on_mouse_down(self, pos):
+        pos = self.adj_pos(pos)
+        for child in self.children:
+            if pygame.Rect(child.get_rect()).collidepoint(pos):
+                child.on_click(pos)
+
+    def adj_pos(self, pos):
+        return np.subtract(np.subtract(pos, (self.x, self.y)), (self.scroll_x, self.scroll_y))
 
     def add_child(self, child):
         self.children.append(child)
@@ -60,11 +69,11 @@ class Frame(Widget):
             return
 
         if is_down:
-            self.scroll_y += config.SCROLL_SPEED
-        else:
             self.scroll_y -= config.SCROLL_SPEED
+        else:
+            self.scroll_y += config.SCROLL_SPEED
 
-        self.scroll_y = self.crop(self.scroll_y, -self.max_scroll_y, self.max_scroll_y)
+        self.scroll_y = self.crop(self.scroll_y, -self.max_scroll_y, 0)
 
     def crop(self, val, min_val, max_val):
         return max(min(val, max_val), min_val)

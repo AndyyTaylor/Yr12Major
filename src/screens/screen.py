@@ -57,8 +57,11 @@ class Screen():
 
     def on_mouse_down(self, event, pos):
         for widget in self.widgets:
-            if pygame.Rect(widget.get_rect()).collidepoint(pos):
+            if widget.type == 'frame':
+                widget.on_mouse_down(pos)
+            elif pygame.Rect(widget.get_rect()).collidepoint(pos):
                 widget.on_click(pos)
+                return
 
     def on_mouse_up(self, event, pos):
         for widget in self.widgets:
