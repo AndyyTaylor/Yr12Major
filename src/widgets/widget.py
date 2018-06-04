@@ -54,7 +54,9 @@ class Widget(UIElement):
         return
 
     def has_changed(self):
-        temp = self.changed
-        self.changed = False
+        # temp = self.changed
+        # self.changed = False
+        #
+        # return temp
 
-        return temp
+        return self.changed

@@ -17,5 +17,3 @@ class MainMenu(Screen):
 
     def on_update(self, elapsed):
         super().on_update(elapsed)
-
-        print(int(1000 / elapsed))

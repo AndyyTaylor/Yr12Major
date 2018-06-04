@@ -108,6 +108,8 @@ class Button(Widget):
 
         self.callback = callback
 
+        self.enabled = True
+
         self.font = pygame.font.Font('%s/data/fonts/%s' % (config.DIR_PATH, 'Square.ttf'), self.font_size)
         self.rendered_text = self.font.render(self.text, True, self.font_col)
 
@@ -156,8 +158,14 @@ class Button(Widget):
 
         self.alpha_cover.render(screen, self.x, self.y, self.animation / self.animation_time)
 
+        self.changed = False
+
     def on_mouse_motion(self, pos):
         self.hover = pygame.Rect(self.get_rect()).collidepoint(pos)
 
     def on_click(self, pos):
-        self.callback()
+        if self.enabled:
+            self.callback()
+
+    def disable(self):
+        self.enabled = False
