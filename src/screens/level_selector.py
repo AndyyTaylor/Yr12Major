@@ -29,8 +29,7 @@ class LevelSelector(Screen):
                 level_num += 1
 
     def create_level_button(self, x, y, level_num, box_width, box_height):
-        button = Button(x, y, box_width, box_height, str(level_num), 72, config.BLACK, config.SCHEME4, config.SCHEME3, 10, lambda: print(level_num))
-        # lambda: self.parent.change_state("Level", level_num)
+        button = Button(x, y, box_width, box_height, str(level_num), 72, config.BLACK, config.SCHEME4, config.SCHEME3, 10, lambda: self.parent.change_state("Level", level_num))
 
         if level_num > config.MAX_LEVEL:
             button.disable()
