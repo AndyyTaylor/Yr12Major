@@ -14,22 +14,26 @@ class Frame(Widget):
         self.scrollable = scrollable
         self.scroll_y = 0
         self.scroll_x = 0
-        self.min_scroll_y = 0
-        self.max_scroll_y = 500
-        self.max_scroll_x = 0
 
-        # defaults = {
-        #     'min_scroll_y': 0,
-        #     'max_scroll_y': 500,
-        #     'min_scroll_x': 0,
-        #     'max_scroll_x': 500
-        # }
+        defaults = {
+            'min_scroll_y': -500,
+            'max_scroll_y': 0,
+            'min_scroll_x': 0,
+            'max_scroll_x': 500
+        }
+
+        for key, val in defaults.items():
+            if key in kwargs:
+                setattr(self, key, kwargs[key])
+            else:
+                setattr(self, key, val)
 
         self.children = []
         self.prev_hash = None
         self.back_color = back_color
 
-        self.surf = pygame.Surface((self.w + 2 * self.max_scroll_x, self.h + 2 * self.max_scroll_y))
+        self.surf = pygame.Surface((self.w + abs(self.min_scroll_x) + self.max_scroll_x,
+                                    self.h + abs(self.min_scroll_y) + self.max_scroll_y))
         self.has_filled = False
 
     def on_update(self, elapsed):
@@ -85,7 +89,7 @@ class Frame(Widget):
         else:
             self.scroll_y += config.SCROLL_SPEED
 
-        self.scroll_y = self.crop(self.scroll_y, -self.max_scroll_y, 0)
+        self.scroll_y = self.crop(self.scroll_y, self.min_scroll_y, self.max_scroll_y)
 
     def crop(self, val, min_val, max_val):
         return max(min(val, max_val), min_val)
