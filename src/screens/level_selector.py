@@ -8,9 +8,7 @@ from ..widgets import *
 class LevelSelector(Screen):
 
     def __init__(self):
-        super().__init__("LevelSelector", "MasterState")
-
-        self.widgets.append(Label(0, 0, config.SCREEN_WIDTH, 150, config.SCHEME2, "Level Selector", 118, config.BLACK))
+        super().__init__('LevelSelector', 'MasterState', back_screen='MainMenu')
 
         self.create_level_buttons(50, 170, config.SCREEN_WIDTH-100, config.SCREEN_HEIGHT+200, 150, 150, 20)
 

@@ -4,6 +4,7 @@ import numpy as np
 
 from src import config
 from .frame import Frame
+from .holder import Holder
 
 
 class Component(Frame):
@@ -22,6 +23,12 @@ class Component(Frame):
         self.output_labels = []
 
     def setup_inputs_and_outputs(self):
-        return  # STUBBY
+        for out in self.output_pos:
+            self.outputs.append(Holder(*np.subtract(out, (0, self.slot_height/2)), self.slot_width, self.slot_height))
+
+        for inp in self.input_pos:
+            self.inputs.append(Holder(*np.subtract(inp, (0, self.slot_height/2)), self.slot_width, self.slot_height))
+
+        self.children += self.inputs + self.outputs
 
 

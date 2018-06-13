@@ -9,9 +9,7 @@ from ..components import *
 class Level(Screen):
 
     def __init__(self):
-        super().__init__("Level", "MasterState")
-
-        self.widgets.append(Label(0, 0, config.SCREEN_WIDTH, 150, config.SCHEME2, "Level", 118, config.BLACK))
+        super().__init__('Level', 'MasterState', back_screen='LevelSelector')
 
         self.component_frame = Frame(0, 220, 300, config.SCREEN_HEIGHT - 160, True, config.SCHEME2)
         # component_frame.add_child()

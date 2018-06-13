@@ -20,7 +20,7 @@ class Widget(UIElement):
     def on_init(self):
         return
 
-    def on_shutdown(self): 
+    def on_shutdown(self):
         return
 
     def on_enter(self, data, screen):
@@ -51,7 +51,7 @@ class Widget(UIElement):
         return
 
     def on_click(self, pos):
-        return
+        return False
 
     def on_scroll(self, is_down):
         return

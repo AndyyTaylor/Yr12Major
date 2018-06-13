@@ -26,7 +26,13 @@ class Rect(Shape):
         rect = self.get_rect()
         adj_rect = (rect[0] + x_off, rect[1] + y_off, rect[2], rect[3])
 
-        pygame.draw.rect(screen, self.color, adj_rect)
+        if self.alpha_enabled:
+            s = pygame.Surface(self.get_size())
+            s.set_alpha(255 * animation)
+            s.fill(config.WHITE)
+            screen.blit(s, self.get_pos())
+        else:
+            pygame.draw.rect(screen, self.color, adj_rect)
 
 
 class RoundedRect(Shape):
@@ -166,6 +172,9 @@ class Button(Widget):
     def on_click(self, pos):
         if self.enabled:
             self.callback()
+            return True
+
+        return False
 
     def disable(self):
         self.enabled = False

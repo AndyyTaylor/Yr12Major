@@ -9,12 +9,28 @@ from src.framework.StateRegistry import StateRegistry
 
 class Screen():
 
-    def __init__(self, name, parent, back_color=config.SCHEME5):
+    def __init__(self, name, parent, back_color=config.SCHEME5, **kwargs):
         self.name = name
         self.back_color = back_color
         self.parent = StateRegistry.instance().register(self, parent)
 
+        defaults = {
+            'back_button': True,
+            'show_title': True,
+            'back_screen': 'MainMenu'
+        }
+
+        for key, val in defaults.items():
+            setattr(self, key, kwargs.get(key, val))
+
         self.widgets = []
+
+        if self.show_title:
+            self.widgets.append(Label(0, 0, config.SCREEN_WIDTH, 150, config.SCHEME2, self.name, 118, config.BLACK))
+
+        if self.back_button:
+            self.widgets.append(Button(0, 0, 150, 150, "", 72, config.BLACK, config.SCHEME2, config.SCHEME2, 0, lambda: self.parent.change_state(self.back_screen), shape='rect'))
+            self.widgets.append(Image(25, 25, 100, 100, "back_arrow.png"))
 
     def on_init(self):
         for widget in self.widgets:
@@ -60,8 +76,8 @@ class Screen():
             if widget.type == 'frame':
                 widget.on_mouse_down(pos)
             elif pygame.Rect(widget.get_rect()).collidepoint(pos):
-                widget.on_click(pos)
-                return
+                if widget.on_click(pos):
+                    True
 
     def on_mouse_up(self, event, pos):
         for widget in self.widgets:

@@ -31,7 +31,7 @@ class ColorInput(Component):
 
         self.colors = [config.RED, config.GREEN, config.BLUE, config.YELLOW, config.WHITE][:num_colors]
 
-        self.output_pos.append((self.x + self.w - self.slot_width, self.y + self.h/2 - self.slot_height/2))
+        self.output_pos.append((self.x + self.w - self.slot_width, self.y + self.h/2))
 
         self.setup_inputs_and_outputs()
 

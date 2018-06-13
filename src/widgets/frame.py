@@ -23,10 +23,7 @@ class Frame(Widget):
         }
 
         for key, val in defaults.items():
-            if key in kwargs:
-                setattr(self, key, kwargs[key])
-            else:
-                setattr(self, key, val)
+            setattr(self, key, kwargs.get(key, val))
 
         self.children = []
         self.prev_hash = None
