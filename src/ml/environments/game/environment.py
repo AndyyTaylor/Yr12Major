@@ -10,14 +10,14 @@ class Environment():
 
         X, y = self.unison_shuffled_copies(X, y)
 
-        self.trainX = X[:int(np.floor(m*train_perc)), :]
-        self.trainy = y[:int(np.floor(m*train_perc))]
+        self.trainX = X[:int(np.floor(m * train_perc)), :]
+        self.trainy = y[:int(np.floor(m * train_perc))]
 
-        self.crossX = X[int(np.ceil(m*train_perc)):int(np.floor(m*cross_perc)), :]
-        self.crossy = y[int(np.ceil(m*train_perc)):int(np.floor(m*cross_perc))]
+        self.crossX = X[int(np.ceil(m * train_perc)):int(np.floor(m * cross_perc)), :]
+        self.crossy = y[int(np.ceil(m * train_perc)):int(np.floor(m * cross_perc))]
 
-        self.testX = X[int(np.ceil(m*cross_perc)):, :]
-        self.testy = y[int(np.ceil(m*cross_perc)):]
+        self.testX = X[int(np.ceil(m * cross_perc)):, :]
+        self.testy = y[int(np.ceil(m * cross_perc)):]
 
         self.labels = np.array(tuple(set(y)))
 
@@ -29,4 +29,5 @@ class Environment():
         p = np.random.permutation(len(a))
         return a[p], b[p]
 
-    def on_render(self, screen): pass
+    def on_render(self, screen):
+        pass
