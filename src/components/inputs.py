@@ -1,10 +1,9 @@
 
 import pygame
-import numpy as np
 
 from src import config
-from ..widgets import *
-from src.ml.environments.game import *
+from ..widgets import Label, Component
+from src.ml.environments.game import ColorEnv
 
 
 class Sample:
@@ -29,14 +28,15 @@ class ColorInput(Component):
             'test': 0
         }
 
-        self.colors = [config.RED, config.GREEN, config.BLUE, config.YELLOW, config.WHITE][:num_colors]
+        self.colors = [config.RED, config.GREEN,
+                       config.BLUE, config.YELLOW, config.WHITE][:num_colors]
 
         self.output_pos.append((self.x + self.w - self.slot_width, self.y + self.h/2))
 
         self.setup_inputs_and_outputs()
 
         for i in range(self.environment.testX.shape[0]):
-            sample = Sample(self.environment.testX[i], self.environment.testy[i])
+            sample = Sample(self.environment.testX[i], self.environment.testy[i])  # noqa
             # self.outputs[0].add_data(sample)
 
     def render_data(self, screen, x, y, data, size=20):

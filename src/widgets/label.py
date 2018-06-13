@@ -1,10 +1,8 @@
 
 import pygame
-import numpy as np
 
 from src import config
 from .widget import Widget
-from src.framework.StateRegistry import StateRegistry
 
 
 class Label(Widget):
@@ -16,7 +14,8 @@ class Label(Widget):
         self.font_size = font_size
         self.font_col = font_col
 
-        self.font = pygame.font.Font('%s/data/fonts/%s' % (config.DIR_PATH, 'Square.ttf'), self.font_size)
+        self.font = pygame.font.Font('%s/data/fonts/%s' % (config.DIR_PATH, 'Square.ttf'),
+                                     self.font_size)
         self.rendered_text = self.font.render(self.text, True, self.font_col)
 
     def on_init(self):

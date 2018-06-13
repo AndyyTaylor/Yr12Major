@@ -1,5 +1,6 @@
 
-import pygame, datetime
+import pygame
+import datetime
 import numpy as np
 
 from src import config
@@ -52,9 +53,10 @@ class RoundedRect(Shape):
             self.prev_animation = animation
 
         if self.alpha_enabled:
-            self.draw_rounded_rect(screen, adj_rect, (*self.color, int(animation*50)), 0.4+animation*0.6)
+            self.draw_rounded_rect(screen, adj_rect,
+                                   (*self.color, int(animation * 50)), 0.4 + animation * 0.6)
         else:
-            self.draw_rounded_rect(screen, adj_rect, self.color, 0.4+animation*0.6)
+            self.draw_rounded_rect(screen, adj_rect, self.color, 0.4 + animation * 0.6)
 
     def draw_rounded_rect(self, surface, rect, color, radius=0.4):
         """
@@ -76,9 +78,9 @@ class RoundedRect(Shape):
             rect.topleft = 0, 0
             rectangle = pygame.Surface(rect.size, pygame.SRCALPHA)
 
-            circle = pygame.Surface([min(rect.size)*3]*2, pygame.SRCALPHA)
+            circle = pygame.Surface([min(rect.size) * 3] * 2, pygame.SRCALPHA)
             pygame.draw.ellipse(circle, (0, 0, 0), circle.get_rect(), 0)
-            circle = pygame.transform.smoothscale(circle, [int(min(rect.size)*radius)]*2)
+            circle = pygame.transform.smoothscale(circle, [int(min(rect.size) * radius)] * 2)
 
             radius = rectangle.blit(circle, (0, 0))
             radius.bottomright = rect.bottomright
@@ -101,7 +103,8 @@ class RoundedRect(Shape):
 
 class Button(Widget):
 
-    def __init__(self, x, y, w, h, text, font_size, font_col, back_color, front_color, border_width, callback, shape='rounded_rect'):
+    def __init__(self, x, y, w, h, text, font_size, font_col, back_color,
+                 front_color, border_width, callback, shape='rounded_rect'):
         super().__init__(x, y, w, h, back_color, "label")
 
         self.back_color = back_color
@@ -116,7 +119,8 @@ class Button(Widget):
 
         self.enabled = True
 
-        self.font = pygame.font.Font('%s/data/fonts/%s' % (config.DIR_PATH, 'Square.ttf'), self.font_size)
+        self.font = pygame.font.Font('%s/data/fonts/%s' % (config.DIR_PATH, 'Square.ttf'),
+                                     self.font_size)
         self.rendered_text = self.font.render(self.text, True, self.font_col)
 
         self.shapes = []
@@ -129,7 +133,9 @@ class Button(Widget):
             raise NotImplementedError("Can't find shape " + shape)
 
         self.shapes.append(ShapeClass(0, 0, w, h, self.back_color))
-        self.shapes.append(ShapeClass(border_width, border_width, w - 2*border_width, h - 2*border_width, self.front_color))
+        self.shapes.append(ShapeClass(border_width, border_width,
+                                      w - 2 * border_width, h - 2 * border_width,
+                                      self.front_color))
 
         self.alpha_cover = ShapeClass(0, 0, w, h, config.WHITE, True)
 

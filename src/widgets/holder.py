@@ -1,6 +1,5 @@
 
 import pygame
-import numpy as np
 
 from src import config
 from .widget import Widget
@@ -37,5 +36,3 @@ class Holder(Widget):
 
     def on_mouse_motion(self, pos):
         self.hover = pygame.Rect(self.get_rect()).collidepoint(pos)
-
-

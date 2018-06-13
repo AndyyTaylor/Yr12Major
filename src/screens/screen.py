@@ -1,9 +1,8 @@
 
 import pygame
-import numpy as np
 
 from src import config
-from ..widgets import *
+from ..widgets import Label, Button, Image
 from src.framework.StateRegistry import StateRegistry
 
 
@@ -26,10 +25,14 @@ class Screen():
         self.widgets = []
 
         if self.show_title:
-            self.widgets.append(Label(0, 0, config.SCREEN_WIDTH, 150, config.SCHEME2, self.name, 118, config.BLACK))
+            self.widgets.append(Label(0, 0, config.SCREEN_WIDTH, 150,
+                                config.SCHEME2, self.name, 118, config.BLACK))
 
         if self.back_button:
-            self.widgets.append(Button(0, 0, 150, 150, "", 72, config.BLACK, config.SCHEME2, config.SCHEME2, 0, lambda: self.parent.change_state(self.back_screen), shape='rect'))
+            self.widgets.append(Button(0, 0, 150, 150, "", 72,
+                                config.BLACK, config.SCHEME2, config.SCHEME2, 0,
+                                lambda: self.parent.change_state(self.back_screen), shape='rect'))
+
             self.widgets.append(Image(25, 25, 100, 100, "back_arrow.png"))
 
     def on_init(self):

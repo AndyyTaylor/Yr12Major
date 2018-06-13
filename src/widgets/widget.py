@@ -1,9 +1,4 @@
 
-import pygame
-import numpy as np
-
-from src import config
-from src.framework.StateRegistry import StateRegistry
 from src.framework import UIElement
 
 

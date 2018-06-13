@@ -1,10 +1,7 @@
 
 import pygame
-import numpy as np
 
-from src import config
 from .widget import Widget
-from src.framework.StateRegistry import StateRegistry
 
 
 class Image(Widget):
@@ -13,7 +10,8 @@ class Image(Widget):
         super().__init__(x, y, w, h, None, "image")
 
         self.file_name = file_name
-        self.img_surf = pygame.transform.smoothscale(pygame.image.load("data/assets/" + file_name), (self.w, self.h))
+        self.img_surf = pygame.transform.smoothscale(pygame.image.load("data/assets/" + file_name),
+                                                     (self.w, self.h))
 
     def on_init(self):
         return

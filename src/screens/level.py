@@ -1,9 +1,8 @@
 
-import pygame
 from src import config
 from .screen import Screen
-from ..widgets import *
-from ..components import *
+from ..widgets import Frame, Label
+from ..components import ColorInput
 
 
 class Level(Screen):

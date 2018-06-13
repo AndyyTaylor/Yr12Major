@@ -3,10 +3,10 @@
 import datetime
 import pygame
 from .. import config
-from pygame.locals import *
+from pygame.locals import DOUBLEBUF
 from .StateRegistry import StateRegistry
 from .StateGroup import StateGroup
-from ..screens import *
+from ..screens import MainMenu, LevelSelector, Level
 
 
 class StateAppRunner():
@@ -15,7 +15,8 @@ class StateAppRunner():
     def __init__(self):
         pygame.init()
 
-        self.window = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT), DOUBLEBUF)
+        self.window = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT),
+                                              DOUBLEBUF)
         self.window.set_alpha(None)
         pygame.display.set_caption("Andy's Machine Learning")
         self.last_update = datetime.datetime.now()
@@ -26,11 +27,9 @@ class StateAppRunner():
         master_group = StateGroup("MasterState")
         StateRegistry.instance().register_group(master_group)
 
-
         MainMenu()
         LevelSelector()
         Level()
-
 
         master_group.change_state("MainMenu")
 
@@ -49,23 +48,24 @@ class StateAppRunner():
         self.render()
 
     def read_input(self):
+        master_state = StateRegistry.instance().get_group("MasterState")
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.close()
             if event.type == pygame.MOUSEMOTION:
                 pos = pygame.mouse.get_pos()
-                StateRegistry.instance().get_group("MasterState").on_mouse_motion(event, pos)
+                master_state.on_mouse_motion(event, pos)
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 4 or event.button == 5:
-                    StateRegistry.instance().get_group("MasterState").on_scroll(int(event.button == 5))
+                    master_state.on_scroll(int(event.button == 5))
                 else:
                     pos = pygame.mouse.get_pos()
-                    StateRegistry.instance().get_group("MasterState").on_mouse_down(event, pos)
+                    master_state.on_mouse_down(event, pos)
             elif event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()
-                StateRegistry.instance().get_group("MasterState").on_mouse_up(event, pos)
+                master_state.on_mouse_up(event, pos)
             elif event.type == pygame.KEYDOWN:
-                StateRegistry.instance().get_group("MasterState").on_key_down(event.key)
+                master_state.on_key_down(event.key)
 
     def update(self, elapsed):
         StateRegistry.instance().get_group("MasterState").on_update(elapsed)

@@ -24,11 +24,11 @@ class Component(Frame):
 
     def setup_inputs_and_outputs(self):
         for out in self.output_pos:
-            self.outputs.append(Holder(*np.subtract(out, (0, self.slot_height/2)), self.slot_width, self.slot_height))
+            self.outputs.append(Holder(*np.subtract(out, (0, self.slot_height / 2)),
+                                self.slot_width, self.slot_height))
 
         for inp in self.input_pos:
-            self.inputs.append(Holder(*np.subtract(inp, (0, self.slot_height/2)), self.slot_width, self.slot_height))
+            self.inputs.append(Holder(*np.subtract(inp, (0, self.slot_height / 2)),
+                               self.slot_width, self.slot_height))
 
         self.children += self.inputs + self.outputs
-
-
