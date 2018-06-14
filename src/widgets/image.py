@@ -29,4 +29,6 @@ class Image(Widget):
         return
 
     def on_render(self, screen, back_fill=None):
+        super().on_render(screen, back_fill)
+
         screen.blit(self.img_surf, self.get_pos())

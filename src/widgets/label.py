@@ -34,6 +34,8 @@ class Label(Widget):
         return
 
     def on_render(self, screen, back_fill=None):
+        super().on_render(screen, back_fill)
+
         pygame.draw.rect(screen, self.back_color, self.get_rect())
 
         t_w, t_h = self.font.size(self.text)

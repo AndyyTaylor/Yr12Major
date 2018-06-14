@@ -10,7 +10,7 @@ class LevelSelector(Screen):
         super().__init__('LevelSelector', 'MasterState', back_screen='MainMenu')
 
         self.create_level_buttons(50, 170, config.SCREEN_WIDTH - 100,
-                                  config.SCREEN_HEIGHT+200, 150, 150, 20)
+                                  config.SCREEN_HEIGHT + 200, 150, 150, 20)
 
     def on_update(self, elapsed):
         super().on_update(elapsed)

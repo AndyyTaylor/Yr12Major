@@ -56,10 +56,10 @@ class StateAppRunner():
                 pos = pygame.mouse.get_pos()
                 master_state.on_mouse_motion(event, pos)
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
                 if event.button == 4 or event.button == 5:
-                    master_state.on_scroll(int(event.button == 5))
+                    master_state.on_scroll(int(event.button == 5), pos)
                 else:
-                    pos = pygame.mouse.get_pos()
                     master_state.on_mouse_down(event, pos)
             elif event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()

@@ -10,7 +10,7 @@ from .holder import Holder
 class Component(Frame):
 
     def __init__(self, x, y, w, h):
-        super().__init__(x, y, w, h, False, config.SCHEME4)
+        super().__init__(x, y, w, h, False, config.SCHEME4, name='component')
 
         self.slot_width = 40
         self.slot_height = 30

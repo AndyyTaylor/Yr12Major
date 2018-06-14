@@ -29,6 +29,8 @@ class Holder(Widget):
             self.prev_hash = new_hash
 
     def on_render(self, screen, back_fill=None):
+        super().on_render(screen, back_fill)
+
         pygame.draw.rect(screen, config.SCHEME3, self.get_rect())
 
         if self.hover:

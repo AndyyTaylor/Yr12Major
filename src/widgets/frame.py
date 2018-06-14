@@ -9,7 +9,7 @@ from .widget import Widget
 class Frame(Widget):
 
     def __init__(self, x, y, w, h, scrollable=False, back_color=None, **kwargs):
-        super().__init__(x, y, w, h, None, 'frame')
+        super().__init__(x, y, w, h, None, kwargs.get('name', 'frame'), clickable=True)
 
         self.scrollable = scrollable
         self.scroll_y = 0
@@ -43,15 +43,17 @@ class Frame(Widget):
             self.changed = True
 
     def on_render(self, screen, back_fill=None):
+        super().on_render(screen, back_fill)
+
         if self.back_color is not None:
             back_fill = self.back_color
 
-        if not self.has_filled and back_fill is not None:
+        if (not self.has_filled or self.changed) and back_fill is not None:
             self.surf.fill(back_fill)
             self.has_filled = True
 
         for child in self.children:  # Crop things that are out of the Frame
-            if child.has_changed():
+            if child.has_changed() or self.changed:
                 child.on_render(self.surf, back_fill)
 
         temp_surf = pygame.Surface((self.w, self.h))
@@ -60,6 +62,8 @@ class Frame(Widget):
         temp_surf.blit(self.surf, (self.scroll_x, self.scroll_y))
 
         screen.blit(temp_surf, (self.x, self.y))
+
+        self.changed = False
 
     def on_mouse_motion(self, pos):
         for child in self.children:
@@ -97,3 +101,7 @@ class Frame(Widget):
                 return True
 
         return self.changed
+
+    def reset_animation(self):
+        for child in self.children:
+            child.reset_animation()

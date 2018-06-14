@@ -47,6 +47,7 @@ class Screen():
         pygame.draw.rect(screen, self.back_color, screen.get_rect())
 
         for widget in self.widgets:
+            widget.reset_animation()
             widget.on_render(screen)
 
     def on_exit(self):
@@ -86,6 +87,7 @@ class Screen():
         for widget in self.widgets:
             widget.on_mouse_up(pos)
 
-    def on_scroll(self, is_down):
+    def on_scroll(self, is_down, pos):
         for widget in self.widgets:
-            widget.on_scroll(is_down)
+            if pygame.Rect(widget.get_rect()).collidepoint(pos):
+                widget.on_scroll(is_down)

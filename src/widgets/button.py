@@ -105,7 +105,7 @@ class Button(Widget):
 
     def __init__(self, x, y, w, h, text, font_size, font_col, back_color,
                  front_color, border_width, callback, shape='rounded_rect'):
-        super().__init__(x, y, w, h, back_color, "label")
+        super().__init__(x, y, w, h, back_color, 'button', True)
 
         self.back_color = back_color
         self.front_color = front_color
@@ -145,6 +145,9 @@ class Button(Widget):
         self.hover = False
 
     def on_update(self, elapsed):
+        if self.is_clicked and self.enabled:
+            self.callback()
+
         if self.hover and self.animation < self.animation_time:
             dt = min(elapsed, self.animation_time - self.animation)
             self.animation += dt
@@ -159,6 +162,8 @@ class Button(Widget):
             self.prev_hash = new_hash
 
     def on_render(self, screen, back_fill=None):
+        super().on_render(screen, back_fill)
+
         if back_fill is not None:
             pygame.draw.rect(screen, back_fill, self.get_rect())
 
@@ -174,13 +179,6 @@ class Button(Widget):
 
     def on_mouse_motion(self, pos):
         self.hover = pygame.Rect(self.get_rect()).collidepoint(pos)
-
-    def on_click(self, pos):
-        if self.enabled:
-            self.callback()
-            return True
-
-        return False
 
     def disable(self):
         self.enabled = False
