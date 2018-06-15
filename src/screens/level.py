@@ -1,5 +1,6 @@
 
 import pygame
+import numpy as np
 from src import config
 from .screen import Screen
 from ..widgets import Frame, Label
@@ -27,6 +28,7 @@ class Level(Screen):
         self.widgets.append(Label(0, 160, 300, 60, config.SCHEME2, "Components", 36, config.BLACK))
 
         self.floating_component = None
+        self.drag_offset = (0, 0)
 
     def on_enter(self, data, screen):
         super().on_enter(data, screen)
@@ -56,6 +58,7 @@ class Level(Screen):
             for widget in self.component_frame.children:
                 if widget.is_clicked:
                     widget.add_pos(*self.component_frame.get_pos())
+                    self.drag_offset = np.subtract(pos, widget.get_pos())
                     self.floating_component = widget
                     self.component_frame.children.remove(widget)
                     break
@@ -64,6 +67,7 @@ class Level(Screen):
             for widget in self.workspace_frame.children:
                 if widget.is_clicked:
                     widget.add_pos(*self.workspace_frame.get_pos())
+                    self.drag_offset = np.subtract(pos, widget.get_pos())
                     self.floating_component = widget
                     self.workspace_frame.children.remove(widget)
                     break
@@ -72,7 +76,7 @@ class Level(Screen):
         super().on_mouse_motion(event, pos)
 
         if self.floating_component is not None:
-            self.floating_component.set_pos(*pos)
+            self.floating_component.set_pos(*np.subtract(pos, self.drag_offset))
 
             for widget in self.widgets:
                 widget_rect = pygame.Rect(widget.get_rect())
