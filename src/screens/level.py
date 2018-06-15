@@ -14,7 +14,7 @@ class Level(Screen):
 
         self.component_frame = Frame(0, 220, 300, config.SCREEN_HEIGHT - 220, True, config.SCHEME2)
         self.workspace_frame = Frame(310, 160, config.SCREEN_WIDTH - 305,
-                                     config.SCREEN_HEIGHT - 160, True, config.SCHEME1)
+                                     config.SCREEN_HEIGHT - 160, True, config.SCHEME5)
 
         border1 = Frame(0, 150, config.SCREEN_WIDTH, 10, back_color=config.SCHEME5)
         border2 = Frame(300, 160, 10, config.SCREEN_HEIGHT - 160, back_color=config.SCHEME5)

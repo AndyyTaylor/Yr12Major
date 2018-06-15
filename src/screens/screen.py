@@ -2,7 +2,7 @@
 import pygame
 
 from src import config
-from ..widgets import Label, Button, Image
+from ..widgets import Label, Button, Image, Frame
 from src.framework.StateRegistry import StateRegistry
 
 
@@ -29,11 +29,16 @@ class Screen():
                                 config.SCHEME2, self.name, 118, config.BLACK))
 
         if self.back_button:
-            self.widgets.append(Button(0, 0, 150, 150, "", 72,
-                                config.BLACK, config.SCHEME2, config.SCHEME2, 0,
-                                lambda: self.parent.change_state(self.back_screen), shape='rect'))
+            back_button_frame = Frame(0, 0, 150, 150, back_color=config.SCHEME2)
 
-            self.widgets.append(Image(25, 25, 100, 100, "back_arrow.png"))
+            back_button_frame.add_child(Button(0, 0, 150, 150, "", 72,
+                                        config.BLACK, config.SCHEME2, config.SCHEME2, 0,
+                                        lambda: self.parent.change_state(self.back_screen),
+                                        shape='rect'))
+
+            back_button_frame.add_child(Image(25, 25, 100, 100, "back_arrow.png"))
+
+            self.widgets.append(back_button_frame)
 
     def on_init(self):
         for widget in self.widgets:

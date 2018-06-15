@@ -18,7 +18,8 @@ class LevelSelector(Screen):
         print(int(1000 / elapsed))
 
     def create_level_buttons(self, x, y, w, h, box_width, box_height, gap_size):
-        level_button_frame = Frame(x, y, w, h, True, None, min_scroll_y=-500, max_scroll_y=0)
+        level_button_frame = Frame(x, y, w, h, True, config.SCHEME5,
+                                   min_scroll_y=-500, max_scroll_y=0)
         self.widgets.append(level_button_frame)
 
         level_num = 1
