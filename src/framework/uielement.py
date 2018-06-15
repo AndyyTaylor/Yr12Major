@@ -25,6 +25,10 @@ class UIElement():
         self.x -= dx
         self.y -= dy
 
+    def add_pos(self, dx, dy):
+        self.x += dx
+        self.y += dy
+
     def get_size(self):
         return (self.w, self.h)
 

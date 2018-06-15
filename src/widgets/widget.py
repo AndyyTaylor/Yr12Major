@@ -32,15 +32,11 @@ class Widget(UIElement):
         return
 
     def on_update(self, elapsed):
-        return
+        self.update_prev_pos()
 
     def on_render(self, screen, back_fill=None):
-        if self.get_pos() != (self.prev_x, self.prev_y):
-            print(back_fill)
         if back_fill is not None:
             pygame.draw.rect(screen, back_fill, self.get_prev_rect())
-
-        self.update_prev_pos()
 
     def on_key_down(self, key):
         return

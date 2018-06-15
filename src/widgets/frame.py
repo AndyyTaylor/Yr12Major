@@ -32,15 +32,18 @@ class Frame(Widget):
         self.surf = pygame.Surface((self.w + abs(self.min_scroll_x) + self.max_scroll_x,
                                     self.h + abs(self.min_scroll_y) + self.max_scroll_y))
         self.has_filled = False
+        self.scrolled = False
 
     def on_update(self, elapsed):
+        super().on_update(elapsed)
+
         for child in self.children:
             child.on_update(elapsed)
 
         new_hash = hash((self.scroll_x, self.scroll_y))
         if new_hash != self.prev_hash:
             self.prev_hash = new_hash
-            self.changed = True
+            self.scrolled = True
 
     def on_render(self, screen, back_fill=None):
         super().on_render(screen, back_fill)
@@ -64,6 +67,7 @@ class Frame(Widget):
         screen.blit(temp_surf, (self.x, self.y))
 
         self.changed = False
+        self.scrolled = False
 
     def on_mouse_motion(self, pos):
         for child in self.children:
@@ -100,7 +104,7 @@ class Frame(Widget):
             if child.has_changed():
                 return True
 
-        return self.changed
+        return self.changed or self.scrolled
 
     def reset_animation(self):
         for child in self.children:
