@@ -83,7 +83,13 @@ class Frame(Widget):
         return np.subtract(np.subtract(pos, (self.x, self.y)), (self.scroll_x, self.scroll_y))
 
     def add_child(self, child):
+        child.x = self.crop(child.x, 0, self.w - child.w)
+        child.y = self.crop(child.y, 0, self.h - child.h)
+
         self.children.append(child)
+
+    def clear_children(self):
+        self.children = []
 
     def on_scroll(self, is_down):
         if not self.scrollable:
