@@ -90,10 +90,16 @@ class Level(Screen):
         super().on_mouse_up(event, pos)
 
         if self.floating_component is not None:
-            workspace_rect = pygame.Rect(self.component_frame.get_rect())
+            workspace_rect = pygame.Rect(self.workspace_frame.get_rect())
             component_rect = pygame.Rect(self.floating_component.get_rect())
+            component_frame_rect = pygame.Rect(self.component_frame.get_rect())
 
-            if workspace_rect.colliderect(component_rect):
+            c_frame_intersect = component_frame_rect.clip(component_rect)
+            w_frame_intersect = workspace_rect.clip(component_rect)
+
+            if c_frame_intersect.size + w_frame_intersect.size == 0:
+                pass
+            elif c_frame_intersect.size > w_frame_intersect.size:
                 self.floating_component.sub_pos(*self.component_frame.get_pos())
                 self.component_frame.add_child(self.floating_component)
             else:

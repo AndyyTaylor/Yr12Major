@@ -29,6 +29,8 @@ class Image(Widget):
         return
 
     def on_render(self, screen, back_fill=None):
-        super().on_render(screen, back_fill)
+        # super().on_render(screen, back_fill)
+        # THIS IS DODGY, but the super is drawing the backfill which means
+        # the alpha breaks.
 
         screen.blit(self.img_surf, self.get_pos())
