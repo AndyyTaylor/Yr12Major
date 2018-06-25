@@ -2,7 +2,7 @@
 import pygame
 
 from src import config
-from ..widgets import Label, Component
+from ..widgets import Component
 from src.ml.environments.game import ColorEnv
 
 
@@ -17,9 +17,8 @@ class Sample:
 class ColorInput(Component):
 
     def __init__(self, x, y, num_colors):
-        super().__init__(x, y, 280, 150)
+        super().__init__(x, y, 280, 150, 'Input')
 
-        self.add_child(Label(0, 0, self.w, 40, config.SCHEME4, "Colour", 32, config.SCHEME1))
         self.environment = ColorEnv(num_colors)
 
         self.index = {
@@ -31,7 +30,7 @@ class ColorInput(Component):
         self.colors = [config.RED, config.GREEN,
                        config.BLUE, config.YELLOW, config.WHITE][:num_colors]
 
-        self.output_pos.append((self.x + self.w - self.slot_width, self.y + self.h/2))
+        self.output_pos.append((self.w - self.slot_width, self.h / 2))
 
         self.setup_inputs_and_outputs()
 
@@ -45,7 +44,7 @@ class ColorInput(Component):
         else:
             label = int(data)
 
-        pygame.draw.circle(screen, self.colors[label-1], (int(x), int(y)), size)
+        pygame.draw.circle(screen, self.colors[label - 1], (int(x), int(y)), size)
 
     def get_train_data(self):
         return (self.environment.trainX, self.environment.trainy)

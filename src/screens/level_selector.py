@@ -15,7 +15,7 @@ class LevelSelector(Screen):
     def on_update(self, elapsed):
         super().on_update(elapsed)
 
-        print(int(1000 / elapsed))
+        # print(int(1000 / elapsed))
 
     def create_level_buttons(self, x, y, w, h, box_width, box_height, gap_size):
         level_button_frame = Frame(x, y, w, h, True, config.SCHEME5,

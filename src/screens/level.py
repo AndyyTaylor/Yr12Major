@@ -4,7 +4,7 @@ import numpy as np
 from src import config
 from .screen import Screen
 from ..widgets import Frame, Label
-from ..components import ColorInput
+from ..components import ColorInput, Output
 
 
 class Level(Screen):
@@ -37,6 +37,7 @@ class Level(Screen):
 
         self.component_frame.clear_children()
         self.component_frame.add_child(ColorInput(10, 10, 3))
+        self.component_frame.add_child(Output(10, 300))
 
     def on_update(self, elapsed):
         super().on_update(elapsed)
@@ -44,7 +45,7 @@ class Level(Screen):
         if self.floating_component is not None:
             self.floating_component.on_update(elapsed)
 
-        print(int(1000 / elapsed))
+        # print(int(1000 / elapsed))
 
     def on_render(self, screen):
         super().on_render(screen)
@@ -56,22 +57,7 @@ class Level(Screen):
         super().on_mouse_down(event, pos)
 
         if self.floating_component is None:
-            for widget in self.component_frame.children:
-                if widget.is_clicked:
-                    widget.add_pos(*self.component_frame.get_pos())
-                    self.drag_offset = np.subtract(pos, widget.get_pos())
-                    self.floating_component = widget
-                    self.component_frame.children.remove(widget)
-                    break
-
-            # If not in the component frame
-            for widget in self.workspace_frame.children:
-                if widget.is_clicked:
-                    widget.add_pos(*self.workspace_frame.get_pos())
-                    self.drag_offset = np.subtract(pos, widget.get_pos())
-                    self.floating_component = widget
-                    self.workspace_frame.children.remove(widget)
-                    break
+            self.select_floating_component(pos)
 
     def on_mouse_motion(self, event, pos):
         super().on_mouse_motion(event, pos)
@@ -115,3 +101,21 @@ class Level(Screen):
 
             self.floating_component.is_clicked = False
             self.floating_component = None
+
+    def select_floating_component(self, pos):
+        for widget in self.component_frame.children:
+            if widget.is_clicked:
+                widget.add_pos(*self.component_frame.get_pos())
+                self.drag_offset = np.subtract(pos, widget.get_pos())
+                self.floating_component = widget
+                self.component_frame.children.remove(widget)
+                return
+
+        # If not in the component frame
+        for widget in self.workspace_frame.children:
+            if widget.is_clicked:
+                widget.add_pos(*self.workspace_frame.get_pos())
+                self.drag_offset = np.subtract(pos, widget.get_pos())
+                self.floating_component = widget
+                self.workspace_frame.children.remove(widget)
+                return
