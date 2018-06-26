@@ -56,6 +56,28 @@ class Level(Screen):
     def on_mouse_down(self, event, pos):
         super().on_mouse_down(event, pos)
 
+        holders = []
+        for widget in self.component_frame.children:
+            if widget.type == 'component':
+                for child in widget.children:
+                    if child.type == 'holder':
+                        parent_pos = tuple(np.add(self.component_frame.get_pos(), widget.get_pos()))
+                        holders.append((child, parent_pos))
+
+        for widget in self.workspace_frame.children:
+            if widget.type == 'component':
+                for child in widget.children:
+                    if child.type == 'holder':
+                        parent_pos = tuple(np.add(self.workspace_frame.get_pos(), widget.get_pos()))
+                        holders.append((child, parent_pos))
+
+        for holder, parent_pos in holders:
+            print(parent_pos)
+            adj_pos = tuple(np.add(holder.get_pos(), parent_pos))
+            print(adj_pos + holder.get_size())
+            if pygame.Rect(adj_pos + holder.get_size()).collidepoint(pos):
+                print("Clicked holder")
+
         if self.floating_component is None:
             self.select_floating_component(pos)
 
