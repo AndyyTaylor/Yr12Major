@@ -23,11 +23,16 @@ class Shape(UIElement):
 
 class Rect(Shape):
 
-    def render(self, screen, x_off, y_off, animation=0):
+    def render(self, screen, x_off, y_off, animation=0, enabled=True):
         rect = self.get_rect()
         adj_rect = (rect[0] + x_off, rect[1] + y_off, rect[2], rect[3])
 
-        if self.alpha_enabled:
+        if not enabled:
+            s = pygame.Surface(self.get_size())
+            s.set_alpha(config.DISABLED_ALPHA)
+            s.fill(config.BLACK)
+            screen.blit(s, self.get_pos())
+        elif self.alpha_enabled:
             s = pygame.Surface(self.get_size())
             s.set_alpha(255 * animation)
             s.fill(config.WHITE)
@@ -44,7 +49,7 @@ class RoundedRect(Shape):
         self.cache = []
         self.prev_animation = 0
 
-    def render(self, screen, x_off, y_off, animation=0):
+    def render(self, screen, x_off, y_off, animation=0, enabled=True):
         rect = self.get_rect()
         adj_rect = (rect[0] + x_off, rect[1] + y_off, rect[2], rect[3])
 
@@ -58,7 +63,11 @@ class RoundedRect(Shape):
         else:
             self.draw_rounded_rect(screen, adj_rect, self.color, 0.4 + animation * 0.6)
 
-    def draw_rounded_rect(self, surface, rect, color, radius=0.4):
+        if not enabled:
+            self.draw_rounded_rect(screen, adj_rect, (*config.BLACK, config.DISABLED_ALPHA),
+                                   0.4 + animation * 0.6, False)
+
+    def draw_rounded_rect(self, surface, rect, color, radius=0.4, use_cache=True):
         """
         AAfilledRoundedRect(surface,rect,color,radius=0.4)
 
@@ -69,7 +78,7 @@ class RoundedRect(Shape):
         """
         pos = (rect[0], rect[1])
 
-        if not self.cache:
+        if not self.cache or not use_cache:
             rect = pygame.Rect(rect)
             color = pygame.Color(*color)
             alpha = color.a
@@ -96,9 +105,13 @@ class RoundedRect(Shape):
             rectangle.fill(color, special_flags=pygame.BLEND_RGBA_MAX)
             rectangle.fill((255, 255, 255, alpha), special_flags=pygame.BLEND_RGBA_MIN)
 
-            self.cache.append(rectangle)
+            if use_cache:
+                self.cache.append(rectangle)
+            else:
+                surface.blit(rectangle, pos)
 
-        return surface.blit(self.cache[0], pos)
+        if use_cache:
+            return surface.blit(self.cache[0], pos)
 
 
 class Button(Widget):
@@ -153,12 +166,13 @@ class Button(Widget):
         if self.is_clicked and self.enabled:
             self.callback()
 
-        if self.hover and self.animation < self.animation_time:
-            dt = min(elapsed, self.animation_time - self.animation)
-            self.animation += dt
-        elif not self.hover and self.animation > 0:
-            dt = min(elapsed, self.animation)
-            self.animation -= dt
+        if self.enabled:
+            if self.hover and self.animation < self.animation_time:
+                dt = min(elapsed, self.animation_time - self.animation)
+                self.animation += dt
+            elif not self.hover and self.animation > 0:
+                dt = min(elapsed, self.animation)
+                self.animation -= dt
 
         new_hash = hash((self.hover, self.animation))
 
@@ -173,12 +187,14 @@ class Button(Widget):
             pygame.draw.rect(screen, back_fill, self.get_rect())
 
         for shape in self.shapes:
-            shape.render(screen, self.x, self.y, self.animation / self.animation_time)
+            shape.render(screen, self.x, self.y,
+                         self.animation / self.animation_time, enabled=self.enabled)
 
         t_w, t_h = self.font.size(self.text)
         screen.blit(self.rendered_text, self.get_adj_center(t_w / 2, t_h / 2))
 
-        self.alpha_cover.render(screen, self.x, self.y, self.animation / self.animation_time)
+        if self.enabled:
+            self.alpha_cover.render(screen, self.x, self.y, self.animation / self.animation_time)
 
         if self.img is not None:
             self.img.on_render(screen, back_fill)

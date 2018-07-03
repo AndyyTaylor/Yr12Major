@@ -23,8 +23,8 @@ class LevelSelector(Screen):
         self.widgets.append(level_button_frame)
 
         level_num = 1
-        for yy in range(y, y + h, box_height + gap_size):
-            for xx in range(x, x + w, box_width + gap_size):
+        for yy in range(y, y + h - box_height + 1, box_height + gap_size):
+            for xx in range(x, x + w - box_width + 1, box_width + gap_size):
                 button = self.create_level_button(xx - x, yy - y, level_num, box_width, box_height)
                 level_button_frame.add_child(button)
                 level_num += 1

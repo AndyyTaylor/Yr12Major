@@ -20,6 +20,7 @@ class Widget(UIElement):
 
     def reset_animation(self):
         self.animation = 0
+        self.hover = False
         self.is_clicked = False
 
     def on_init(self):

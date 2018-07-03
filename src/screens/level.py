@@ -30,18 +30,6 @@ class Level(Screen):
 
         self.widgets.append(Label(0, 160, 300, 60, config.SCHEME2, "Components", 36, config.BLACK))
 
-        pause_button = Button(config.SCREEN_WIDTH - 90 - 310, 0, 80, 80, "", 72,
-                              config.BLACK, config.BLACK, config.SCHEME2, 5,
-                              lambda: self.parent.change_state(self.back_screen),
-                              img=Image(15, 15, 50, 50, "pause.png"))
-        self.workspace_frame.add_child(pause_button)
-
-        play_button = Button(config.SCREEN_WIDTH - 180 - 310, 0, 80, 80, "", 72,
-                             config.BLACK, config.BLACK, config.SCHEME2, 5,
-                             lambda: self.parent.change_state(self.back_screen),
-                             img=Image(18, 15, 50, 50, "play.png"))
-        self.workspace_frame.add_child(play_button)
-
         self.floating_component = None
         self.drag_offset = (0, 0)
 
@@ -49,7 +37,13 @@ class Level(Screen):
         super().on_enter(data, screen)
 
         self.component_frame.clear_children()
-        # self.workspace_frame.clear_children()
+        self.workspace_frame.clear_children()
+
+        self.component_frame.changed = True
+        self.workspace_frame.changed = True
+
+        self.clear_connections()
+        self.add_control_buttons()
         # self.component_frame.add_child(Input(10, 10, 3))
         # self.component_frame.add_child(Output(10, 300))
 
@@ -57,7 +51,7 @@ class Level(Screen):
 
     def on_update(self, elapsed):
         super().on_update(elapsed)
-        print(self.out.get_percentage())
+
         if self.floating_component is not None:
             self.floating_component.on_update(elapsed)
 
@@ -170,11 +164,35 @@ class Level(Screen):
         self.floating_component.is_clicked = False
         self.floating_component = None
 
+    def clear_connections(self):
+        connections = []
+        for widget in self.widgets:
+            if widget.type == 'connection':
+                connections.append(widget)
+
+        for conn in connections:
+            self.widgets.remove(conn)
+
+    def add_control_buttons(self):
+        pause_button = Button(config.SCREEN_WIDTH - 90 - 310, 0, 80, 80, "", 72,
+                              config.BLACK, config.BLACK, config.SCHEME2, 5,
+                              lambda: self.parent.change_state(self.back_screen),
+                              img=Image(15, 15, 50, 50, "pause.png"))
+        self.workspace_frame.add_child(pause_button)
+
+        play_button = Button(config.SCREEN_WIDTH - 180 - 310, 0, 80, 80, "", 72,
+                             config.BLACK, config.BLACK, config.SCHEME2, 5,
+                             lambda: self.parent.change_state(self.back_screen),
+                             img=Image(18, 15, 50, 50, "play.png"))
+        self.workspace_frame.add_child(play_button)
+
     def load_level(self, num):
         if num == 1:
             self.environment = ColorEnv(2)
-            self.component_frame.add_child(Input(10, 10, self.environment))
-            self.out = Output(10, 300, self.environment)
-            self.component_frame.add_child(self.out)
+        elif num == 2:
+            self.environment = ColorEnv(3)
         else:
             raise NotImplementedError("Can't find level", num)
+
+        self.component_frame.add_child(Input(10, 10, self.environment))
+        self.component_frame.add_child(Output(10, 300, self.environment))
