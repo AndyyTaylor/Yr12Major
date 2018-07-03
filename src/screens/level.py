@@ -4,7 +4,7 @@ import numpy as np
 from src import config
 from .screen import Screen
 from ..widgets import Frame, Label
-from ..components import ColorInput, Output
+from ..components import ColorInput, Output, Connection
 
 
 class Level(Screen):
@@ -56,29 +56,7 @@ class Level(Screen):
     def on_mouse_down(self, event, pos):
         super().on_mouse_down(event, pos)
 
-        holders = []
-        for widget in self.component_frame.children:
-            if widget.type == 'component':
-                for child in widget.children:
-                    if child.type == 'holder':
-                        parent_pos = tuple(np.add(self.component_frame.get_pos(), widget.get_pos()))
-                        holders.append((child, parent_pos))
-
-        for widget in self.workspace_frame.children:
-            if widget.type == 'component':
-                for child in widget.children:
-                    if child.type == 'holder':
-                        parent_pos = tuple(np.add(self.workspace_frame.get_pos(), widget.get_pos()))
-                        holders.append((child, parent_pos))
-
-        for holder, parent_pos in holders:
-            print(parent_pos)
-            adj_pos = tuple(np.add(holder.get_pos(), parent_pos))
-            print(adj_pos + holder.get_size())
-            if pygame.Rect(adj_pos + holder.get_size()).collidepoint(pos):
-                print("Clicked holder")
-
-        if self.floating_component is None:
+        if not self.create_connections(pos) and self.floating_component is None:
             self.select_floating_component(pos)
 
     def on_mouse_motion(self, event, pos):
@@ -114,15 +92,26 @@ class Level(Screen):
                 self.floating_component.sub_pos(*self.workspace_frame.get_pos())
                 self.workspace_frame.add_child(self.floating_component)
 
-            for widget in self.widgets:
-                widget_rect = pygame.Rect(widget.get_rect())
-                floating_rect = pygame.Rect(self.floating_component.get_prev_rect())
-
-                if widget_rect.colliderect(floating_rect):
-                    widget.changed = True
-
             self.floating_component.is_clicked = False
             self.floating_component = None
+
+    def create_connections(self, pos):
+        holders = []
+        for widget in self.workspace_frame.children:
+            if widget.type == 'component':
+                for child in widget.children:
+                    if child.type == 'holder':
+                        parent_pos = tuple(np.add(self.workspace_frame.get_pos(), widget.get_pos()))
+                        holders.append((child, parent_pos))
+
+        for holder, parent_pos in holders:
+            adj_pos = tuple(np.add(holder.get_pos(), parent_pos))
+            if pygame.Rect(adj_pos + holder.get_size()).collidepoint(pos):
+                self.widgets.append(Connection(holder, None))
+                print("Creating connection")
+                return True
+
+        return False
 
     def select_floating_component(self, pos):
         for widget in self.component_frame.children:

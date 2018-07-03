@@ -64,6 +64,19 @@ class Screen():
             widget.on_update(elapsed)
 
     def on_render(self, screen):
+        moving_rects = []
+        for widget in self.widgets:
+            if widget.type == 'connection' and widget.has_changed():
+                moving_rects.append(widget.get_rect())
+
+        for widget in self.widgets:
+            widget_rect = pygame.Rect(widget.get_rect())
+
+            for move_rect in moving_rects:
+                if widget_rect.colliderect(move_rect):
+                    widget.changed = True
+                    break
+
         for widget in self.widgets:
             if widget.has_changed():
                 widget.on_render(screen, self.back_color)
