@@ -115,7 +115,6 @@ class Frame(Widget):
     def has_changed(self):
         for child in self.children:
             if child.has_changed():
-                print("child changed", self.get_global_pos())
                 return True
 
         return self.changed or self.scrolled

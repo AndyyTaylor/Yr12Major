@@ -10,7 +10,7 @@ class Holder(Widget):
     def __init__(self, x, y, w, h, parent=None):
         super().__init__(x, y, w, h, config.SCHEME3, 'holder', parent=parent)
 
-        self.data = []
+        self.samples = []
 
         self.hover = False
         self.clicked = False
@@ -37,6 +37,15 @@ class Holder(Widget):
             screen.blit(self.alphaCover, self.get_pos())
 
         self.changed = False
+
+    def add_sample(self, sample):
+        self.samples.append(sample)
+
+    def has_samples(self):
+        return len(self.samples) > 0
+
+    def take_sample(self):
+        return self.samples.pop()
 
     def on_mouse_motion(self, pos):
         self.hover = pygame.Rect(self.get_rect()).collidepoint(pos)

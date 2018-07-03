@@ -1,10 +1,13 @@
 
 import pygame
 import numpy as np
+
 from src import config
+from src.ml.environments.game import ColorEnv
+
 from .screen import Screen
-from ..widgets import Frame, Label
-from ..components import ColorInput, Output, Connection
+from ..widgets import Frame, Label, Image, Button
+from ..components import Input, Output, Connection
 
 
 class Level(Screen):
@@ -27,21 +30,34 @@ class Level(Screen):
 
         self.widgets.append(Label(0, 160, 300, 60, config.SCHEME2, "Components", 36, config.BLACK))
 
+        pause_button = Button(config.SCREEN_WIDTH - 90 - 310, 0, 80, 80, "", 72,
+                              config.BLACK, config.BLACK, config.SCHEME2, 5,
+                              lambda: self.parent.change_state(self.back_screen),
+                              img=Image(15, 15, 50, 50, "pause.png"))
+        self.workspace_frame.add_child(pause_button)
+
+        play_button = Button(config.SCREEN_WIDTH - 180 - 310, 0, 80, 80, "", 72,
+                             config.BLACK, config.BLACK, config.SCHEME2, 5,
+                             lambda: self.parent.change_state(self.back_screen),
+                             img=Image(18, 15, 50, 50, "play.png"))
+        self.workspace_frame.add_child(play_button)
+
         self.floating_component = None
         self.drag_offset = (0, 0)
 
     def on_enter(self, data, screen):
         super().on_enter(data, screen)
 
-        print("Entering level", data)
-
         self.component_frame.clear_children()
-        self.component_frame.add_child(ColorInput(10, 10, 3))
-        self.component_frame.add_child(Output(10, 300))
+        # self.workspace_frame.clear_children()
+        # self.component_frame.add_child(Input(10, 10, 3))
+        # self.component_frame.add_child(Output(10, 300))
+
+        self.load_level(data)
 
     def on_update(self, elapsed):
         super().on_update(elapsed)
-
+        print(self.out.get_percentage())
         if self.floating_component is not None:
             self.floating_component.on_update(elapsed)
 
@@ -76,9 +92,9 @@ class Level(Screen):
         if self.floating_component is not None:
             self.drop_floating_component()
         else:
-            self.create_connections(pos)
+            self.create_connections(pos, True)
 
-    def create_connections(self, pos):
+    def create_connections(self, pos, mouse_up=False):
         holders = []
         for widget in self.workspace_frame.children:
             if widget.type == 'component':
@@ -107,8 +123,8 @@ class Level(Screen):
                     connected = True
                     break
 
-        if not connected:
-            self.widgets.append(Connection(holder, None))
+        if not connected and not mouse_up:  # TODO must check type of holder
+            self.widgets.append(Connection(holder, None, self.environment.render_data))
 
         return True
 
@@ -153,3 +169,12 @@ class Level(Screen):
 
         self.floating_component.is_clicked = False
         self.floating_component = None
+
+    def load_level(self, num):
+        if num == 1:
+            self.environment = ColorEnv(2)
+            self.component_frame.add_child(Input(10, 10, self.environment))
+            self.out = Output(10, 300, self.environment)
+            self.component_frame.add_child(self.out)
+        else:
+            raise NotImplementedError("Can't find level", num)

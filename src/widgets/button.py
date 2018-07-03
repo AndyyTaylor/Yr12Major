@@ -133,6 +133,10 @@ class Button(Widget):
         else:
             raise NotImplementedError("Can't find shape " + shape)
 
+        if self.img is not None:
+            self.img.x += self.x
+            self.img.y += self.y
+
         self.shapes.append(ShapeClass(0, 0, w, h, self.back_color))
         self.shapes.append(ShapeClass(border_width, border_width,
                                       w - 2 * border_width, h - 2 * border_width,
