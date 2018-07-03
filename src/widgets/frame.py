@@ -79,12 +79,19 @@ class Frame(Widget):
             if pygame.Rect(child.get_rect()).collidepoint(pos):
                 child.on_click(pos)
 
+    def on_mouse_up(self, pos):
+        super().on_mouse_up(pos)
+
+        for child in self.children:
+            child.on_mouse_up(pos)
+
     def adj_pos(self, pos):
         return np.subtract(np.subtract(pos, (self.x, self.y)), (self.scroll_x, self.scroll_y))
 
     def add_child(self, child):
         child.x = self.crop(child.x, 0, self.w - child.w)
         child.y = self.crop(child.y, 0, self.h - child.h)
+        child.parent = self
 
         self.children.append(child)
 
@@ -108,6 +115,7 @@ class Frame(Widget):
     def has_changed(self):
         for child in self.children:
             if child.has_changed():
+                print("child changed", self.get_global_pos())
                 return True
 
         return self.changed or self.scrolled

@@ -2,7 +2,7 @@
 import pygame
 
 from src import config
-from ..widgets import Label, Button, Image, Frame
+from ..widgets import Frame, Label, Button, Image
 from src.framework.StateRegistry import StateRegistry
 
 
@@ -25,20 +25,19 @@ class Screen():
         self.widgets = []
 
         if self.show_title:
-            self.widgets.append(Label(0, 0, config.SCREEN_WIDTH, 150,
-                                config.SCHEME2, self.name, 118, config.BLACK))
+            title_frame = Frame(0, 0, config.SCREEN_WIDTH, 150, False, config.SCHEME2)
+            self.widgets.append(title_frame)
 
-        if self.back_button:
-            back_button_frame = Frame(0, 0, 150, 150, back_color=config.SCHEME2)
+            title_frame.add_child(Label(0, 0, config.SCREEN_WIDTH, 150,
+                                  config.SCHEME2, self.name, 118, config.BLACK))
 
-            back_button_frame.add_child(Button(0, 0, 150, 150, "", 72,
-                                        config.BLACK, config.SCHEME2, config.SCHEME2, 0,
-                                        lambda: self.parent.change_state(self.back_screen),
-                                        shape='rect'))
+            if self.back_button:
+                back_button = Button(0, 0, 150, 150, "", 72,
+                                     config.BLACK, config.SCHEME2, config.SCHEME2, 0,
+                                     lambda: self.parent.change_state(self.back_screen),
+                                     shape='rect', img=Image(25, 25, 100, 100, "back_arrow.png"))
 
-            back_button_frame.add_child(Image(25, 25, 100, 100, "back_arrow.png"))
-
-            self.widgets.append(back_button_frame)
+                title_frame.add_child(back_button)
 
     def on_init(self):
         for widget in self.widgets:
@@ -67,19 +66,25 @@ class Screen():
         moving_rects = []
         for widget in self.widgets:
             if widget.type == 'connection' and widget.has_changed():
-                moving_rects.append(widget.get_rect())
+                moving_rects.append(pygame.Rect(widget.get_global_rect()))
 
-        for widget in self.widgets:
-            widget_rect = pygame.Rect(widget.get_rect())
-
-            for move_rect in moving_rects:
-                if widget_rect.colliderect(move_rect):
-                    widget.changed = True
-                    break
+        self.update_components(moving_rects)
 
         for widget in self.widgets:
             if widget.has_changed():
                 widget.on_render(screen, self.back_color)
+
+    def update_components(self, update_rects):
+        if not isinstance(update_rects, list):
+            update_rects = [update_rects]
+
+        for widget in self.widgets:
+            widget_rect = pygame.Rect(widget.get_global_rect())
+
+            for update_rect in update_rects:
+                if widget_rect.colliderect(update_rect):
+                    widget.changed = True
+                    break
 
     def on_key_down(self, key):
         for widget in self.widgets:

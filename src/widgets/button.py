@@ -104,7 +104,7 @@ class RoundedRect(Shape):
 class Button(Widget):
 
     def __init__(self, x, y, w, h, text, font_size, font_col, back_color,
-                 front_color, border_width, callback, shape='rounded_rect'):
+                 front_color, border_width, callback, shape='rounded_rect', img=None):
         super().__init__(x, y, w, h, back_color, 'button', True)
 
         self.back_color = back_color
@@ -114,6 +114,7 @@ class Button(Widget):
         self.text = text
         self.font_size = font_size
         self.font_col = font_col
+        self.img = img
 
         self.callback = callback
 
@@ -174,6 +175,9 @@ class Button(Widget):
         screen.blit(self.rendered_text, self.get_adj_center(t_w / 2, t_h / 2))
 
         self.alpha_cover.render(screen, self.x, self.y, self.animation / self.animation_time)
+
+        if self.img is not None:
+            self.img.on_render(screen, back_fill)
 
         self.changed = False
 

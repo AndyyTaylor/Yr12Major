@@ -1,16 +1,19 @@
 
 import pygame
+import numpy as np
+
 from src.framework import UIElement
 
 
 class Widget(UIElement):
 
-    def __init__(self, x, y, w, h, back_color, type, clickable=False):
+    def __init__(self, x, y, w, h, back_color, type, clickable=False, parent=None):
         super().__init__(x, y, w, h)
 
         self.back_color = back_color
         self.type = type
         self.clickable = clickable
+        self.parent = parent
 
         self.changed = True
         self.is_clicked = False
@@ -66,9 +69,16 @@ class Widget(UIElement):
         return
 
     def has_changed(self):
-        # temp = self.changed
-        # self.changed = False
-        #
-        # return temp
-
         return self.changed
+
+    def get_global_pos(self):
+        if self.parent is None:
+            return self.get_pos()
+
+        return tuple(np.add(self.parent.get_global_pos(), self.get_pos()))
+
+    def get_global_center(self):
+        return tuple(np.add(self.get_global_pos(), (self.w / 2, self.h / 2)))
+
+    def get_global_rect(self):
+        return self.get_global_pos() + (self.w, self.h)

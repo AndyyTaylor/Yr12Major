@@ -7,8 +7,8 @@ from .widget import Widget
 
 class Holder(Widget):
 
-    def __init__(self, x, y, w, h):
-        super().__init__(x, y, w, h, config.SCHEME3, 'holder')
+    def __init__(self, x, y, w, h, parent=None):
+        super().__init__(x, y, w, h, config.SCHEME3, 'holder', parent=parent)
 
         self.data = []
 
@@ -35,6 +35,8 @@ class Holder(Widget):
 
         if self.hover:
             screen.blit(self.alphaCover, self.get_pos())
+
+        self.changed = False
 
     def on_mouse_motion(self, pos):
         self.hover = pygame.Rect(self.get_rect()).collidepoint(pos)

@@ -45,8 +45,6 @@ class Level(Screen):
         if self.floating_component is not None:
             self.floating_component.on_update(elapsed)
 
-        # print(int(1000 / elapsed))
-
     def on_render(self, screen):
         super().on_render(screen)
 
@@ -76,24 +74,9 @@ class Level(Screen):
         super().on_mouse_up(event, pos)
 
         if self.floating_component is not None:
-            workspace_rect = pygame.Rect(self.workspace_frame.get_rect())
-            component_rect = pygame.Rect(self.floating_component.get_rect())
-            component_frame_rect = pygame.Rect(self.component_frame.get_rect())
-
-            c_frame_intersect = component_frame_rect.clip(component_rect)
-            w_frame_intersect = workspace_rect.clip(component_rect)
-
-            if c_frame_intersect.size + w_frame_intersect.size == 0:
-                pass
-            elif c_frame_intersect.size > w_frame_intersect.size:
-                self.floating_component.sub_pos(*self.component_frame.get_pos())
-                self.component_frame.add_child(self.floating_component)
-            else:
-                self.floating_component.sub_pos(*self.workspace_frame.get_pos())
-                self.workspace_frame.add_child(self.floating_component)
-
-            self.floating_component.is_clicked = False
-            self.floating_component = None
+            self.drop_floating_component()
+        else:
+            self.create_connections(pos)
 
     def create_connections(self, pos):
         holders = []
@@ -101,17 +84,33 @@ class Level(Screen):
             if widget.type == 'component':
                 for child in widget.children:
                     if child.type == 'holder':
-                        parent_pos = tuple(np.add(self.workspace_frame.get_pos(), widget.get_pos()))
-                        holders.append((child, parent_pos))
+                        holders.append(child)
 
-        for holder, parent_pos in holders:
-            adj_pos = tuple(np.add(holder.get_pos(), parent_pos))
-            if pygame.Rect(adj_pos + holder.get_size()).collidepoint(pos):
-                self.widgets.append(Connection(holder, None))
-                print("Creating connection")
-                return True
+        touching_holder = None
+        for holder in holders:
+            if pygame.Rect(holder.get_global_rect()).collidepoint(pos):
+                touching_holder = holder
+                break
 
-        return False
+        if touching_holder is None:
+            return False
+
+        connected = False
+        for widget in self.widgets:
+            if widget.type == 'connection':
+                if widget.in_holder is None:
+                    widget.in_holder = touching_holder
+                    connected = True
+                    break
+                elif widget.out_holder is None:
+                    widget.out_holder = touching_holder
+                    connected = True
+                    break
+
+        if not connected:
+            self.widgets.append(Connection(holder, None))
+
+        return True
 
     def select_floating_component(self, pos):
         for widget in self.component_frame.children:
@@ -119,6 +118,7 @@ class Level(Screen):
                 widget.add_pos(*self.component_frame.get_pos())
                 self.drag_offset = np.subtract(pos, widget.get_pos())
                 self.floating_component = widget
+                self.floating_component.parent = None
                 self.component_frame.children.remove(widget)
                 return
 
@@ -128,5 +128,28 @@ class Level(Screen):
                 widget.add_pos(*self.workspace_frame.get_pos())
                 self.drag_offset = np.subtract(pos, widget.get_pos())
                 self.floating_component = widget
+                self.floating_component.parent = None
                 self.workspace_frame.children.remove(widget)
                 return
+
+    def drop_floating_component(self):
+        workspace_rect = pygame.Rect(self.workspace_frame.get_rect())
+        component_rect = pygame.Rect(self.floating_component.get_rect())
+        component_frame_rect = pygame.Rect(self.component_frame.get_rect())
+
+        c_frame_intersect = component_frame_rect.clip(component_rect)
+        w_frame_intersect = workspace_rect.clip(component_rect)
+
+        self.update_components(pygame.Rect(self.floating_component.get_global_rect()))
+
+        if c_frame_intersect.size + w_frame_intersect.size == 0:
+            pass
+        elif c_frame_intersect.size > w_frame_intersect.size:
+            self.floating_component.sub_pos(*self.component_frame.get_pos())
+            self.component_frame.add_child(self.floating_component)
+        else:
+            self.floating_component.sub_pos(*self.workspace_frame.get_pos())
+            self.workspace_frame.add_child(self.floating_component)
+
+        self.floating_component.is_clicked = False
+        self.floating_component = None
