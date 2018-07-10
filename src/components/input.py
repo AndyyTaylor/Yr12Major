@@ -24,6 +24,15 @@ class Input(Component):
             sample = Sample(self.environment.testX[i], self.environment.testy[i])
             self.outputs[0].add_sample(sample)
 
+    def on_render(self, screen, back_fill=None):
+        super().on_render(screen, back_fill)
+
+        top_margin = 35
+        left_margin = 50
+        labels = self.environment.get_labels()
+        for i, label in enumerate(labels):  # Figure this shit out
+            self.environment.render_data(screen, label, (self.x + left_margin + 80 * i, int(self.y + top_margin + (self.h - top_margin) / 2)), 40)
+
     def get_train_data(self):
         return (self.environment.trainX, self.environment.trainy)
 

@@ -21,5 +21,5 @@ class ColorEnv(Environment):
 
         self.create_train_cross_test(self.X, self.y, 0.7, 0.7)
 
-    def render_data(self, screen, data, pos):
-        pygame.draw.circle(screen, np.multiply(self.colors[int(data)], 255), pos, 10)
+    def render_data(self, screen, data, pos, size=10):
+        pygame.draw.circle(screen, np.multiply(self.colors[int(data)], 255), pos, size)

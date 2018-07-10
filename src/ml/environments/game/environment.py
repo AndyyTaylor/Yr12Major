@@ -34,8 +34,8 @@ class Environment():
     def on_render(self, screen):
         pass
 
-    def render_data(self, screen, data, pos):
-        pygame.draw.circle(screen, (255, 255, 0), pos, 10)
+    def render_data(self, screen, data, pos, size=10):
+        pygame.draw.circle(screen, (255, 255, 0), pos, size)
 
     def sample_correct(self, sample):
         if sample.y == self.target_y:
