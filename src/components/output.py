@@ -27,6 +27,19 @@ class Output(Component):
             self.total += 1
             self.correct += int(self.environment.sample_correct(sample))
 
+    def on_render(self, screen, back_fill=None):
+        super().on_render(screen, back_fill)
+
+        y_margin = 35
+        l_x_margin = 50
+        r_x_margin = 10
+
+        width = self.w - l_x_margin - r_x_margin
+        height = self.h - y_margin
+        self.environment.render_correct_data(screen, (self.x + l_x_margin + int(width / 2),
+                                                      self.y + y_margin + int(height / 2)),
+                                             int(min(width, height) / 2))
+
     def get_percentage(self):
         if self.total == 0:
             return '--%'

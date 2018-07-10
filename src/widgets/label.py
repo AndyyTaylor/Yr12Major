@@ -16,7 +16,7 @@ class Label(Widget):
 
         self.font = pygame.font.Font('%s/data/fonts/%s' % (config.DIR_PATH, 'Square.ttf'),
                                      self.font_size)
-        self.rendered_text = self.font.render(self.text, True, self.font_col)
+        self.render_text()
 
     def on_init(self):
         return
@@ -32,6 +32,14 @@ class Label(Widget):
 
     def on_update(self, elapsed):
         return
+
+    def change_text(self, text):
+        self.text = text
+        self.changed = True
+        self.render_text()
+
+    def render_text(self):
+        self.rendered_text = self.font.render(self.text, True, self.font_col)
 
     def on_render(self, screen, back_fill=None):
         super().on_render(screen, back_fill)

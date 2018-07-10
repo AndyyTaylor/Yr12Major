@@ -19,7 +19,10 @@ class Frame(Widget):
             'min_scroll_y': -500,
             'max_scroll_y': 0,
             'min_scroll_x': 0,
-            'max_scroll_x': 500
+            'max_scroll_x': 500,
+            'gridded': False,
+            'item_gap': 20,
+            'item_x_margin': 10
         }
 
         for key, val in defaults.items():
@@ -89,10 +92,32 @@ class Frame(Widget):
         return np.subtract(np.subtract(pos, (self.x, self.y)), (self.scroll_x, self.scroll_y))
 
     def add_child(self, child):
-        child.x = self.crop(child.x, 0, self.w - child.w)
-        child.y = self.crop(child.y, 0, self.h - child.h)
-        child.parent = self
+        if self.gridded:
+            taken = [0]
+            for widget in self.children:
+                taken.append(widget.y)
+                taken.append(widget.y + widget.h)
 
+            taken.sort()
+            min_gap = child.h + self.item_gap * 2
+
+            child.y = None
+            for i, val in enumerate(taken):
+                if i >= len(taken) - 1:
+                    continue
+
+                if taken[i + 1] - val >= min_gap:
+                    child.y = val + self.item_gap
+                    break
+
+            if child.y is None:
+                child.y = taken.pop() + self.item_gap
+            child.x = self.item_x_margin
+        else:
+            child.x = self.crop(child.x, 0, self.w - child.w)
+            child.y = self.crop(child.y, 0, self.h - child.h)
+
+        child.parent = self
         self.children.append(child)
 
     def clear_children(self):

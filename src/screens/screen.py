@@ -28,8 +28,9 @@ class Screen():
             title_frame = Frame(0, 0, config.SCREEN_WIDTH, 150, False, config.SCHEME2)
             self.widgets.append(title_frame)
 
-            title_frame.add_child(Label(0, 0, config.SCREEN_WIDTH, 150,
-                                  config.SCHEME2, self.name, 118, config.BLACK))
+            self.title = Label(0, 0, config.SCREEN_WIDTH, 150,
+                               config.SCHEME2, self.name, 118, config.BLACK)
+            title_frame.add_child(self.title)
 
             if self.back_button:
                 back_button = Button(0, 0, 150, 150, "", 72,

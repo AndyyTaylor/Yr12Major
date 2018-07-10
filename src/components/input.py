@@ -27,11 +27,18 @@ class Input(Component):
     def on_render(self, screen, back_fill=None):
         super().on_render(screen, back_fill)
 
-        top_margin = 35
-        left_margin = 50
+        y_m = 35  # top_margin
+        l_x_m = 10
+        r_x_m = 50
         labels = self.environment.get_labels()
+        num_labels = len(labels)
         for i, label in enumerate(labels):  # Figure this shit out
-            self.environment.render_data(screen, label, (self.x + left_margin + 80 * i, int(self.y + top_margin + (self.h - top_margin) / 2)), 40)
+            label_w = (self.w - l_x_m - r_x_m) / num_labels
+            label_w = min(self.h - y_m, label_w)
+            self.environment.render_data(screen, label,
+                                         (int(self.x + l_x_m + label_w * (i + 0.5)),
+                                          self.y + y_m + int((self.h - y_m) / 2)),
+                                         int(label_w / 2))  # Size is in radius
 
     def get_train_data(self):
         return (self.environment.trainX, self.environment.trainy)

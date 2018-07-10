@@ -15,7 +15,8 @@ class Level(Screen):
     def __init__(self):
         super().__init__('Level', 'MasterState', back_screen='LevelSelector')
 
-        self.component_frame = Frame(0, 220, 300, config.SCREEN_HEIGHT - 220, True, config.SCHEME2)
+        self.component_frame = Frame(0, 220, 300, config.SCREEN_HEIGHT - 220,
+                                     True, config.SCHEME2, gridded=True)
         self.workspace_frame = Frame(310, 160, config.SCREEN_WIDTH - 305,
                                      config.SCREEN_HEIGHT - 160, True, config.SCHEME5)
 
@@ -44,6 +45,7 @@ class Level(Screen):
 
         self.clear_connections()
         self.add_control_buttons()
+        self.title.change_text('Level ' + str(data))
         # self.component_frame.add_child(Input(10, 10, 3))
         # self.component_frame.add_child(Output(10, 300))
 
@@ -86,7 +88,8 @@ class Level(Screen):
         if self.floating_component is not None:
             self.drop_floating_component()
         else:
-            self.create_connections(pos, True)
+            if not self.create_connections(pos, True):
+                self.clear_hanging_connection()
 
     def create_connections(self, pos, mouse_up=False):
         holders = []
@@ -121,6 +124,14 @@ class Level(Screen):
             self.widgets.append(Connection(holder, None, self.environment.render_data))
 
         return True
+
+    def clear_hanging_connection(self):
+        for widget in self.widgets:
+            if widget.type == 'connection':
+                if widget.in_holder is None or widget.out_holder is None:
+                    self.widgets.remove(widget)
+                    self.workspace_frame.changed = True
+                    break
 
     def select_floating_component(self, pos):
         for widget in self.component_frame.children:
@@ -188,9 +199,11 @@ class Level(Screen):
 
     def load_level(self, num):
         if num == 1:
-            self.environment = ColorEnv(2)
+            self.environment = ColorEnv(1, num_samples=5)
         elif num == 2:
-            self.environment = ColorEnv(3)
+            self.environment = ColorEnv(2, target_y=1)
+        elif num == 3:
+            self.environment = ColorEnv(3, target_y=2)
         else:
             raise NotImplementedError("Can't find level", num)
 

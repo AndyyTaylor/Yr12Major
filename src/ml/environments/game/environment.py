@@ -34,6 +34,9 @@ class Environment():
     def on_render(self, screen):
         pass
 
+    def render_correct_data(self, screen, pos, size=10):
+        self.render_data(screen, self.target_y, pos, size)
+
     def render_data(self, screen, data, pos, size=10):
         pygame.draw.circle(screen, (255, 255, 0), pos, size)
 
