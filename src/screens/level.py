@@ -7,7 +7,7 @@ from src.ml.environments.game import ColorEnv
 
 from .screen import Screen
 from ..widgets import Frame, Label, Image, Button
-from ..components import Input, Output, Connection
+from ..components import Input, Output, Connection, KNN
 
 
 class Level(Screen):
@@ -43,6 +43,8 @@ class Level(Screen):
         self.component_frame.changed = True
         self.workspace_frame.changed = True
 
+        self.playing = False
+
         self.clear_connections()
         self.add_control_buttons()
         self.title.change_text('Level ' + str(data))
@@ -52,7 +54,9 @@ class Level(Screen):
         self.load_level(data)
 
     def on_update(self, elapsed):
-        super().on_update(elapsed)
+        for widget in self.widgets:
+            if widget.type != 'connection' or self.playing:
+                widget.on_update(elapsed)
 
         if self.floating_component is not None:
             self.floating_component.on_update(elapsed)
@@ -111,17 +115,20 @@ class Level(Screen):
         connected = False
         for widget in self.widgets:
             if widget.type == 'connection':
-                if widget.in_holder is None:
+                if widget.in_holder is None and touching_holder.holder_type == 'output':
                     widget.in_holder = touching_holder
                     connected = True
                     break
-                elif widget.out_holder is None:
+                elif widget.out_holder is None and touching_holder.holder_type == 'input':
                     widget.out_holder = touching_holder
                     connected = True
                     break
 
         if not connected and not mouse_up:  # TODO must check type of holder
-            self.widgets.append(Connection(holder, None, self.environment.render_data))
+            if holder.holder_type == 'output':
+                self.widgets.append(Connection(holder, None, self.environment.render_data))
+            else:
+                self.widgets.append(Connection(None, holder, self.environment.render_data))
 
         return True
 
@@ -135,7 +142,7 @@ class Level(Screen):
 
     def select_floating_component(self, pos):
         for widget in self.component_frame.children:
-            if widget.is_clicked:
+            if widget.is_clicked and widget.type == 'component':
                 widget.add_pos(*self.component_frame.get_pos())
                 self.drag_offset = np.subtract(pos, widget.get_pos())
                 self.floating_component = widget
@@ -145,7 +152,7 @@ class Level(Screen):
 
         # If not in the component frame
         for widget in self.workspace_frame.children:
-            if widget.is_clicked:
+            if widget.is_clicked and widget.type == 'component':
                 widget.add_pos(*self.workspace_frame.get_pos())
                 self.drag_offset = np.subtract(pos, widget.get_pos())
                 self.floating_component = widget
@@ -187,15 +194,21 @@ class Level(Screen):
     def add_control_buttons(self):
         pause_button = Button(config.SCREEN_WIDTH - 90 - 310, 0, 80, 80, "", 72,
                               config.BLACK, config.BLACK, config.SCHEME2, 5,
-                              lambda: self.parent.change_state(self.back_screen),
+                              self.pause,
                               img=Image(15, 15, 50, 50, "pause.png"))
         self.workspace_frame.add_child(pause_button)
 
         play_button = Button(config.SCREEN_WIDTH - 180 - 310, 0, 80, 80, "", 72,
                              config.BLACK, config.BLACK, config.SCHEME2, 5,
-                             lambda: self.parent.change_state(self.back_screen),
+                             self.play,
                              img=Image(18, 15, 50, 50, "play.png"))
         self.workspace_frame.add_child(play_button)
+
+    def play(self):
+        self.playing = True
+
+    def pause(self):
+        self.playing = False
 
     def load_level(self, num):
         if num == 1:
@@ -209,3 +222,4 @@ class Level(Screen):
 
         self.component_frame.add_child(Input(10, 10, self.environment))
         self.component_frame.add_child(Output(10, 300, self.environment))
+        self.component_frame.add_child(KNN(self.environment))

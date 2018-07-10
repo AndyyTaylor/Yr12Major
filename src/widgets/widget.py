@@ -72,14 +72,17 @@ class Widget(UIElement):
     def has_changed(self):
         return self.changed
 
-    def get_global_pos(self):
+    def get_global_pos(self, cast=False):
         if self.parent is None:
-            return self.get_pos()
+            return self.get_pos(cast)
 
-        return tuple(np.add(self.parent.get_global_pos(), self.get_pos()))
+        return tuple(np.add(self.parent.get_global_pos(cast), self.get_pos(cast)))
 
-    def get_global_center(self):
-        return tuple(np.add(self.get_global_pos(), (self.w / 2, self.h / 2)))
+    def get_global_center(self, cast=False):
+        if cast:
+            return tuple(np.add(self.get_global_pos(True), (int(self.w / 2), int(self.h / 2))))
+        else:
+            return tuple(np.add(self.get_global_pos(), (self.w / 2, self.h / 2)))
 
     def get_global_rect(self):
         return self.get_global_pos() + (self.w, self.h)
