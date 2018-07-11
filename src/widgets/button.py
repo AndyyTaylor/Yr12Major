@@ -117,7 +117,7 @@ class RoundedRect(Shape):
 class Button(Widget):
 
     def __init__(self, x, y, w, h, text, font_size, font_col, back_color,
-                 front_color, border_width, callback, shape='rounded_rect', img=None):
+                 front_color, border_width, callback, shape='rounded_rect', img=None, bsfix=False):
         super().__init__(x, y, w, h, back_color, 'button', True)
 
         self.back_color = back_color
@@ -155,7 +155,10 @@ class Button(Widget):
                                       w - 2 * border_width, h - 2 * border_width,
                                       self.front_color))
 
-        self.alpha_cover = ShapeClass(0, 0, w, h, config.WHITE, True)
+        if not bsfix:
+            self.alpha_cover = ShapeClass(0, 0, w, h, config.WHITE, True)
+        else:
+            self.alpha_cover = ShapeClass(self.x, self.y, w, h, config.WHITE, True)
 
         self.prev_hash = None
         self.animation = 0
