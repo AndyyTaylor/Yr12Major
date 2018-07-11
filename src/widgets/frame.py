@@ -137,6 +137,9 @@ class Frame(Widget):
     def crop(self, val, min_val, max_val):
         return max(min(val, max_val), min_val)
 
+    def get_scroll(self):
+        return (self.scroll_x, self.scroll_y)
+
     def has_changed(self):
         for child in self.children:
             if child.has_changed():
