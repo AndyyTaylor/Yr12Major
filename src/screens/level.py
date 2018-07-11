@@ -128,8 +128,8 @@ class Level(Screen):
         self.score_frame.add_child(Label(5, 90, 100, 40, None, "Time", 30,
                                          config.BLACK, align='lc'))
 
-        self.acc_label = Label(160, 50, 60, 40, None, "--%", 30, config.BLACK, align='lc')
-        self.time_label = Label(160, 90, 60, 40, None, '0', 30, config.BLACK, align='lc')
+        self.acc_label = Label(160, 50, 80, 40, None, "--%", 30, config.BLACK, align='lc')
+        self.time_label = Label(160, 90, 80, 40, None, '0', 30, config.BLACK, align='lc')
 
         self.score_frame.add_child(self.acc_label)
         self.score_frame.add_child(self.time_label)
@@ -245,16 +245,22 @@ class Level(Screen):
             self.widgets.remove(conn)
 
     def add_control_buttons(self):
-        pause_button = Button(config.SCREEN_WIDTH - 90 - 310, 0, 80, 80, "", 72,
+        stop_button = Button(config.SCREEN_WIDTH - 90 - 310, 0, 80, 80, "", 72,
+                             config.BLACK, config.BLACK, config.SCHEME2, 5,
+                             self.stop,
+                             img=Image(15, 15, 50, 50, "stop.png"))
+        self.workspace_frame.add_child(stop_button)
+
+        pause_button = Button(config.SCREEN_WIDTH - 180 - 310, 0, 80, 80, "", 72,
                               config.BLACK, config.BLACK, config.SCHEME2, 5,
                               self.pause,
                               img=Image(15, 15, 50, 50, "pause.png"))
         self.workspace_frame.add_child(pause_button)
 
-        play_button = Button(config.SCREEN_WIDTH - 180 - 310, 0, 80, 80, "", 72,
+        play_button = Button(config.SCREEN_WIDTH - 270 - 310, 0, 80, 80, "", 72,
                              config.BLACK, config.BLACK, config.SCHEME2, 5,
                              self.play,
-                             img=Image(18, 15, 50, 50, "play.png"))
+                             img=Image(15, 15, 50, 50, "play.png"))
         self.workspace_frame.add_child(play_button)
 
     def play(self):
@@ -265,6 +271,21 @@ class Level(Screen):
 
     def pause(self):
         self.playing = False
+
+    def stop(self):
+        self.playing = False
+        self.play_time = 0
+
+        self.output.reset_stats()
+        self.clear_components()
+        self.update_scores(0)
+
+    def clear_components(self):
+        for widget in self.workspace_frame.children + self.widgets:
+            if widget.type == 'component':
+                widget.clear_holders()
+            elif widget.type == 'connection':
+                widget.clear_samples()
 
     def load_level(self, num):
         if num == 1:

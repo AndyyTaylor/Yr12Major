@@ -63,3 +63,6 @@ class Connection(Widget):
             self.y = self.y - self.h
 
         return start_pos, end_pos
+
+    def clear_samples(self):
+        self.samples = []

@@ -51,3 +51,7 @@ class Output(Component):
             return 100
 
         return int(self.correct / self.total * 100)
+
+    def reset_stats(self):
+        self.total = 0
+        self.correct = 0
