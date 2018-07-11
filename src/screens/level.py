@@ -121,7 +121,7 @@ class Level(Screen):
 
     def setup_score_frame(self):
         self.score_frame = Frame(config.SCREEN_WIDTH - 340, 0, 340, 150, back_color=config.SCHEME4)
-        self.score_frame.add_child(Label(0, 0, 300, 50, None, "Score", 36, config.BLACK))
+        self.score_frame.add_child(Label(0, 0, 340, 50, None, "Score", 36, config.BLACK))
 
         self.score_frame.add_child(Label(5, 50, 100, 40, None, "Accuracy", 30,
                                          config.BLACK, align='lc'))
