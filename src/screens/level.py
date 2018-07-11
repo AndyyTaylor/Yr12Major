@@ -144,6 +144,7 @@ class Level(Screen):
         for widget in self.component_frame.children:
             if widget.is_clicked and widget.type == 'component':
                 widget.add_pos(*self.component_frame.get_pos())
+                widget.add_pos(*self.component_frame.get_scroll())
                 self.drag_offset = np.subtract(pos, widget.get_pos())
                 self.floating_component = widget
                 self.floating_component.parent = None
@@ -154,6 +155,7 @@ class Level(Screen):
         for widget in self.workspace_frame.children:
             if widget.is_clicked and widget.type == 'component':
                 widget.add_pos(*self.workspace_frame.get_pos())
+                widget.add_pos(*self.workspace_frame.get_scroll())
                 self.drag_offset = np.subtract(pos, widget.get_pos())
                 self.floating_component = widget
                 self.floating_component.parent = None
@@ -174,9 +176,11 @@ class Level(Screen):
             pass
         elif c_frame_intersect.size > w_frame_intersect.size:
             self.floating_component.sub_pos(*self.component_frame.get_pos())
+            self.floating_component.sub_pos(*self.component_frame.get_scroll())
             self.component_frame.add_child(self.floating_component)
         else:
             self.floating_component.sub_pos(*self.workspace_frame.get_pos())
+            self.floating_component.sub_pos(*self.workspace_frame.get_scroll())
             self.workspace_frame.add_child(self.floating_component)
 
         self.floating_component.is_clicked = False
