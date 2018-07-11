@@ -21,11 +21,6 @@ class Algorithm(Component):
         self.place_holders()
         self.setup_inputs_and_outputs()
 
-    def on_mouse_down(self, pos):
-        super().on_mouse_down(pos)
-
-        print("Mouse down")
-
     def on_update(self, elapsed):
         super().on_update(elapsed)
         # print(self.output_button.get_pos())
@@ -50,6 +45,8 @@ class Algorithm(Component):
 
             self.render_data(screen, self.holder_labels[i],
                              np.add(holder.parent.get_pos(True), holder.get_center(True)))
+
+        self.changed = False
 
     def train(self, X, y):
         self.agent.train(X, y)
@@ -79,10 +76,11 @@ class Algorithm(Component):
             self.add_child(self.output_button)
 
     def change_label(self, i):
+        print("Label changed")
         self.holder_labels[i] += 1
         if self.holder_labels[i] >= self.num_labels:
             self.holder_labels[i] = 0
-        self.outputs[i].changed = True
+        self.changed = True
 
 
 class KNN(Algorithm):

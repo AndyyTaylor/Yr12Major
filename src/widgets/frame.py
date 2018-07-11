@@ -80,9 +80,12 @@ class Frame(Widget):
         pos = self.adj_pos(pos)
         for child in self.children:
             if child.type == 'component':
-                child.on_mouse_down(pos)
+                if not child.on_mouse_down(pos):
+                    if pygame.Rect(child.get_rect()).collidepoint(pos):
+                        child.on_click(pos)
             elif pygame.Rect(child.get_rect()).collidepoint(pos):
-                child.on_click(pos)
+                if child.on_click(pos):
+                    return True
 
     def on_mouse_up(self, pos):
         super().on_mouse_up(pos)
