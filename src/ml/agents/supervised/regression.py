@@ -1,6 +1,6 @@
 # Copyright 2017 Andy Taylor
 
-from math import e, log
+from math import e
 import numpy as np
 
 
