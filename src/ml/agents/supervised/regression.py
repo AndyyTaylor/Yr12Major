@@ -26,6 +26,7 @@ class Regression():
         self.fit(X, y, num_iters)
 
     def fit(self, X, y, num_iters):
+        y = np.reshape(y, (len(y), 1))
         for i in range(num_iters):
             self.vectorized_BGD(X, y, len(y))
 
@@ -33,7 +34,7 @@ class Regression():
         self.params = np.subtract(self.params, (self.alpha * self.gradient(X, y, m)))
 
     def predict(self, x):
-        return np.sum(np.insert(x, 0, 1, axis=1).dot(self.params), axis=1)
+        return int(np.sum(np.insert(x, 0, 1, axis=1).dot(self.params), axis=1) > 0)
 
     def scale_features(self, X):
         return X
@@ -48,7 +49,7 @@ class LogisticRegression(Regression):
 
     def cost(self, X, y, m):
         h = self.sigmoid(X.dot(self.params))
-        J = (1.0 / m) * np.subtract(-(y.T).dot(np.log(h)), (1 - y).T.dot(np.log(1-h)))
+        J = (1.0 / m) * np.subtract(-(y.T).dot(np.log(h)), (1 - y).T.dot(np.log(1 - h)))
 
         return J
 
