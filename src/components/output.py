@@ -44,4 +44,10 @@ class Output(Component):
         if self.total == 0:
             return '--%'
         else:
-            return str(int(self.correct / self.total * 100)) + '%'
+            return str(self.get_raw_percentage()) + '%'
+
+    def get_raw_percentage(self):
+        if self.total == 0:
+            return 100
+
+        return int(self.correct / self.total * 100)

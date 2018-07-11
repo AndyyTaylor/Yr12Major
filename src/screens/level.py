@@ -15,19 +15,8 @@ class Level(Screen):
     def __init__(self):
         super().__init__('Level', 'MasterState', back_screen='LevelSelector')
 
-        self.component_frame = Frame(0, 220, 300, config.SCREEN_HEIGHT - 220,
-                                     True, config.SCHEME2, gridded=True)
-        self.workspace_frame = Frame(310, 160, config.SCREEN_WIDTH - 305,
-                                     config.SCREEN_HEIGHT - 160, True, config.SCHEME5)
-
-        border1 = Frame(0, 150, config.SCREEN_WIDTH, 10, back_color=config.SCHEME5)
-        border2 = Frame(300, 160, 10, config.SCREEN_HEIGHT - 160, back_color=config.SCHEME5)
-
-        self.widgets.append(border1)
-        self.widgets.append(border2)
-
-        self.widgets.append(self.component_frame)
-        self.widgets.append(self.workspace_frame)
+        self.setup_frames()
+        self.setup_score_frame()
 
         self.widgets.append(Label(0, 160, 300, 60, config.SCHEME2, "Components", 36, config.BLACK))
 
@@ -42,8 +31,11 @@ class Level(Screen):
 
         self.component_frame.changed = True
         self.workspace_frame.changed = True
+        self.score_frame.clear_children()
+        self.setup_score_frame()
 
         self.playing = False
+        self.play_time = 0
 
         self.clear_connections()
         self.add_control_buttons()
@@ -54,18 +46,35 @@ class Level(Screen):
         self.load_level(data)
 
     def on_update(self, elapsed):
-        for widget in self.widgets:
+        for widget in self.widgets:  # FIX, this will allow components to process while game paused
             if widget.type != 'connection' or self.playing:
                 widget.on_update(elapsed)
 
         if self.floating_component is not None:
             self.floating_component.on_update(elapsed)
 
+        if self.playing:
+            self.update_scores(elapsed)
+
     def on_render(self, screen):
         super().on_render(screen)
 
         if self.floating_component is not None:
             self.floating_component.on_render(screen)
+
+    def update_scores(self, elapsed):
+        self.play_time += elapsed / 1000
+        self.time_label.change_text(int(self.play_time))
+        if self.play_time <= self.max_time:
+            self.time_label.change_color(config.GREEN)
+        else:
+            self.time_label.change_color(config.RED)
+
+        self.acc_label.change_text(self.output.get_percentage())
+        if self.output.get_raw_percentage() >= self.req_accuracy:
+            self.acc_label.change_color(config.GREEN)
+        else:
+            self.acc_label.change_color(config.RED)
 
     def on_mouse_down(self, event, pos):
         super().on_mouse_down(event, pos)
@@ -94,6 +103,47 @@ class Level(Screen):
         else:
             if not self.create_connections(pos, True):
                 self.clear_hanging_connection()
+
+    def setup_frames(self):
+        self.component_frame = Frame(0, 220, 300, config.SCREEN_HEIGHT - 220,
+                                     True, config.SCHEME2, gridded=True)
+        self.workspace_frame = Frame(310, 160, config.SCREEN_WIDTH - 305,
+                                     config.SCREEN_HEIGHT - 160, True, config.SCHEME5)
+
+        border1 = Frame(0, 150, config.SCREEN_WIDTH, 10, back_color=config.SCHEME5)
+        border2 = Frame(300, 160, 10, config.SCREEN_HEIGHT - 160, back_color=config.SCHEME5)
+
+        self.widgets.append(self.component_frame)
+        self.widgets.append(self.workspace_frame)
+
+        self.widgets.append(border1)
+        self.widgets.append(border2)
+
+    def setup_score_frame(self):
+        self.score_frame = Frame(config.SCREEN_WIDTH - 340, 0, 340, 150, back_color=config.SCHEME4)
+        self.score_frame.add_child(Label(0, 0, 300, 50, None, "Score", 36, config.BLACK))
+
+        self.score_frame.add_child(Label(5, 50, 100, 40, None, "Accuracy", 30,
+                                         config.BLACK, align='lc'))
+        self.score_frame.add_child(Label(5, 90, 100, 40, None, "Time", 30,
+                                         config.BLACK, align='lc'))
+
+        self.acc_label = Label(160, 50, 60, 40, None, "--%", 30, config.BLACK, align='lc')
+        self.time_label = Label(160, 90, 60, 40, None, '0', 30, config.BLACK, align='lc')
+
+        self.score_frame.add_child(self.acc_label)
+        self.score_frame.add_child(self.time_label)
+
+        self.score_frame.add_child(Label(240, 50, 60, 40, None, '/', 30, config.BLACK, align='lc'))
+        self.score_frame.add_child(Label(240, 90, 60, 40, None, '/', 30, config.BLACK, align='lc'))
+
+        self.req_acc_label = Label(270, 50, 60, 40, None, '--%', 30, config.BLACK, align='lc')
+        self.max_time_label = Label(270, 90, 60, 40, None, '--', 30, config.BLACK, align='lc')
+
+        self.score_frame.add_child(self.req_acc_label)
+        self.score_frame.add_child(self.max_time_label)
+
+        self.title_frame.add_child(self.score_frame)
 
     def create_connections(self, pos, mouse_up=False):
         holders = []
@@ -149,8 +199,7 @@ class Level(Screen):
                 self.floating_component = widget
                 self.floating_component.parent = None
                 self.component_frame.children.remove(widget)
-                return
-
+            None
         # If not in the component frame
         for widget in self.workspace_frame.children:
             if widget.is_clicked and widget.type == 'component':
@@ -220,15 +269,25 @@ class Level(Screen):
     def load_level(self, num):
         if num == 1:
             self.environment = ColorEnv(1, num_samples=5)
+            self.req_accuracy = 100
+            self.max_time = 10
         elif num == 2:
             self.environment = ColorEnv(2, target_y=1)
+            self.req_accuracy = 100
+            self.max_time = 10
         elif num == 3:
             self.environment = ColorEnv(3, target_y=2)
+            self.req_accuracy = 100
+            self.max_time = 10
         else:
             raise NotImplementedError("Can't find level", num)
 
+        self.req_acc_label.change_text(str(self.req_accuracy) + '%')
+        self.max_time_label.change_text(self.max_time)
+
+        self.output = Output(10, 300, self.environment)
         self.component_frame.add_child(Input(10, 10, self.environment))
-        self.component_frame.add_child(Output(10, 300, self.environment))
+        self.component_frame.add_child(self.output)
         self.component_frame.add_child(KNN(self.environment))
         self.component_frame.add_child(NBayes(self.environment))
         self.component_frame.add_child(LogisticRegression(self.environment))
