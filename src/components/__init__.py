@@ -1,4 +1,3 @@
-from .inputs import *
-from .outputs import *
+from .input import Input
+from .output import Output
 from .connection import Connection
-from .algorithms import *

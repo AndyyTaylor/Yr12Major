@@ -1,59 +1,65 @@
 
 import pygame
 import numpy as np
-from .algorithms import Algorithm
-from ..ui.UIElement import UIElement
-from .. import config
+
+from src import config
+from ..widgets.widget import Widget
 
 
-class Connection(UIElement):
+class Connection(Widget):
 
     def __init__(self, in_holder, out_holder, render_data):
+        super().__init__(0, 0, 0, 0, None, 'connection')
+
         self.in_holder = in_holder
         self.out_holder = out_holder
         self.render_data = render_data
 
-        self.data = []
+        self.speed = 1
+
+        self.samples = []
 
     def on_update(self, elapsed):
-        if (not self.data or not isinstance(self.out_holder.component, Algorithm)) and self.in_holder.has_data():
-            sample = self.in_holder.take_data()
-            sample.progress = 0
-            self.data.append(sample)
+        super().on_update(elapsed)
 
-        out_comp = self.out_holder.component
-        if hasattr(out_comp, 'get_avg_cool_down'):
-            travel_time = out_comp.get_avg_cool_down()
-        else:
-            travel_time = 1000
+        if self.in_holder is not None and self.out_holder is not None:
+            if self.in_holder.has_samples() and len(self.samples) < 1:
+                self.samples.append(self.in_holder.take_sample())
 
-        data_clone = self.data[:]
-        for sample in self.data:
-            sample.progress += 1 * (elapsed / travel_time)
-            if sample.progress >= 1:
-                self.out_holder.add_data(sample)
-                data_clone.remove(sample)
+            for sample in self.samples:
+                sample.progress += min((elapsed / 1000) * self.speed, 1 - sample.progress)
 
-        self.data = data_clone
+                if sample.progress == 1:
+                    self.out_holder.add_sample(sample)
+                    self.samples.remove(sample)
 
-    def on_render(self, screen):
-        pygame.draw.line(screen, config.GREEN, self.in_holder.get_center(), self.out_holder.get_center(), 5)
+    def on_render(self, screen, back_fill=None):
+        super().on_render(screen, None)
 
-        start_pos = self.in_holder.get_center()
-        end_pos = self.out_holder.get_center()
-        travel = tuple(np.subtract(end_pos, start_pos))
-        for sample in self.data:
-            pos = tuple(np.add(start_pos, np.multiply(travel, sample.progress)))
-            self.render_data(screen, int(pos[0]), int(pos[1]), self.data[0])
+        start_pos, end_pos = self.rebuild_pos()
 
-    def has_data(self):
-        return len(self.data) > 0  # This could be implicit, but this is more readable
+        pygame.draw.line(screen, config.BLACK, start_pos, end_pos, 3)
 
-    def on_mouse_motion(self, pos):
-        pass
+        pos_diff = np.subtract(end_pos, start_pos)
+        for sample in self.samples:
+            diff = np.multiply(pos_diff, sample.progress)
+            pos = np.add(start_pos, diff)
+            self.render_data(screen, sample.y, tuple([int(x) for x in pos]))
 
-    def on_mouse_down(self, pos):
-        pass
+        self.changed = True
 
-    def on_mouse_up(self, pos):
-        pass
+    def rebuild_pos(self):
+        start_pos = self.in_holder.get_global_center() if self.in_holder else pygame.mouse.get_pos()
+        end_pos = self.out_holder.get_global_center() if self.out_holder else pygame.mouse.get_pos()
+
+        self.x, self.y = start_pos
+        self.w, self.h = np.subtract(end_pos, start_pos)
+
+        if self.w < 0:
+            self.w *= -1
+            self.x = self.x - self.w
+        if self.h < 0:
+            self.h *= -1
+            self.y = self.y - self.h
+
+        return start_pos, end_pos

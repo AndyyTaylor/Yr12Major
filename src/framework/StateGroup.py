@@ -1,10 +1,10 @@
 " doc "
 
 from ..framework.StateRegistry import StateRegistry
-from ..states.AbstractState import State
+from ..screens.screen import Screen
 
 
-class StateGroup(State):
+class StateGroup(Screen):
     " doc "
 
     def __init__(self, name, parent=False):
@@ -36,7 +36,7 @@ class StateGroup(State):
         self.state_stack = []
 
         if name in self.children:
-            self.children[name].on_enter(StateRegistry.instance().pop_stack())
+            self.children[name].on_enter(*StateRegistry.instance().pop_stack())
             self.state_stack.append(self.children[name])
         else:
             self.parent.change_state(name)
@@ -68,7 +68,7 @@ class StateGroup(State):
         " Called when the application is closed "
         return
 
-    def on_enter(self):
+    def on_enter(self, _, __):
         " Called when the state is entered "
         return
 
@@ -114,3 +114,8 @@ class StateGroup(State):
         state = self.get_current_state()
         if state:
             state.on_mouse_up(event, pos)
+
+    def on_scroll(self, is_down, pos):
+        state = self.get_current_state()
+        if state:
+            state.on_scroll(is_down, pos)

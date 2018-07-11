@@ -3,16 +3,10 @@
 import datetime
 import pygame
 from .. import config
-
+from pygame.locals import DOUBLEBUF
 from .StateRegistry import StateRegistry
 from .StateGroup import StateGroup
-from ..states.IntroState import IntroState
-from ..states.MainMenu import MainMenu
-from ..states.LevelSelector import LevelSelector
-from ..states.Level import LevelState
-
-from ..states.DLSim import Simulation
-# from ..states.SupSim import Simulation
+from ..screens import MainMenu, LevelSelector, Level
 
 
 class StateAppRunner():
@@ -21,21 +15,23 @@ class StateAppRunner():
     def __init__(self):
         pygame.init()
 
-        self.screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
+        self.window = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT),
+                                              DOUBLEBUF)
+        self.window.set_alpha(None)
         pygame.display.set_caption("Andy's Machine Learning")
         self.last_update = datetime.datetime.now()
 
-        StateRegistry.instance().register_group(StateGroup("MasterState"))
-        StateRegistry.instance().register_group(StateGroup("IntroGroup"))
-        StateRegistry.instance().register_group(StateGroup("Menu"))
-        # StateRegistry.instance().register_group(StateGroup("Environments"))
-        IntroState()
-        MainMenu()
-        Simulation()
-        LevelSelector()
-        LevelState()
+        StateRegistry.instance().set_screen(self.window)
 
-        # print(StateRegistry.instance().get_state("Rawplot").parent.name)
+        # Fix stategroup order
+        master_group = StateGroup("MasterState")
+        StateRegistry.instance().register_group(master_group)
+
+        MainMenu()
+        LevelSelector()
+        Level()
+
+        master_group.change_state("MainMenu")
 
         self.closed = False
         self.now = None
@@ -52,28 +48,30 @@ class StateAppRunner():
         self.render()
 
     def read_input(self):
+        master_state = StateRegistry.instance().get_group("MasterState")
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.close()
             if event.type == pygame.MOUSEMOTION:
                 pos = pygame.mouse.get_pos()
-                StateRegistry.instance().get_group("MasterState").on_mouse_motion(event, pos)
+                master_state.on_mouse_motion(event, pos)
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
-                StateRegistry.instance().get_group("MasterState").on_mouse_down(event, pos)
+                if event.button == 4 or event.button == 5:
+                    master_state.on_scroll(int(event.button == 5), pos)
+                else:
+                    master_state.on_mouse_down(event, pos)
             elif event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()
-                StateRegistry.instance().get_group("MasterState").on_mouse_up(event, pos)
+                master_state.on_mouse_up(event, pos)
             elif event.type == pygame.KEYDOWN:
-                StateRegistry.instance().get_group("MasterState").on_key_down(event.key)
+                master_state.on_key_down(event.key)
 
     def update(self, elapsed):
         StateRegistry.instance().get_group("MasterState").on_update(elapsed)
 
     def render(self):
-        self.screen.fill(config.WHITE)
-
-        StateRegistry.instance().get_group("MasterState").on_render(self.screen)
+        StateRegistry.instance().get_group("MasterState").on_render(self.window)
 
         pygame.display.update()
 
