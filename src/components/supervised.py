@@ -25,7 +25,7 @@ class Algorithm(Component):
         if in_holder.has_samples():
             sample = in_holder.take_sample()
 
-            pred = self.agent.predict([sample.x])
+            pred = self.agent.predict(np.array([sample.x]))
 
             pred_label = int(pred)
             if pred_label in self.holder_labels:
@@ -60,3 +60,9 @@ class KNN(Algorithm):
 
     def __init__(self, environment):
         super().__init__(ClassificationKNN, 'KNN', environment, w=150)
+
+
+class NBayes(Algorithm):
+
+    def __init__(self, environment):
+        super().__init__(NaiveBayes, 'N Bayes', environment, w=150)
