@@ -75,7 +75,8 @@ class LinearRegression(Regression):
     def cost(self, X, y, m):
         prediction = X.dot(self.params)
         err = np.subtract(prediction, y)
-        J = 1.0 / (2*m) * np.sum(np.square(err)) + (self.lambd / (2*m)) * np.sum(np.square(self.params[1:]))
+        J = 1.0 / (2 * m) * np.sum(np.square(err)) \
+            + (self.lambd / (2 * m)) * np.sum(np.square(self.params[1:]))
 
         return J
 
