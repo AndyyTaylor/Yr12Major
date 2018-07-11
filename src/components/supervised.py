@@ -3,6 +3,7 @@ import numpy as np
 
 from ..widgets import Component
 from ..ml.agents.supervised import ClassificationKNN, NaiveBayes
+from ..ml.agents.supervised import LogisticRegression as LogRegAlgo
 
 
 class Algorithm(Component):
@@ -66,3 +67,9 @@ class NBayes(Algorithm):
 
     def __init__(self, environment):
         super().__init__(NaiveBayes, 'N Bayes', environment, w=150)
+
+
+class LogisticRegression(Algorithm):
+
+    def __init__(self, environment):
+        super().__init__(LogRegAlgo, 'Log Reg', environment, w=200)
