@@ -35,3 +35,6 @@ class Component(Frame):
                                       self.slot_width, self.slot_height, 'input', self))
 
         self.children += self.inputs + self.outputs
+
+    def train(self, X, y):
+        pass

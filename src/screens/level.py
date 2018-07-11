@@ -206,6 +206,9 @@ class Level(Screen):
 
     def play(self):
         self.playing = True
+        for widget in self.workspace_frame.children:
+            if widget.type == 'component':
+                widget.train(self.environment.trainX, self.environment.trainy)
 
     def pause(self):
         self.playing = False

@@ -40,6 +40,7 @@ class Holder(Widget):
         self.changed = False
 
     def add_sample(self, sample):
+        sample.progress = 0
         self.samples.append(sample)
 
     def has_samples(self):

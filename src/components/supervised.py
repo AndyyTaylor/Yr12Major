@@ -2,12 +2,12 @@
 import numpy as np
 
 from ..widgets import Component
-from ..ml.agents.supervised import ClassificationKNN
+from ..ml.agents.supervised import ClassificationKNN, NaiveBayes
 
 
 class Algorithm(Component):
 
-    def __init__(self, AgentClass, name, environment, w=280, h=150, num_outputs=3):
+    def __init__(self, AgentClass, name, environment, w=280, h=150, num_outputs=2):
         super().__init__(0, 0, w, h, name)
 
         self.agent = AgentClass(environment.num_features)
@@ -25,9 +25,13 @@ class Algorithm(Component):
         if in_holder.has_samples():
             sample = in_holder.take_sample()
 
-            pred = self.agent.predict(sample)
+            pred = self.agent.predict([sample.x])
 
-            print('Prediction:', pred)
+            pred_label = int(pred)
+            if pred_label in self.holder_labels:
+                self.outputs[self.holder_labels.index(pred_label)].add_sample(sample)
+            else:
+                self.outputs[-1].add_sample(sample)
 
     def on_render(self, screen, back_fill=None):
         super().on_render(screen, back_fill)
