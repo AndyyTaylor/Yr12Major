@@ -9,6 +9,7 @@ class Environment():
 
     def create_train_cross_test(self, X, y, train_perc, cross_perc):
         m = X.shape[0]
+        self.num_features = X.shape[1]
 
         X, y = self.unison_shuffled_copies(X, y)
 

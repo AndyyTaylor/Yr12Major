@@ -10,8 +10,11 @@ class UIElement():
         self.prev_x = x
         self.prev_y = y
 
-    def get_pos(self):
-        return (self.x, self.y)
+    def get_pos(self, cast=False):
+        if cast:
+            return (int(self.x), int(self.y))
+        else:
+            return (self.x, self.y)
 
     def set_pos(self, x, y):
         self.x = x
@@ -38,8 +41,11 @@ class UIElement():
     def get_prev_rect(self):
         return (self.prev_x, self.prev_y, self.w, self.h)
 
-    def get_center(self):
-        return (self.x + self.w / 2, self.y + self.h / 2)
+    def get_center(self, cast=False):
+        if cast:
+            return (int(self.x + self.w / 2), int(self.y + self.h / 2))
+        else:
+            return (self.x + self.w / 2, self.y + self.h / 2)
 
     def get_adj_center(self, x_off, y_off):
         return (self.x + self.w / 2 - x_off, self.y + self.h / 2 - y_off)

@@ -3,4 +3,4 @@ from .regression import LogisticRegression
 from .knn import ClassificationKNN
 from .knn import RegressionKNN
 from .nn import NN
-from .bayes import Bayes
+from .bayes import Bayes as NaiveBayes

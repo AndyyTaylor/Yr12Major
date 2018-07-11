@@ -7,13 +7,14 @@ from .widget import Widget
 
 class Holder(Widget):
 
-    def __init__(self, x, y, w, h, parent=None):
+    def __init__(self, x, y, w, h, holder_type, parent=None):
         super().__init__(x, y, w, h, config.SCHEME3, 'holder', parent=parent)
 
         self.samples = []
 
         self.hover = False
         self.clicked = False
+        self.holder_type = holder_type
 
         self.alphaCover = pygame.Surface((self.w, self.h))
         self.alphaCover.set_alpha(128)
@@ -39,6 +40,7 @@ class Holder(Widget):
         self.changed = False
 
     def add_sample(self, sample):
+        sample.progress = 0
         self.samples.append(sample)
 
     def has_samples(self):

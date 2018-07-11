@@ -28,10 +28,13 @@ class Component(Frame):
     def setup_inputs_and_outputs(self):
         for out in self.output_pos:
             self.outputs.append(Holder(*np.subtract(out, (0, self.slot_height / 2)),
-                                       self.slot_width, self.slot_height, self))
+                                       self.slot_width, self.slot_height, 'output', self))
 
         for inp in self.input_pos:
             self.inputs.append(Holder(*np.subtract(inp, (0, self.slot_height / 2)),
-                                      self.slot_width, self.slot_height, self))
+                                      self.slot_width, self.slot_height, 'input', self))
 
         self.children += self.inputs + self.outputs
+
+    def train(self, X, y):
+        pass
