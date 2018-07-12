@@ -11,11 +11,12 @@ from src.framework import UIElement
 
 class Shape(UIElement):
 
-    def __init__(self, x, y, w, h, color, alpha_enabled=False):
+    def __init__(self, x, y, w, h, color, remould, alpha_enabled=False):
         super().__init__(x, y, w, h)
 
         self.color = color
         self.alpha_enabled = alpha_enabled
+        self.remould = remould
 
     def render(self, screen, x_off, y_off, animation=0):
         return
@@ -34,7 +35,7 @@ class Rect(Shape):
             screen.blit(s, self.get_pos())
         elif self.alpha_enabled:
             s = pygame.Surface(self.get_size())
-            s.set_alpha(255 * animation)
+            s.set_alpha(255 * animation * 0.5)
             s.fill(config.WHITE)
             screen.blit(s, self.get_pos())
         else:
@@ -43,8 +44,8 @@ class Rect(Shape):
 
 class RoundedRect(Shape):
 
-    def __init__(self, x, y, w, h, color, alpha_enabled=False):
-        super().__init__(x, y, w, h, color, alpha_enabled)
+    def __init__(self, x, y, w, h, color, remould, alpha_enabled=False):
+        super().__init__(x, y, w, h, color, remould, alpha_enabled)
 
         self.cache = []
         self.prev_animation = 0
@@ -59,13 +60,15 @@ class RoundedRect(Shape):
 
         if self.alpha_enabled:
             self.draw_rounded_rect(screen, adj_rect,
-                                   (*self.color, int(animation * 50)), 0.4 + animation * 0.6)
+                                   (*self.color, int(animation * 50)),
+                                   0.4 + animation * 0.6 * int(self.remould))
         else:
-            self.draw_rounded_rect(screen, adj_rect, self.color, 0.4 + animation * 0.6)
+            self.draw_rounded_rect(screen, adj_rect, self.color,
+                                   0.4 + animation * 0.6 * int(self.remould))
 
         if not enabled:
             self.draw_rounded_rect(screen, adj_rect, (*config.BLACK, config.DISABLED_ALPHA),
-                                   0.4 + animation * 0.6, False)
+                                   0.4 + animation * 0.6 * int(self.remould), False)
 
     def draw_rounded_rect(self, surface, rect, color, radius=0.4, use_cache=True):
         """
@@ -117,7 +120,8 @@ class RoundedRect(Shape):
 class Button(Widget):
 
     def __init__(self, x, y, w, h, text, font_size, font_col, back_color,
-                 front_color, border_width, callback, shape='rounded_rect', img=None):
+                 front_color, border_width, callback, shape='rounded_rect', img=None,
+                 remould=True):
         super().__init__(x, y, w, h, back_color, 'button', True)
 
         self.back_color = back_color
@@ -150,12 +154,15 @@ class Button(Widget):
             self.img.x += self.x
             self.img.y += self.y
 
-        self.shapes.append(ShapeClass(0, 0, w, h, self.back_color))
+        self.shapes.append(ShapeClass(0, 0, w, h, self.back_color, remould))
         self.shapes.append(ShapeClass(border_width, border_width,
                                       w - 2 * border_width, h - 2 * border_width,
-                                      self.front_color))
+                                      self.front_color, remould))
 
-        self.alpha_cover = ShapeClass(0, 0, w, h, config.WHITE, True)
+        if shape == 'rect':
+            self.alpha_cover = ShapeClass(self.x, self.y, w, h, config.WHITE, remould, True)
+        else:
+            self.alpha_cover = ShapeClass(0, 0, w, h, config.WHITE, remould, True)
 
         self.prev_hash = None
         self.animation = 0

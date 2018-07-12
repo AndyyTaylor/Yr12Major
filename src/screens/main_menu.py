@@ -14,9 +14,9 @@ class MainMenu(Screen):
                             64, config.BLACK, config.BLACK, config.SCHEME2, 6,
                             lambda: self.parent.change_state("LevelSelector")))
 
-        self.widgets.append(Button(50, config.SCREEN_HEIGHT - 270, 400, 100, "Load",
+        self.widgets.append(Button(50, config.SCREEN_HEIGHT - 270, 400, 100, "Shop",
                             64, config.BLACK, config.BLACK, config.SCHEME2, 6,
-                            lambda: print("Load")))  # noqa - throws bad syntax error
+                            lambda: self.parent.change_state("Shop")))
 
         self.widgets.append(Button(50, config.SCREEN_HEIGHT - 150, 400, 100, "About",
                             64, config.BLACK, config.BLACK, config.SCHEME2, 6,

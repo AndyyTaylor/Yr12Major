@@ -6,7 +6,7 @@ from .. import config
 from pygame.locals import DOUBLEBUF
 from .StateRegistry import StateRegistry
 from .StateGroup import StateGroup
-from ..screens import MainMenu, LevelSelector, Level
+from ..screens import MainMenu, LevelSelector, Level, Shop
 
 
 class StateAppRunner():
@@ -30,6 +30,7 @@ class StateAppRunner():
         MainMenu()
         LevelSelector()
         Level()
+        Shop()
 
         master_group.change_state("MainMenu")
 
