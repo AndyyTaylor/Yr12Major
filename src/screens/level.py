@@ -199,7 +199,7 @@ class Level(Screen):
                 self.floating_component = widget
                 self.floating_component.parent = None
                 self.component_frame.children.remove(widget)
-            None
+
         # If not in the component frame
         for widget in self.workspace_frame.children:
             if widget.is_clicked and widget.type == 'component':

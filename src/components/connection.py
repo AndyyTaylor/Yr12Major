@@ -17,21 +17,22 @@ class Connection(Widget):
 
         self.speed = 1
 
+        self.prev_scroll = None
+
         self.samples = []
 
     def on_update(self, elapsed):
         super().on_update(elapsed)
 
         if self.in_holder is not None and self.out_holder is not None:
-            if self.in_holder.has_samples() and len(self.samples) < 1:
-                self.samples.append(self.in_holder.take_sample())
+            self.collect_samples()
+            self.progress_samples(elapsed)
 
-            for sample in self.samples:
-                sample.progress += min((elapsed / 1000) * self.speed, 1 - sample.progress)
-
-                if sample.progress == 1:
-                    self.out_holder.add_sample(sample)
-                    self.samples.remove(sample)
+            if self.in_holder.parent.parent is not None:  # Component is being dragged
+                current_scroll = self.in_holder.parent.parent.get_scroll()
+                if current_scroll != self.prev_scroll:
+                    self.prev_scroll = current_scroll
+                    self.rebuild_pos()
 
     def on_render(self, screen, back_fill=None):
         super().on_render(screen, None)
@@ -47,6 +48,18 @@ class Connection(Widget):
             self.render_data(screen, sample.y, tuple([int(x) for x in pos]))
 
         self.changed = True
+
+    def collect_samples(self):
+        if self.in_holder.has_samples() and len(self.samples) < 1:
+            self.samples.append(self.in_holder.take_sample())
+
+    def progress_samples(self, elapsed):
+        for sample in self.samples:
+            sample.progress += min((elapsed / 1000) * self.speed, 1 - sample.progress)
+
+            if sample.progress == 1:
+                self.out_holder.add_sample(sample)
+                self.samples.remove(sample)
 
     def rebuild_pos(self):
         start_pos = self.in_holder.get_global_center() if self.in_holder else pygame.mouse.get_pos()
