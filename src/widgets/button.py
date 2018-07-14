@@ -170,6 +170,8 @@ class Button(Widget):
         self.hover = False
 
     def on_update(self, elapsed):
+        super().on_update(elapsed)
+
         if self.is_clicked and self.enabled:
             self.callback()
 
