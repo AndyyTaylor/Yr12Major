@@ -77,7 +77,11 @@ class Widget(UIElement):
         if self.parent is None:
             return self.get_pos(cast)
 
-        return tuple(np.add(self.parent.get_global_pos(cast), self.get_pos(cast)))
+        pos = tuple(np.add(self.parent.get_global_pos(cast), self.get_pos(cast)))
+        if self.parent.type == 'frame':  # and not self.float
+            pos = np.add(pos, self.parent.get_scroll())
+
+        return pos
 
     def get_global_center(self, cast=False):
         if cast:
