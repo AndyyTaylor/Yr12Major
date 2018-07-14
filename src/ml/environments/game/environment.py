@@ -23,6 +23,7 @@ class Environment():
         self.testy = y[int(np.ceil(m * cross_perc)):]
 
         self.labels = np.array(tuple(set(y)))
+        self.num_labels = len(self.get_labels())
 
     def get_labels(self):
         return self.labels
