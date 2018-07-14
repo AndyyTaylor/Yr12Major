@@ -17,6 +17,7 @@ class Widget(UIElement):
 
         self.changed = True
         self.is_clicked = False
+        self.was_clicked = False
 
     def reset_animation(self):
         self.animation = 0

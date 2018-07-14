@@ -117,7 +117,11 @@ class RoundedRect(Shape):
 class Button(Widget):
 
     def __init__(self, x, y, w, h, text, font_size, font_col, back_color,
-                 front_color, border_width, callback, shape='rounded_rect', img=None):
+                 front_color, border_width, callback, shape='rounded_rect', img=None, bsfix=False):
+                    # I'm sorry future me, bssfix is some serious bullshit...
+                    # I'm sure you'll work it out - total faith in you x
+                    # Something to do with Component(s) being Frame(s) but also not
+
         super().__init__(x, y, w, h, back_color, 'button', True)
 
         self.back_color = back_color
@@ -155,7 +159,10 @@ class Button(Widget):
                                       w - 2 * border_width, h - 2 * border_width,
                                       self.front_color))
 
-        self.alpha_cover = ShapeClass(0, 0, w, h, config.WHITE, True)
+        if not bsfix:
+            self.alpha_cover = ShapeClass(0, 0, w, h, config.WHITE, True)
+        else:
+            self.alpha_cover = ShapeClass(self.x, self.y, w, h, config.WHITE, True)
 
         self.prev_hash = None
         self.animation = 0
@@ -163,7 +170,7 @@ class Button(Widget):
         self.hover = False
 
     def on_update(self, elapsed):
-        if self.is_clicked and self.enabled:
+        if not self.is_clicked and self.was_clicked and self.enabled:
             self.callback()
 
         if self.enabled:
@@ -179,6 +186,8 @@ class Button(Widget):
         if new_hash != self.prev_hash:
             self.changed = True
             self.prev_hash = new_hash
+
+        self.was_clicked = self.is_clicked
 
     def on_render(self, screen, back_fill=None):
         super().on_render(screen, back_fill)
