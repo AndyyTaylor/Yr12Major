@@ -42,9 +42,13 @@ class Label(Widget):
         self.rendered_text = self.font.render(self.text, True, self.font_col)
 
     def on_render(self, screen, back_fill=None):
+        if self.back_color is None:  # Labels are special case, should be entirely transparent
+            back_fill = None
+
         super().on_render(screen, back_fill)
 
-        pygame.draw.rect(screen, self.back_color, self.get_rect())
+        if self.back_color is not None:
+            pygame.draw.rect(screen, self.back_color, self.get_rect())
 
         t_w, t_h = self.font.size(self.text)
         screen.blit(self.rendered_text, self.get_adj_center(t_w / 2, t_h / 2))

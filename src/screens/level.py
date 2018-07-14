@@ -16,7 +16,7 @@ class Level(Screen):
         super().__init__('Level', 'MasterState', back_screen='LevelSelector')
 
         self.component_frame = Frame(0, 220, 300, config.SCREEN_HEIGHT - 220,
-                                     True, config.SCHEME2, gridded=True)
+                                     True, config.SCHEME2, grid_type='stack')
         self.workspace_frame = Frame(310, 160, config.SCREEN_WIDTH - 305,
                                      config.SCREEN_HEIGHT - 160, True, config.SCHEME5)
 

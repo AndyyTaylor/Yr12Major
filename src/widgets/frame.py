@@ -20,7 +20,7 @@ class Frame(Widget):
             'max_scroll_y': 0,
             'min_scroll_x': 0,
             'max_scroll_x': 500,
-            'gridded': False,
+            'grid_type': 'default',
             'item_gap': 20,
             'item_x_margin': 10
         }
@@ -58,6 +58,14 @@ class Frame(Widget):
             self.surf.fill(back_fill)
             self.has_filled = True
 
+        for child in self.children:
+            if child.has_changed():
+                for other_child in self.children:
+                    if pygame.Rect(child.get_rect()).colliderect(
+                        pygame.Rect(other_child.get_rect())
+                    ):
+                        other_child.changed = True
+
         for child in self.children:  # Crop things that are out of the Frame
             if child.has_changed() or self.changed:
                 child.on_render(self.surf, back_fill)
@@ -92,33 +100,57 @@ class Frame(Widget):
         return np.subtract(np.subtract(pos, (self.x, self.y)), (self.scroll_x, self.scroll_y))
 
     def add_child(self, child):
-        if self.gridded:
-            taken = [0]
-            for widget in self.children:
-                taken.append(widget.y)
-                taken.append(widget.y + widget.h)
-
-            taken.sort()
-            min_gap = child.h + self.item_gap * 2
-
-            child.y = None
-            for i, val in enumerate(taken):
-                if i >= len(taken) - 1:
-                    continue
-
-                if taken[i + 1] - val >= min_gap:
-                    child.y = val + self.item_gap
-                    break
-
-            if child.y is None:
-                child.y = taken.pop() + self.item_gap
-            child.x = self.item_x_margin
+        if self.grid_type == 'stack':
+            self.stack_child(child)
+        elif self.grid_type == 'grid':
+            self.grid_child(child)
         else:
             child.x = self.crop(child.x, 0, self.w - child.w)
             child.y = self.crop(child.y, 0, self.h - child.h)
 
         child.parent = self
         self.children.append(child)
+
+    def grid_child(self, child):
+        locations = []
+        for y in range(self.item_gap, self.h - self.min_scroll_y, child.h + self.item_gap):
+            for x in range(self.item_x_margin, self.w - child.w, child.w + self.item_gap):
+                locations.append((x, y))
+
+        taken_locations = [c.get_pos() for c in self.children]
+
+        for location in locations:
+            if location not in taken_locations:
+                child.x, child.y = location[0], location[1]
+
+                return
+
+        print("Couldn't fit item!")
+
+    def stack_child(self, child):
+        taken = [0]
+        for widget in self.children:
+            taken.append(widget.y)
+            taken.append(widget.y + widget.h)
+
+        taken.sort()
+        min_gap = child.h + self.item_gap * 2
+
+        child.y = None
+        for i, val in enumerate(taken):
+            if i % 2 != 0:
+                continue
+
+            if i >= len(taken) - 1:
+                continue
+
+            if taken[i + 1] - val >= min_gap:
+                child.y = val + self.item_gap
+                break
+
+        if child.y is None:
+            child.y = taken.pop() + self.item_gap
+        child.x = self.item_x_margin
 
     def clear_children(self):
         self.children = []
