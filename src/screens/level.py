@@ -7,7 +7,7 @@ from src.ml.environments.game import ColorEnv
 
 from .screen import Screen
 from ..widgets import Frame, Label, Image, Button
-from ..components import Input, Output, Connection, KNN, NBayes, LogisticRegression
+from ..components import Input, Output, Connection, KNN, NBayes, LogisticRegression, NeuralNetwork
 
 
 class Level(Screen):
@@ -309,6 +309,7 @@ class Level(Screen):
         self.output = Output(10, 300, self.environment)
         self.component_frame.add_child(Input(10, 10, self.environment))
         self.component_frame.add_child(self.output)
+        self.component_frame.add_child(NeuralNetwork(self.environment))
         self.component_frame.add_child(KNN(self.environment))
         self.component_frame.add_child(NBayes(self.environment))
         self.component_frame.add_child(LogisticRegression(self.environment))

@@ -5,6 +5,8 @@ from src import config
 from ..widgets import Component, Button, Image
 from ..ml.agents.supervised import ClassificationKNN, NaiveBayes
 from ..ml.agents.supervised import LogisticRegression as LogRegAlgo
+from ..ml.agents.deeplearning import NeuralNetwork as NeuralNetAlgo
+from ..ml.agents.deeplearning import Dense, Activation
 
 
 class Algorithm(Component):
@@ -76,7 +78,6 @@ class Algorithm(Component):
             self.add_child(self.output_button)
 
     def change_label(self, i):
-        print("Label changed")
         self.holder_labels[i] += 1
         if self.holder_labels[i] >= self.num_labels:
             self.holder_labels[i] = 0
@@ -99,3 +100,14 @@ class LogisticRegression(Algorithm):
 
     def __init__(self, environment):
         super().__init__(LogRegAlgo, 'Log Reg', environment, w=200)
+
+
+class NeuralNetwork(Algorithm):
+
+    def __init__(self, environment):
+        super().__init__(NeuralNetAlgo, 'Neural Net', environment, w=200)
+
+        self.agent.add_layer(Dense(10, input_shape=environment.num_features))
+        self.agent.add_layer(Activation('sigmoid'))
+        self.agent.add_layer(Dense(environment.num_labels))
+        self.agent.add_layer(Activation('softmax'))
