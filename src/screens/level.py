@@ -3,7 +3,7 @@ import pygame
 import numpy as np
 
 from src import config
-from src.ml.environments.game import ColorEnv
+from src.ml.environments.game import ColorEnv, DonutEnv
 
 from .screen import Screen
 from ..widgets import Frame, Label, Image, Button
@@ -289,17 +289,65 @@ class Level(Screen):
 
     def load_level(self, num):
         if num == 1:
-            self.environment = ColorEnv(1, num_samples=15)
+            """
+            Your aim is to connect the inputs to the outputs
+            """
+            self.environment = ColorEnv(1, num_samples=10)
             self.req_accuracy = 100
-            self.max_time = 20
+            self.max_time = 15
         elif num == 2:
+            """
+            But you will have to filter them using ALGORITHMS!
+
+            Here's your first (and only free) algorithm, logistic regression.
+            It's very flexible when used with higher degrees, which you can purchase in the shop.
+
+            + Fast training time
+            + Non-linear classifier
+            - Slower training time
+            - Can easily under or overfit with wrong degree
+            """
             self.environment = ColorEnv(2, target_y=1, num_samples=30)
             self.req_accuracy = 100
             self.max_time = 10
         elif num == 3:
-            self.environment = ColorEnv(3, target_y=2)
+            """
+            Have a go at changing the algorithms output labels by clicking on the cog wheel.
+            """
+            self.environment = ColorEnv(3, target_y=2, num_samples=30)
             self.req_accuracy = 100
             self.max_time = 10
+        elif num == 4:
+            """
+            The Donut Problem
+            Non-linear problem (you're 1st degree logistic regression will struggle here!)
+
+            Hint: Purchase a new algorithm or higher degrees at the shop
+            """
+            self.environment = DonutEnv(num_samples=30)
+            self.req_accuracy = 100
+            self.max_time = 10
+        elif num == 5:
+            """
+            The XOR problem
+            A more difficult non-linear problem
+            """
+            # self.environment = XOREnv(num_samples=30)
+        elif num == 6:
+            """
+            Handwritten Digit Recognition (Easy)
+            Slightly modified MNIST dataset
+            """
+        elif num == 7:
+            """
+            - Fashion MNIST
+            - World cup man of the match
+            - Fruit recognition
+            - Soccer match prediction with post-game stats (excluding scores)
+            - Soccer match prediction with post-game stats (excluding scores & on/off target)
+            - Soccer match prediction with post-game stats (excluding scores & attempts)
+            - Soccer match prediction without post-game stats
+            """
         else:
             raise NotImplementedError("Can't find level", num)
 

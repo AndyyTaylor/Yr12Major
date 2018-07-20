@@ -27,6 +27,7 @@ class Algorithm(Component):
 
         self.skip_elapsed = False
 
+        self.skip_predict = False
         self.predict_cooldown = 0
         self.max_predict_cooldown = 0
 
@@ -53,9 +54,12 @@ class Algorithm(Component):
                 pred = self.agent.predict(np.array([sample.x]))
                 end_time = datetime.datetime.now()
 
-                self.max_predict_cooldown = (end_time - start_time).total_seconds()
-                self.max_predict_cooldown *= 1000 * config.PREDICT_MULTIPLIER
-                self.predict_cooldown = self.max_predict_cooldown
+                if not self.skip_predict:
+                    self.max_predict_cooldown = (end_time - start_time).total_seconds()
+                    self.max_predict_cooldown *= 1000 * config.PREDICT_MULTIPLIER
+                    self.predict_cooldown = self.max_predict_cooldown
+                else:
+                    self.skip_predict = False
                 pred_label = int(pred)
 
                 if pred_label in self.holder_labels:
@@ -94,6 +98,7 @@ class Algorithm(Component):
         start_time = datetime.datetime.now()
         self.agent.train(X, y)
         self.skip_elapsed = True
+        self.skip_predict = True
         end_time = datetime.datetime.now()
 
         self.max_train_cooldown = (end_time - start_time).total_seconds()
