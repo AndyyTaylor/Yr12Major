@@ -3,7 +3,7 @@ import pygame
 import numpy as np
 
 from src import config
-from src.ml.environments.game import ColorEnv, DonutEnv
+from src.ml.environments.game import ColorEnv, DonutEnv, XOREnv
 
 from .screen import Screen
 from ..widgets import Frame, Label, Image, Button
@@ -332,7 +332,9 @@ class Level(Screen):
             The XOR problem
             A more difficult non-linear problem
             """
-            # self.environment = XOREnv(num_samples=30)
+            self.environment = XOREnv(num_samples=30)
+            self.req_accuracy = 100
+            self.max_time = 10
         elif num == 6:
             """
             Handwritten Digit Recognition (Easy)
