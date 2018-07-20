@@ -289,11 +289,11 @@ class Level(Screen):
 
     def load_level(self, num):
         if num == 1:
-            self.environment = ColorEnv(1, num_samples=5)
+            self.environment = ColorEnv(1, num_samples=15)
             self.req_accuracy = 100
-            self.max_time = 10
+            self.max_time = 20
         elif num == 2:
-            self.environment = ColorEnv(2, target_y=1)
+            self.environment = ColorEnv(2, target_y=1, num_samples=30)
             self.req_accuracy = 100
             self.max_time = 10
         elif num == 3:
