@@ -55,7 +55,16 @@ class Connection(Widget):
 
     def progress_samples(self, elapsed):
         for sample in self.samples:
-            sample.progress += min((elapsed / 1000) * self.speed, 1 - sample.progress)
+            out_parent = self.out_holder.parent
+            in_parent = self.in_holder.parent
+            if hasattr(out_parent, 'max_predict_cooldown'):
+                total = max(out_parent.max_predict_cooldown, 1)
+            elif hasattr(in_parent, 'max_predict_cooldown'):
+                total = max(in_parent.max_predict_cooldown, 1)
+            else:
+                total = 1000
+
+            sample.progress += min(elapsed / total * self.speed, 1 - sample.progress)
 
             if sample.progress == 1:
                 self.out_holder.add_sample(sample)
