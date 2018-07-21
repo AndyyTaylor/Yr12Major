@@ -98,7 +98,7 @@ class Frame(Widget):
 
     def add_child(self, child):
         if self.gridded:
-            taken = [0]
+            taken = [0, 0]
             for widget in self.children:
                 taken.append(widget.y)
                 taken.append(widget.y + widget.h)
@@ -108,7 +108,7 @@ class Frame(Widget):
 
             child.y = None
             for i, val in enumerate(taken):
-                if i >= len(taken) - 1:
+                if i >= len(taken) - 1 or i % 2 == 0:
                     continue
 
                 if taken[i + 1] - val >= min_gap:

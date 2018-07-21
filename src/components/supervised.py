@@ -145,7 +145,17 @@ class Algorithm(Component):
 class KNN(Algorithm):
 
     def __init__(self, environment):
-        super().__init__(ClassificationKNN, 'KNN', environment, w=250)
+        super().__init__(ClassificationKNN, 'KNN', environment, w=280, h=180)
+
+    def on_render(self, screen, back_fill=None):
+        super().on_render(screen, back_fill)
+
+        width = self.w - self.slot_width * 2.5 - self.slot_height
+        canvas = pygame.Surface((width, self.h - 50))
+        canvas.fill(config.WHITE)
+        pygame.draw.rect(canvas, config.BLACK, (10, 10, 30, 30))
+
+        screen.blit(canvas, (self.x + self.slot_width * 1.25, self.y + 40))
 
 
 class NBayes(Algorithm):
