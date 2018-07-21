@@ -171,8 +171,8 @@ class NeuralNetwork(Algorithm):
         self.agent.add_layer(Activation('softmax'))
 
         self.output_rects = []
-        self.output_tallies = [0 for x in range(environment.num_labels)]
-        self.total_predictions = 0
+        self.output_predictions = [0 for x in range(environment.num_labels)]
+        self.output_totals = [0 for x in range(environment.num_labels)]
 
         width = (self.w - self.slot_width * 2.5 - self.slot_height) / environment.num_labels
         for i in range(environment.num_labels):
@@ -185,10 +185,9 @@ class NeuralNetwork(Algorithm):
     def on_update(self, elapsed):
         super().on_update(elapsed)
 
-        if self.total_predictions > 0:
-            for i, rect in enumerate(self.output_rects):
-                rect.change_text(self.get_perc_string(self.output_tallies[i],
-                                 self.total_predictions))
+        for i, rect in enumerate(self.output_rects):
+            rect.change_text(self.get_perc_string(self.output_predictions[i],
+                             self.output_totals[i]))
 
     def on_render(self, screen, back_fill=None):
         super().on_render(screen, back_fill)
@@ -201,11 +200,14 @@ class NeuralNetwork(Algorithm):
     def predict(self, sample):
         pred_label = super().predict(sample)  # Ahem Python
 
-        self.total_predictions += 1
-        self.output_tallies[pred_label] += 1
+        self.output_totals[int(sample.y)] += 1
+        if pred_label == int(sample.y):
+            self.output_predictions[pred_label] += 1
 
         return pred_label
 
     def get_perc_string(self, numerator, denominator):
+        if denominator == 0:
+            return '--%'
         dp = int(numerator / denominator * 100)
         return str(dp) + '%'
