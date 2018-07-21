@@ -346,7 +346,6 @@ class Level(Screen):
             - World cup man of the match
             - Fruit recognition
             - Soccer match prediction with post-game stats (excluding scores)
-            - Soccer match prediction with post-game stats (excluding scores & on/off target)
             - Soccer match prediction with post-game stats (excluding scores & attempts)
             - Soccer match prediction without post-game stats
             """

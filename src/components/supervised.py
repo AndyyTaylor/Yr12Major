@@ -139,7 +139,7 @@ class Algorithm(Component):
 class KNN(Algorithm):
 
     def __init__(self, environment):
-        super().__init__(ClassificationKNN, 'KNN', environment, w=150)
+        super().__init__(ClassificationKNN, 'KNN', environment, w=250)
 
 
 class NBayes(Algorithm):
