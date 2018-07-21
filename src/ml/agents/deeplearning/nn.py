@@ -32,11 +32,11 @@ class NeuralNetwork():
         for m in range(len(y)):
             t[m, int(y[m])] = 1
 
-        cost = 0    # terribly implemented cross entropy cost function
-        for m in range(len(y)):
-            for i in range(len(t[0])):
-                cost += t[m, i] * np.log(max(P[m, i], 1e-120)) + (1 - t[m, i]) \
-                    * np.log(max(1 - P[m, i], 1e-120))
+        # cost = 0    # terribly implemented cross entropy cost function
+        # for m in range(len(y)):
+        #     for i in range(len(t[0])):
+        #         cost += t[m, i] * np.log(max(P[m, i], 1e-120)) + (1 - t[m, i]) \
+        #             * np.log(max(1 - P[m, i], 1e-120))
 
         grad = (1 / len(y)) * (t - P)   # normalized gradient
 
