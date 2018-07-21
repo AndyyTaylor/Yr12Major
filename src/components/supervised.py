@@ -4,7 +4,7 @@ import datetime
 import pygame
 from src import config
 
-from ..widgets import Component, Button, Image
+from ..widgets import Component, Button, Image, Label
 from ..ml.agents.supervised import ClassificationKNN, NaiveBayes
 from ..ml.agents.supervised import LogisticRegression as LogRegAlgo
 from ..ml.agents.deeplearning import NeuralNetwork as NeuralNetAlgo
@@ -50,17 +50,7 @@ class Algorithm(Component):
             if in_holder.has_samples():
                 sample = in_holder.take_sample()
 
-                start_time = datetime.datetime.now()
-                pred = self.agent.predict(np.array([sample.x]))
-                end_time = datetime.datetime.now()
-
-                if not self.skip_predict:
-                    self.max_predict_cooldown = (end_time - start_time).total_seconds()
-                    self.max_predict_cooldown *= 1000 * config.PREDICT_MULTIPLIER
-                    self.predict_cooldown = self.max_predict_cooldown
-                else:
-                    self.skip_predict = False
-                pred_label = int(pred)
+                pred_label = self.predict(sample)
 
                 if pred_label in self.holder_labels:
                     self.outputs[self.holder_labels.index(pred_label)].add_sample(sample)
@@ -104,6 +94,22 @@ class Algorithm(Component):
         self.max_train_cooldown = (end_time - start_time).total_seconds()
         self.max_train_cooldown *= 1000 * config.TRAIN_MULTIPLIER
         self.train_cooldown = self.max_train_cooldown
+
+    def predict(self, sample):
+        start_time = datetime.datetime.now()
+        pred = self.agent.predict(np.array([sample.x]))
+        end_time = datetime.datetime.now()
+
+        if not self.skip_predict:
+            self.max_predict_cooldown = (end_time - start_time).total_seconds()
+            self.max_predict_cooldown *= 1000 * config.PREDICT_MULTIPLIER
+            self.predict_cooldown = self.max_predict_cooldown
+        else:
+            self.skip_predict = False
+
+        pred_label = int(pred)
+
+        return pred_label
 
     def place_holders(self):
         title_height = 35
@@ -157,9 +163,49 @@ class LogisticRegression(Algorithm):
 class NeuralNetwork(Algorithm):
 
     def __init__(self, environment):
-        super().__init__(NeuralNetAlgo, 'Neural Net', environment, w=200)
+        super().__init__(NeuralNetAlgo, 'Neural Net', environment, w=280)
 
         self.agent.add_layer(Dense(10, input_shape=environment.num_features))
         self.agent.add_layer(Activation('sigmoid'))
         self.agent.add_layer(Dense(environment.num_labels))
         self.agent.add_layer(Activation('softmax'))
+
+        self.output_rects = []
+        self.output_tallies = [0 for x in range(environment.num_labels)]
+        self.total_predictions = 0
+
+        width = (self.w - self.slot_width * 2.5 - self.slot_height) / environment.num_labels
+        for i in range(environment.num_labels):
+            self.output_rects.append(Label(self.slot_width * 1.25 + width * i, 60, width, 80,
+                                           None, '--%', 26, config.WHITE))
+
+        for rect in self.output_rects:
+            self.add_child(rect)
+
+    def on_update(self, elapsed):
+        super().on_update(elapsed)
+
+        if self.total_predictions > 0:
+            for i, rect in enumerate(self.output_rects):
+                rect.change_text(self.get_perc_string(self.output_tallies[i],
+                                 self.total_predictions))
+
+    def on_render(self, screen, back_fill=None):
+        super().on_render(screen, back_fill)
+
+        for i, rect in enumerate(self.output_rects):
+            self.render_data(screen, i,
+                             np.subtract(np.add(rect.get_center(True), self.get_pos(True)),
+                                         (0, 40)))
+
+    def predict(self, sample):
+        pred_label = super().predict(sample)  # Ahem Python
+
+        self.total_predictions += 1
+        self.output_tallies[pred_label] += 1
+
+        return pred_label
+
+    def get_perc_string(self, numerator, denominator):
+        dp = int(numerator / denominator * 100)
+        return str(dp) + '%'
