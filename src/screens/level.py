@@ -6,7 +6,7 @@ from src import config
 from src.ml.environments.game import ColorEnv
 
 from .screen import Screen
-from ..widgets import Frame, Label, Image, Button
+from ..widgets import Frame, Label, Image, Button, Message
 from ..components import Input, Output, Connection, KNN, NBayes, LogisticRegression
 
 
@@ -44,6 +44,7 @@ class Level(Screen):
         # self.component_frame.add_child(Output(10, 300))
 
         self.load_level(data)
+        self.show_level_blurb()
 
     def on_update(self, elapsed):
         for widget in self.widgets:  # FIX, this will allow components to process while game paused
@@ -79,7 +80,10 @@ class Level(Screen):
     def on_mouse_down(self, event, pos):
         super().on_mouse_down(event, pos)
 
-        if not self.create_connections(pos) and self.floating_component is None:
+        if not self.blurb_frame.hidden:
+            self.blurb_frame.hide()
+            self.workspace_frame.changed = True
+        elif not self.create_connections(pos) and self.floating_component is None:
             self.select_floating_component(pos)
 
     def on_mouse_motion(self, event, pos):
@@ -144,6 +148,18 @@ class Level(Screen):
         self.score_frame.add_child(self.max_time_label)
 
         self.title_frame.add_child(self.score_frame)
+
+    def show_level_blurb(self):
+        width = 600
+        height = 600
+        x = int(config.SCREEN_WIDTH / 2 - width / 2)
+        blurb_frame = Frame(x, self.workspace_frame.y, width, height, back_color=config.SCHEME2)
+        blurb_frame.add_child(Label(10, 10, width - 20, 70, config.SCHEME5, self.level_title, 48,
+                                    config.WHITE))
+        blurb_frame.add_child(Message(10, 80, width - 20, height - 90, config.SCHEME5,
+                                      self.level_description, 24, config.WHITE, align='ll'))
+        self.blurb_frame = blurb_frame
+        self.widgets.append(blurb_frame)
 
     def create_connections(self, pos, mouse_up=False):
         holders = []
@@ -288,10 +304,14 @@ class Level(Screen):
                 widget.clear_samples()
 
     def load_level(self, num):
+        self.level_title = "Placeholder Title"
+        self.level_description = "This is a placeholder level description...\n" * 5
         if num == 1:
             self.environment = ColorEnv(1, num_samples=5)
             self.req_accuracy = 100
             self.max_time = 10
+            self.level_title = "Red Circles"
+            self.level_description = "Your goal is to filter all of the inputs and gather the correct output and this is a really long sentence so that I can test the Message widget"
         elif num == 2:
             self.environment = ColorEnv(2, target_y=1)
             self.req_accuracy = 100
