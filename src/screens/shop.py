@@ -43,7 +43,6 @@ class Shop(Screen):
 
     def on_enter(self, data, screen):
         super().on_enter(data, screen)
-        print("Shop entered")
 
     def create_purchase_buttons(self):
         for type, items in self.purchases.items():

@@ -28,7 +28,7 @@ class Screen():
             self.title_frame = Frame(0, 0, config.SCREEN_WIDTH, 150, False, config.SCHEME2)
             self.widgets.append(self.title_frame)
 
-            self.title = Label(0, 0, config.SCREEN_WIDTH, 150,
+            self.title = Label(200, 0, config.SCREEN_WIDTH - 400, 150,
                                config.SCHEME2, self.name, 118, config.BLACK)
             self.title_frame.add_child(self.title)
 

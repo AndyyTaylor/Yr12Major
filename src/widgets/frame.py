@@ -60,13 +60,13 @@ class Frame(Widget):
                 self.surf.fill(back_fill)
                 self.has_filled = True
 
-            # for child in self.children:
-            #     if child.has_changed():
-            #         for other_child in self.children:
-            #             if pygame.Rect(child.get_rect()).colliderect(
-            #                 pygame.Rect(other_child.get_rect())
-            #             ):
-            #                 other_child.changed = True
+            for child in self.children:
+                if child.has_changed():
+                    for other_child in self.children:
+                        if pygame.Rect(child.get_rect()).colliderect(
+                            pygame.Rect(other_child.get_rect())
+                        ):
+                            other_child.changed = True
 
             for child in self.children:  # Crop things that are out of the Frame
                 if child.has_changed() or self.changed:
