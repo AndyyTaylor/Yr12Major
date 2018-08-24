@@ -36,7 +36,7 @@ class Screen():
                 back_button = Button(0, 0, 150, 150, "", 72,
                                      config.BLACK, config.SCHEME2, config.SCHEME2, 0,
                                      lambda: self.parent.change_state(self.back_screen),
-                                     shape='rect', img=Image(25, 25, 100, 100, "back_arrow.png"))
+                                     shape='rect', img=Image(25, 25, 100, 100, "back_arrow.bmp"))
 
                 self.title_frame.add_child(back_button)
 

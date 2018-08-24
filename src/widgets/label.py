@@ -15,7 +15,7 @@ class Label(Widget):
         self.font_col = font_col
         self.align = align
 
-        self.font = pygame.font.Font('%s/data/fonts/%s' % (config.DIR_PATH, 'Square.ttf'),
+        self.font = pygame.font.Font('data/fonts/%s' % ('Square.ttf'),
                                      self.font_size)
         self.render_text()
 

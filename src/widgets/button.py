@@ -140,7 +140,7 @@ class Button(Widget):
 
         self.enabled = True
 
-        self.font = pygame.font.Font('%s/data/fonts/%s' % (config.DIR_PATH, 'Square.ttf'),
+        self.font = pygame.font.Font('data/fonts/%s' % ('Square.ttf'),
                                      self.font_size)
         self.rendered_text = self.font.render(self.text, True, self.font_col)
 
