@@ -398,13 +398,7 @@ class Level(Screen):
                         f.readline()
 
         if num == 1:
-<<<<<<< HEAD
-            """
-            Your aim is to connect the inputs to the outputs
-            """
             self.environment = ColorEnv(1, num_samples=10)
-            self.req_accuracy = 100
-            self.max_time = 15
         elif num == 2:
             """
             But you will have to filter them using ALGORITHMS!
@@ -459,13 +453,6 @@ class Level(Screen):
             - Soccer match prediction with post-game stats (excluding scores & attempts)
             - Soccer match prediction without post-game stats
             """
-=======
-            self.environment = ColorEnv(1, num_samples=5)
-        elif num == 2:
-            self.environment = ColorEnv(2, target_y=1, num_samples=15)
-        elif num == 3:
-            self.environment = ColorEnv(3, target_y=2)
->>>>>>> feature/game_ui
         else:
             raise NotImplementedError("Can't find level", num)
 
