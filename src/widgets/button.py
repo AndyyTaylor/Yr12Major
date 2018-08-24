@@ -181,7 +181,7 @@ class Button(Widget):
                 dt = min(elapsed, self.animation)
                 self.animation -= dt
 
-        new_hash = hash((self.hover, self.animation))
+        new_hash = hash((self.hover, self.animation, self.enabled))
 
         if new_hash != self.prev_hash:
             self.changed = True
@@ -215,3 +215,6 @@ class Button(Widget):
 
     def disable(self):
         self.enabled = False
+
+    def enable(self):
+        self.enabled = True

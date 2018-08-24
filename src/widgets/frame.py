@@ -22,7 +22,8 @@ class Frame(Widget):
             'max_scroll_x': 500,
             'gridded': False,
             'item_gap': 20,
-            'item_x_margin': 10
+            'item_x_margin': 10,
+            'hidden': False
         }
 
         for key, val in defaults.items():
@@ -49,25 +50,28 @@ class Frame(Widget):
             self.scrolled = True
 
     def on_render(self, screen, back_fill=None):
-        super().on_render(screen, back_fill)
+        if not self.hidden:
+            super().on_render(screen, back_fill)
 
-        if self.back_color is not None:
-            back_fill = self.back_color
+            if self.back_color is not None:
+                back_fill = self.back_color
 
-        if (not self.has_filled or self.changed) and back_fill is not None:
-            self.surf.fill(back_fill)
-            self.has_filled = True
+            if (not self.has_filled or self.changed) and back_fill is not None:
+                self.surf.fill(back_fill)
+                self.has_filled = True
 
-        for child in self.children:  # Crop things that are out of the Frame
-            if child.has_changed() or self.changed:
-                child.on_render(self.surf, back_fill)
+            for child in self.children:  # Crop things that are out of the Frame
+                if child.has_changed() or self.changed:
+                    child.on_render(self.surf, back_fill)
 
-        temp_surf = pygame.Surface((self.w, self.h))
-        if back_fill is not None:
-            temp_surf.fill(back_fill)
-        temp_surf.blit(self.surf, (self.scroll_x, self.scroll_y))
+            temp_surf = pygame.Surface((self.w, self.h))
+            if back_fill is not None:
+                temp_surf.fill(back_fill)
+            temp_surf.blit(self.surf, (self.scroll_x, self.scroll_y))
 
-        screen.blit(temp_surf, (self.x, self.y))
+            screen.blit(temp_surf, (self.x, self.y))
+        else:
+            super().on_render(screen)
 
         self.changed = False
         self.scrolled = False
@@ -155,3 +159,7 @@ class Frame(Widget):
     def reset_animation(self):
         for child in self.children:
             child.reset_animation()
+
+    def hide(self):
+        self.hidden = True
+        self.changed = True
