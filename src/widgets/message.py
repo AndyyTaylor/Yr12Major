@@ -60,13 +60,14 @@ class Message(Widget):
         for word in words:
             t_w, t_h = self.font.size(sentence + word + ' ')
 
-            if t_w > self.w or word == 'zzz':
+            if t_w > self.w or word == 'zzz' or word == '<new>':
                 t_render = self.font.render(sentence, True, self.font_col)
                 self.rendered_text.blit(t_render, (0, current_height))
                 sentence = ''
                 current_height += t_h
 
-            sentence += word + ' '
+            if word != '<new>':
+                sentence += word + ' '
 
     def on_render(self, screen, back_fill=None):
         super().on_render(screen, back_fill)

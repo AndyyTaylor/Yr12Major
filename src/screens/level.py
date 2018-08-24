@@ -31,6 +31,7 @@ class Level(Screen):
 
         self.component_frame.changed = True
         self.workspace_frame.changed = True
+        self.title_frame.changed = True
         self.score_frame.clear_children()
         self.setup_score_frame()
 
@@ -55,7 +56,10 @@ class Level(Screen):
             self.floating_component.on_update(elapsed)
 
         if self.playing:
-            self.update_scores(elapsed)
+            if self.is_game_over():
+                self.resolve_game()
+            else:
+                self.update_scores(elapsed)
 
     def on_render(self, screen):
         super().on_render(screen)
@@ -77,12 +81,77 @@ class Level(Screen):
         else:
             self.acc_label.change_color(config.RED)
 
+    def is_game_over(self):
+        for child in self.workspace_frame.children:
+            if isinstance(child, Button):
+                continue
+
+            total_data = 0
+            for holder in child.inputs + child.outputs:
+                total_data += len(holder.samples)
+
+            if total_data > 0:
+                return False
+
+        for widget in self.widgets:
+            if widget.type == 'connection':
+                if len(widget.samples) > 0:
+                    return False
+
+        return True
+
+    def resolve_game(self):
+        won = self.has_won()
+
+        if self.end_frame.hidden:
+            width = 250
+            height = 450
+            x = int(config.SCREEN_WIDTH / 2 - width / 2)
+            self.end_frame = Frame(x, self.workspace_frame.y, width, height,
+                                   back_color=config.SCHEME2)
+            if won:
+                title = 'YOU WON!'
+            else:
+                title = 'YOU LOST'
+            self.end_frame.add_child(Label(10, 10, width - 20, 70, config.BLACK, title, 48,
+                                           config.WHITE))
+
+            if won:
+                file = 'trophy.png'
+            else:
+                file = 'spoon.png'
+            self.end_frame.add_child(Image(10, 90, width - 20, height - 50 - 90, file))
+
+            if won:
+                desc = 'Click anywhere to continue'
+            else:
+                desc = 'Click anywhere to retry'
+            self.end_frame.add_child(Label(10, height - 40, width - 20, 30, config.BLACK,
+                                           desc, 16, config.WHITE))
+            self.widgets.append(self.end_frame)
+
+    def has_won(self):
+        if self.play_time < self.max_time and self.output.get_raw_percentage() >= self.req_accuracy:
+            return True
+
+        return False
+
     def on_mouse_down(self, event, pos):
         super().on_mouse_down(event, pos)
 
         if not self.blurb_frame.hidden:
             self.blurb_frame.hide()
             self.workspace_frame.changed = True
+            self.title_frame.changed = True
+        elif not self.end_frame.hidden:
+            self.end_frame.hide()
+            self.workspace_frame.changed = True
+            self.title_frame.changed = True
+            self.widgets.remove(self.end_frame)
+            if self.has_won():
+                self.parent.change_state('Level', self.current_level + 1)
+            else:
+                self.stop()
         elif not self.create_connections(pos) and self.floating_component is None:
             self.select_floating_component(pos)
 
@@ -113,6 +182,8 @@ class Level(Screen):
                                      True, config.SCHEME2, gridded=True)
         self.workspace_frame = Frame(310, 160, config.SCREEN_WIDTH - 305,
                                      config.SCREEN_HEIGHT - 160, True, config.SCHEME5)
+        self.end_frame = Frame(0, self.workspace_frame.y, 200, 200, back_color=config.SCHEME2)
+        self.end_frame.hide()
 
         border1 = Frame(0, 150, config.SCREEN_WIDTH, 10, back_color=config.SCHEME5)
         border2 = Frame(300, 160, 10, config.SCREEN_HEIGHT - 160, back_color=config.SCHEME5)
@@ -154,10 +225,12 @@ class Level(Screen):
         height = 600
         x = int(config.SCREEN_WIDTH / 2 - width / 2)
         blurb_frame = Frame(x, self.workspace_frame.y, width, height, back_color=config.SCHEME2)
-        blurb_frame.add_child(Label(10, 10, width - 20, 70, config.SCHEME5, self.level_title, 48,
+        blurb_frame.add_child(Label(10, 10, width - 20, 70, config.BLACK, self.level_title, 48,
                                     config.WHITE))
-        blurb_frame.add_child(Message(10, 80, width - 20, height - 90, config.SCHEME5,
+        blurb_frame.add_child(Message(10, 80, width - 20, height - 90, config.BLACK,
                                       self.level_description, 24, config.WHITE, align='ll'))
+        blurb_frame.add_child(Label(10, 560, width - 20, 30, config.BLACK,
+                                    'Click anywhere to continue...', 16, config.WHITE))
         self.blurb_frame = blurb_frame
         self.widgets.append(blurb_frame)
 
@@ -304,22 +377,32 @@ class Level(Screen):
                 widget.clear_samples()
 
     def load_level(self, num):
-        self.level_title = "Placeholder Title"
-        self.level_description = "This is a placeholder level description...\n" * 5
+        config.MAX_LEVEL = max(config.MAX_LEVEL, num)
+        self.current_level = num
+        self.level_title = ''
+        self.level_description = ''
+
+        with open("data/assets/level_text.txt") as f:
+            while self.level_title == '' or self.level_description == '':
+                line = f.readline().strip()
+                if int(line) == num:
+                    self.level_title = f.readline().strip()
+                    self.level_description = f.readline().strip()
+                    self.req_accuracy = int(f.readline().strip())
+                    self.max_time = int(f.readline().strip())
+
+                    break
+                else:
+                    # Skip over the current title and desc etc
+                    for i in range(4):
+                        f.readline()
+
         if num == 1:
             self.environment = ColorEnv(1, num_samples=5)
-            self.req_accuracy = 100
-            self.max_time = 10
-            self.level_title = "Red Circles"
-            self.level_description = "Your goal is to filter all of the inputs and gather the correct output and this is a really long sentence so that I can test the Message widget"
         elif num == 2:
-            self.environment = ColorEnv(2, target_y=1)
-            self.req_accuracy = 100
-            self.max_time = 10
+            self.environment = ColorEnv(2, target_y=1, num_samples=15)
         elif num == 3:
             self.environment = ColorEnv(3, target_y=2)
-            self.req_accuracy = 100
-            self.max_time = 10
         else:
             raise NotImplementedError("Can't find level", num)
 

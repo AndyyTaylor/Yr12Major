@@ -1,0 +1,10 @@
+1
+Red Circles
+Your job is simple. You have to filter the data from the 'Input' component and provide the correct samples to the 'Output' component. In this level, it's simply a case of connecting the two together and pressing play.
+100
+5
+2
+Red and Green Circles
+Now you have to filter between the green and red circles. <new> <new> I've given you access to the logistic regression algorithm to get you started.
+100
+10
