@@ -20,9 +20,7 @@ class Input(Component):
         self.output_pos.append((self.w - self.slot_width, self.h / 2))
         self.setup_inputs_and_outputs()
 
-        for i in range(self.environment.testX.shape[0]):
-            sample = Sample(self.environment.testX[i], self.environment.testy[i])
-            self.outputs[0].add_sample(sample)
+        self.load_samples()
 
     def on_render(self, screen, back_fill=None):
         super().on_render(screen, back_fill)
@@ -40,8 +38,18 @@ class Input(Component):
                                           self.y + y_m + int((self.h - y_m) / 2)),
                                          int(label_w / 2))  # Size is in radius
 
+    def load_samples(self):
+        for i in range(self.environment.testX.shape[0]):
+            sample = Sample(self.environment.testX[i], self.environment.testy[i])
+            self.outputs[0].add_sample(sample)
+
     def get_train_data(self):
         return (self.environment.trainX, self.environment.trainy)
 
     def get_labels(self):
         return self.environment.get_labels()
+
+    def clear_holders(self):
+        super().clear_holders()
+
+        self.load_samples()

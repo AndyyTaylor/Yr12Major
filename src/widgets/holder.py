@@ -47,7 +47,10 @@ class Holder(Widget):
         return len(self.samples) > 0
 
     def take_sample(self):
-        return self.samples.pop()
+        return self.samples.pop(0)
+
+    def clear_samples(self):
+        self.samples = []
 
     def on_mouse_motion(self, pos):
         self.hover = pygame.Rect(self.get_rect()).collidepoint(pos)

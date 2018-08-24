@@ -11,16 +11,25 @@ class LevelSelector(Screen):
 
         self.create_level_buttons(50, 170, config.SCREEN_WIDTH - 100,
                                   config.SCREEN_HEIGHT + 200, 150, 150, 20)
+        self.max_level = config.MAX_LEVEL
 
     def on_update(self, elapsed):
         super().on_update(elapsed)
 
-        # print(int(1000 / elapsed))
+        if config.MAX_LEVEL != self.max_level:
+            for button in self.level_button_frame.children:
+                if int(button.text) <= config.MAX_LEVEL:
+                    button.enable()
+                else:
+                    button.disable()
+
+            self.max_level = config.MAX_LEVEL
 
     def create_level_buttons(self, x, y, w, h, box_width, box_height, gap_size):
         level_button_frame = Frame(x, y, w, h, True, config.SCHEME5,
                                    min_scroll_y=-500, max_scroll_y=0)
         self.widgets.append(level_button_frame)
+        self.level_button_frame = level_button_frame
 
         level_num = 1
         for yy in range(y, y + h - box_height + 1, box_height + gap_size):

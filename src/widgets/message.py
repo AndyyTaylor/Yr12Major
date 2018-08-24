@@ -5,10 +5,10 @@ from src import config
 from .widget import Widget
 
 
-class Label(Widget):
+class Message(Widget):
 
     def __init__(self, x, y, w, h, back_color, text, font_size, font_col, align='cc'):
-        super().__init__(x, y, w, h, back_color, "label")
+        super().__init__(x, y, w, h, back_color, "message")
 
         self.text = text
         self.font_size = font_size
@@ -52,12 +52,24 @@ class Label(Widget):
         self.render_text()
 
     def render_text(self):
-        self.rendered_text = self.font.render(self.text, True, self.font_col)
+        self.rendered_text = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
+
+        words = self.text.split() + ['zzz']
+        sentence = ''
+        current_height = 0
+        for word in words:
+            t_w, t_h = self.font.size(sentence + word + ' ')
+
+            if t_w > self.w or word == 'zzz' or word == '<new>':
+                t_render = self.font.render(sentence, True, self.font_col)
+                self.rendered_text.blit(t_render, (0, current_height))
+                sentence = ''
+                current_height += t_h
+
+            if word != '<new>':
+                sentence += word + ' '
 
     def on_render(self, screen, back_fill=None):
-        if self.back_color is None:  # Labels are special case, should be entirely transparent
-            back_fill = None
-
         super().on_render(screen, back_fill)
 
         if self.back_color is not None:

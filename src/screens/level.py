@@ -3,11 +3,11 @@ import pygame
 import numpy as np
 
 from src import config
-from src.ml.environments.game import ColorEnv
+from src.ml.environments.game import ColorEnv, DonutEnv, XOREnv
 
 from .screen import Screen
-from ..widgets import Frame, Label, Image, Button
-from ..components import Input, Output, Connection, KNN, NBayes, LogisticRegression
+from ..widgets import Frame, Label, Image, Button, Message
+from ..components import Input, Output, Connection, KNN, NBayes, LogisticRegression, NeuralNetwork
 
 
 class Level(Screen):
@@ -15,19 +15,8 @@ class Level(Screen):
     def __init__(self):
         super().__init__('Level', 'MasterState', back_screen='LevelSelector')
 
-        self.component_frame = Frame(0, 220, 300, config.SCREEN_HEIGHT - 220,
-                                     True, config.SCHEME2, grid_type='stack')
-        self.workspace_frame = Frame(310, 160, config.SCREEN_WIDTH - 305,
-                                     config.SCREEN_HEIGHT - 160, True, config.SCHEME5)
-
-        border1 = Frame(0, 150, config.SCREEN_WIDTH, 10, back_color=config.SCHEME5)
-        border2 = Frame(300, 160, 10, config.SCREEN_HEIGHT - 160, back_color=config.SCHEME5)
-
-        self.widgets.append(border1)
-        self.widgets.append(border2)
-
-        self.widgets.append(self.component_frame)
-        self.widgets.append(self.workspace_frame)
+        self.setup_frames()
+        self.setup_score_frame()
 
         self.widgets.append(Label(0, 160, 300, 60, config.SCHEME2, "Components", 36, config.BLACK))
 
@@ -42,8 +31,12 @@ class Level(Screen):
 
         self.component_frame.changed = True
         self.workspace_frame.changed = True
+        self.title_frame.changed = True
+        self.score_frame.clear_children()
+        self.setup_score_frame()
 
         self.playing = False
+        self.play_time = 0
 
         self.clear_connections()
         self.add_control_buttons()
@@ -52,14 +45,21 @@ class Level(Screen):
         # self.component_frame.add_child(Output(10, 300))
 
         self.load_level(data)
+        self.show_level_blurb()
 
     def on_update(self, elapsed):
-        for widget in self.widgets:
+        for widget in self.widgets:  # FIX, this will allow components to process while game paused
             if widget.type != 'connection' or self.playing:
                 widget.on_update(elapsed)
 
         if self.floating_component is not None:
             self.floating_component.on_update(elapsed)
+
+        if self.playing:
+            if self.is_game_over():
+                self.resolve_game()
+            else:
+                self.update_scores(elapsed)
 
     def on_render(self, screen):
         super().on_render(screen)
@@ -67,10 +67,92 @@ class Level(Screen):
         if self.floating_component is not None:
             self.floating_component.on_render(screen)
 
+    def update_scores(self, elapsed):
+        self.play_time += elapsed / 1000
+        self.time_label.change_text(int(self.play_time))
+        if self.play_time <= self.max_time:
+            self.time_label.change_color(config.GREEN)
+        else:
+            self.time_label.change_color(config.RED)
+
+        self.acc_label.change_text(self.output.get_percentage())
+        if self.output.get_raw_percentage() >= self.req_accuracy:
+            self.acc_label.change_color(config.GREEN)
+        else:
+            self.acc_label.change_color(config.RED)
+
+    def is_game_over(self):
+        for child in self.workspace_frame.children:
+            if isinstance(child, Button):
+                continue
+
+            total_data = 0
+            for holder in child.inputs + child.outputs:
+                total_data += len(holder.samples)
+
+            if total_data > 0:
+                return False
+
+        for widget in self.widgets:
+            if widget.type == 'connection':
+                if len(widget.samples) > 0:
+                    return False
+
+        return True
+
+    def resolve_game(self):
+        won = self.has_won()
+
+        if self.end_frame.hidden:
+            width = 250
+            height = 450
+            x = int(config.SCREEN_WIDTH / 2 - width / 2)
+            self.end_frame = Frame(x, self.workspace_frame.y, width, height,
+                                   back_color=config.SCHEME2)
+            if won:
+                title = 'YOU WON!'
+            else:
+                title = 'YOU LOST'
+            self.end_frame.add_child(Label(10, 10, width - 20, 70, config.BLACK, title, 48,
+                                           config.WHITE))
+
+            if won:
+                file = 'trophy.png'
+            else:
+                file = 'spoon.png'
+            self.end_frame.add_child(Image(10, 90, width - 20, height - 50 - 90, file))
+
+            if won:
+                desc = 'Click anywhere to continue'
+            else:
+                desc = 'Click anywhere to retry'
+            self.end_frame.add_child(Label(10, height - 40, width - 20, 30, config.BLACK,
+                                           desc, 16, config.WHITE))
+            self.widgets.append(self.end_frame)
+
+    def has_won(self):
+        if self.play_time < self.max_time and self.output.get_raw_percentage() >= self.req_accuracy:
+            return True
+
+        return False
+
     def on_mouse_down(self, event, pos):
         super().on_mouse_down(event, pos)
 
-        if not self.create_connections(pos) and self.floating_component is None:
+        if not self.blurb_frame.hidden:
+            self.blurb_frame.hide()
+            self.workspace_frame.changed = True
+            self.title_frame.changed = True
+        elif not self.end_frame.hidden:
+            self.end_frame.hide()
+            self.workspace_frame.changed = True
+            self.title_frame.changed = True
+            self.widgets.remove(self.end_frame)
+            if self.has_won():
+                self.parent.change_state('Level', self.current_level + 1)
+            else:
+                self.stop()
+        elif not self.create_connections(pos) and self.floating_component is None:
             self.select_floating_component(pos)
 
     def on_mouse_motion(self, event, pos):
@@ -94,6 +176,67 @@ class Level(Screen):
         else:
             if not self.create_connections(pos, True):
                 self.clear_hanging_connection()
+
+    def setup_frames(self):
+        self.component_frame = Frame(0, 220, 300, config.SCREEN_HEIGHT - 220,
+                                     True, config.SCHEME2, grid_type='stack')
+        self.workspace_frame = Frame(310, 160, config.SCREEN_WIDTH - 305,
+                                     config.SCREEN_HEIGHT - 160, True, config.SCHEME5)
+        self.end_frame = Frame(0, self.workspace_frame.y, 200, 200, back_color=config.SCHEME2)
+        self.end_frame.hide()
+
+        border1 = Frame(0, 150, config.SCREEN_WIDTH, 10, back_color=config.SCHEME5)
+        border2 = Frame(300, 160, 10, config.SCREEN_HEIGHT - 160, back_color=config.SCHEME5)
+
+        self.widgets.append(self.component_frame)
+        self.widgets.append(self.workspace_frame)
+
+        self.widgets.append(border1)
+        self.widgets.append(border2)
+
+    def setup_score_frame(self):
+        self.score_frame = Frame(config.SCREEN_WIDTH - 340, 0, 340, 150, back_color=config.SCHEME4)
+        self.score_frame.add_child(Label(0, 0, 340, 50, None, "Score", 36, config.BLACK))
+
+        self.score_frame.add_child(Label(5, 50, 100, 40, None, "Accuracy", 30,
+                                         config.BLACK, align='lc'))
+        self.score_frame.add_child(Label(5, 90, 100, 40, None, "Time", 30,
+                                         config.BLACK, align='lc'))
+
+        self.acc_label = Label(160, 50, 80, 40, config.SCHEME4, "--%", 30, config.BLACK, align='lc')
+        self.time_label = Label(160, 90, 80, 40, config.SCHEME4, '0', 30, config.BLACK, align='lc')
+
+        self.score_frame.add_child(self.acc_label)
+        self.score_frame.add_child(self.time_label)
+
+        self.score_frame.add_child(Label(240, 50, 60, 40, config.SCHEME4, '/', 30, config.BLACK,
+                                         align='lc'))
+        self.score_frame.add_child(Label(240, 90, 60, 40, config.SCHEME4, '/', 30, config.BLACK,
+                                         align='lc'))
+
+        self.req_acc_label = Label(270, 50, 60, 40, config.SCHEME4, '--%', 30, config.BLACK,
+                                   align='lc')
+        self.max_time_label = Label(270, 90, 60, 40, config.SCHEME4, '--', 30, config.BLACK,
+                                    align='lc')
+
+        self.score_frame.add_child(self.req_acc_label)
+        self.score_frame.add_child(self.max_time_label)
+
+        self.title_frame.add_child(self.score_frame)
+
+    def show_level_blurb(self):
+        width = 600
+        height = 600
+        x = int(config.SCREEN_WIDTH / 2 - width / 2)
+        blurb_frame = Frame(x, self.workspace_frame.y, width, height, back_color=config.SCHEME2)
+        blurb_frame.add_child(Label(10, 10, width - 20, 70, config.BLACK, self.level_title, 48,
+                                    config.WHITE))
+        blurb_frame.add_child(Message(10, 80, width - 20, height - 90, config.BLACK,
+                                      self.level_description, 24, config.WHITE, align='ll'))
+        blurb_frame.add_child(Label(10, 560, width - 20, 30, config.BLACK,
+                                    'Click anywhere to continue...', 16, config.WHITE))
+        self.blurb_frame = blurb_frame
+        self.widgets.append(blurb_frame)
 
     def create_connections(self, pos, mouse_up=False):
         holders = []
@@ -149,7 +292,6 @@ class Level(Screen):
                 self.floating_component = widget
                 self.floating_component.parent = None
                 self.component_frame.children.remove(widget)
-                return
 
         # If not in the component frame
         for widget in self.workspace_frame.children:
@@ -196,16 +338,22 @@ class Level(Screen):
             self.widgets.remove(conn)
 
     def add_control_buttons(self):
-        pause_button = Button(config.SCREEN_WIDTH - 90 - 310, 0, 80, 80, "", 72,
+        stop_button = Button(config.SCREEN_WIDTH - 90 - 310, 0, 80, 80, "", 72,
+                             config.BLACK, config.BLACK, config.SCHEME2, 5,
+                             self.stop,
+                             img=Image(15, 15, 50, 50, "stop.png"))
+        self.workspace_frame.add_child(stop_button)
+
+        pause_button = Button(config.SCREEN_WIDTH - 180 - 310, 0, 80, 80, "", 72,
                               config.BLACK, config.BLACK, config.SCHEME2, 5,
                               self.pause,
                               img=Image(15, 15, 50, 50, "pause.png"))
         self.workspace_frame.add_child(pause_button)
 
-        play_button = Button(config.SCREEN_WIDTH - 180 - 310, 0, 80, 80, "", 72,
+        play_button = Button(config.SCREEN_WIDTH - 270 - 310, 0, 80, 80, "", 72,
                              config.BLACK, config.BLACK, config.SCHEME2, 5,
                              self.play,
-                             img=Image(18, 15, 50, 50, "play.png"))
+                             img=Image(15, 15, 50, 50, "play.png"))
         self.workspace_frame.add_child(play_button)
 
     def play(self):
@@ -217,18 +365,108 @@ class Level(Screen):
     def pause(self):
         self.playing = False
 
+    def stop(self):
+        self.playing = False
+        self.play_time = 0
+
+        self.output.reset_stats()
+        self.clear_components()
+        self.update_scores(0)
+
+    def clear_components(self):
+        for widget in self.workspace_frame.children + self.widgets:
+            if widget.type == 'component':
+                widget.clear_holders()
+            elif widget.type == 'connection':
+                widget.clear_samples()
+
     def load_level(self, num):
+        config.MAX_LEVEL = max(config.MAX_LEVEL, num)
+        self.current_level = num
+        self.level_title = ''
+        self.level_description = ''
+
+        with open("data/assets/level_text.txt") as f:
+            while self.level_title == '' or self.level_description == '':
+                line = f.readline().strip()
+                if int(line) == num:
+                    self.level_title = f.readline().strip()
+                    self.level_description = f.readline().strip()
+                    self.req_accuracy = int(f.readline().strip())
+                    self.max_time = int(f.readline().strip())
+
+                    break
+                else:
+                    # Skip over the current title and desc etc
+                    for i in range(4):
+                        f.readline()
+
         if num == 1:
-            self.environment = ColorEnv(1, num_samples=5)
+            self.environment = ColorEnv(1, num_samples=10)
         elif num == 2:
-            self.environment = ColorEnv(2, target_y=1)
+            """
+            But you will have to filter them using ALGORITHMS!
+
+            Here's your first (and only free) algorithm, logistic regression.
+            It's very flexible when used with higher degrees, which you can purchase in the shop.
+
+            + Fast training time
+            + Non-linear classifier
+            - Slower training time
+            - Can easily under or overfit with wrong degree
+            """
+            self.environment = ColorEnv(2, target_y=1, num_samples=30)
+            self.req_accuracy = 100
+            self.max_time = 10
         elif num == 3:
-            self.environment = ColorEnv(3, target_y=2)
+            """
+            Have a go at changing the algorithms output labels by clicking on the cog wheel.
+            """
+            self.environment = ColorEnv(3, target_y=2, num_samples=30)
+            self.req_accuracy = 100
+            self.max_time = 10
+        elif num == 4:
+            """
+            The Donut Problem
+            Non-linear problem (you're 1st degree logistic regression will struggle here!)
+
+            Hint: Purchase a new algorithm or higher degrees at the shop
+            """
+            self.environment = DonutEnv(num_samples=30)
+            self.req_accuracy = 100
+            self.max_time = 10
+        elif num == 5:
+            """
+            The XOR problem
+            A more difficult non-linear problem
+            """
+            self.environment = XOREnv(num_samples=30)
+            self.req_accuracy = 100
+            self.max_time = 10
+        elif num == 6:
+            """
+            Handwritten Digit Recognition (Easy)
+            Slightly modified MNIST dataset
+            """
+        elif num == 7:
+            """
+            - Fashion MNIST
+            - World cup man of the match
+            - Fruit recognition
+            - Soccer match prediction with post-game stats (excluding scores)
+            - Soccer match prediction with post-game stats (excluding scores & attempts)
+            - Soccer match prediction without post-game stats
+            """
         else:
             raise NotImplementedError("Can't find level", num)
 
+        self.req_acc_label.change_text(str(self.req_accuracy) + '%')
+        self.max_time_label.change_text(self.max_time)
+
+        self.output = Output(10, 300, self.environment)
         self.component_frame.add_child(Input(10, 10, self.environment))
-        self.component_frame.add_child(Output(10, 300, self.environment))
+        self.component_frame.add_child(self.output)
+        self.component_frame.add_child(NeuralNetwork(self.environment))
         self.component_frame.add_child(KNN(self.environment))
         self.component_frame.add_child(NBayes(self.environment))
         self.component_frame.add_child(LogisticRegression(self.environment))

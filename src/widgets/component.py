@@ -38,3 +38,7 @@ class Component(Frame):
 
     def train(self, X, y):
         pass
+
+    def clear_holders(self):
+        for holder in self.inputs + self.outputs:
+            holder.clear_samples()

@@ -2,7 +2,7 @@ import numpy as np
 
 
 class NeuralNetwork():
-    def __init__(self):
+    def __init__(self, environment):
         self.layers = []
 
     def add_layer(self, layer):
@@ -21,21 +21,24 @@ class NeuralNetwork():
 
         return X
 
+    def train(self, X, y, num_iters=1000):
+        for i in range(num_iters):
+            self.back_propagate(X, y)
+
     def back_propagate(self, X, y):
         P = self.feed_forward(X)
 
         t = np.zeros(P.shape)
         for m in range(len(y)):
-            t[m, y[m]] = 1
+            t[m, int(y[m])] = 1
 
-        cost = 0    # terribly implemented cross entropy cost function
-        for m in range(len(y)):
-            for i in range(len(t[0])):
-                cost += t[m, i] * np.log(max(P[m, i], 1e-120)) + (1 - t[m, i]) * np.log(max(1 - P[m, i], 1e-120))
+        # cost = 0    # terribly implemented cross entropy cost function
+        # for m in range(len(y)):
+        #     for i in range(len(t[0])):
+        #         cost += t[m, i] * np.log(max(P[m, i], 1e-120)) + (1 - t[m, i]) \
+        #             * np.log(max(1 - P[m, i], 1e-120))
 
         grad = (1 / len(y)) * (t - P)   # normalized gradient
 
         for layer in reversed(self.layers):
             grad = layer.back_propagate(grad)
-
-        print(cost)

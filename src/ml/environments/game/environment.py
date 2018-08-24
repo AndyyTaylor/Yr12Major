@@ -1,11 +1,13 @@
 
 import pygame
 import numpy as np
+from src import config
 
 
 class Environment():
-    def __init__(self, target_y):
+    def __init__(self, target_y, num_samples):
         self.target_y = target_y
+        self.num_samples = int(np.ceil(num_samples / config.TEST_PERC))
 
     def create_train_cross_test(self, X, y, train_perc, cross_perc):
         m = X.shape[0]
@@ -23,6 +25,7 @@ class Environment():
         self.testy = y[int(np.ceil(m * cross_perc)):]
 
         self.labels = np.array(tuple(set(y)))
+        self.num_labels = len(self.get_labels())
 
     def get_labels(self):
         return self.labels
