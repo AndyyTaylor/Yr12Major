@@ -28,7 +28,7 @@ class Screen():
             self.title_frame = Frame(0, 0, config.SCREEN_WIDTH, 150, False, config.SCHEME2)
             self.widgets.append(self.title_frame)
 
-            self.title = Label(0, 0, config.SCREEN_WIDTH, 150,
+            self.title = Label(200, 0, config.SCREEN_WIDTH - 400, 150,
                                config.SCHEME2, self.name, 118, config.BLACK)
             self.title_frame.add_child(self.title)
 
@@ -36,7 +36,7 @@ class Screen():
                 back_button = Button(0, 0, 150, 150, "", 72,
                                      config.BLACK, config.SCHEME2, config.SCHEME2, 0,
                                      lambda: self.parent.change_state(self.back_screen),
-                                     shape='rect', img=Image(25, 25, 100, 100, "back_arrow.png"))
+                                     shape='rect', img=Image(25, 25, 100, 100, "back_arrow.bmp"))
 
                 self.title_frame.add_child(back_button)
 

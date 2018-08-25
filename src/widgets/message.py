@@ -15,7 +15,7 @@ class Message(Widget):
         self.font_col = font_col
         self.align = align
 
-        self.font = pygame.font.Font('%s/data/fonts/%s' % (config.DIR_PATH, 'Square.ttf'),
+        self.font = pygame.font.Font('data/fonts/%s' % ('Square.ttf'),
                                      self.font_size)
         self.render_text()
 
@@ -70,6 +70,9 @@ class Message(Widget):
                 sentence += word + ' '
 
     def on_render(self, screen, back_fill=None):
+        if self.back_color is None:
+            back_fill = None
+
         super().on_render(screen, back_fill)
 
         if self.back_color is not None:

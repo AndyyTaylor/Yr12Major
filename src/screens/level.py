@@ -179,7 +179,7 @@ class Level(Screen):
 
     def setup_frames(self):
         self.component_frame = Frame(0, 220, 300, config.SCREEN_HEIGHT - 220,
-                                     True, config.SCHEME2, gridded=True)
+                                     True, config.SCHEME2, grid_type='stack')
         self.workspace_frame = Frame(310, 160, config.SCREEN_WIDTH - 305,
                                      config.SCREEN_HEIGHT - 160, True, config.SCHEME5)
         self.end_frame = Frame(0, self.workspace_frame.y, 200, 200, back_color=config.SCHEME2)
@@ -203,17 +203,21 @@ class Level(Screen):
         self.score_frame.add_child(Label(5, 90, 100, 40, None, "Time", 30,
                                          config.BLACK, align='lc'))
 
-        self.acc_label = Label(160, 50, 80, 40, None, "--%", 30, config.BLACK, align='lc')
-        self.time_label = Label(160, 90, 80, 40, None, '0', 30, config.BLACK, align='lc')
+        self.acc_label = Label(160, 50, 80, 40, config.SCHEME4, "--%", 30, config.BLACK, align='lc')
+        self.time_label = Label(160, 90, 80, 40, config.SCHEME4, '0', 30, config.BLACK, align='lc')
 
         self.score_frame.add_child(self.acc_label)
         self.score_frame.add_child(self.time_label)
 
-        self.score_frame.add_child(Label(240, 50, 60, 40, None, '/', 30, config.BLACK, align='lc'))
-        self.score_frame.add_child(Label(240, 90, 60, 40, None, '/', 30, config.BLACK, align='lc'))
+        self.score_frame.add_child(Label(240, 50, 60, 40, config.SCHEME4, '/', 30, config.BLACK,
+                                         align='lc'))
+        self.score_frame.add_child(Label(240, 90, 60, 40, config.SCHEME4, '/', 30, config.BLACK,
+                                         align='lc'))
 
-        self.req_acc_label = Label(270, 50, 60, 40, None, '--%', 30, config.BLACK, align='lc')
-        self.max_time_label = Label(270, 90, 60, 40, None, '--', 30, config.BLACK, align='lc')
+        self.req_acc_label = Label(270, 50, 60, 40, config.SCHEME4, '--%', 30, config.BLACK,
+                                   align='lc')
+        self.max_time_label = Label(270, 90, 60, 40, config.SCHEME4, '--', 30, config.BLACK,
+                                    align='lc')
 
         self.score_frame.add_child(self.req_acc_label)
         self.score_frame.add_child(self.max_time_label)
