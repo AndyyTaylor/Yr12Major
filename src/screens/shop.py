@@ -14,17 +14,29 @@ class Shop(Screen):
 
         shop_width = config.SCREEN_WIDTH
 
-        self.shop_frame = Frame(0, 200, shop_width, config.SCREEN_HEIGHT - 200, True,
-                                config.SCHEME5, grid_type='grid', item_x_margin=80)
+        self.algorithm_frame = Frame(0, 200, shop_width, config.SCREEN_HEIGHT - 200, True,
+                                     config.SCHEME5, grid_type='grid', item_x_margin=80)
+        self.upgrade_frame = Frame(0, 200, shop_width, config.SCREEN_HEIGHT - 200, True,
+                                   config.SCHEME5, grid_type='grid', item_x_margin=80)
+        self.business_frame = Frame(0, 200, shop_width, config.SCREEN_HEIGHT - 200, True,
+                                    config.SCHEME5, grid_type='grid', item_x_margin=80)
 
-        self.widgets.append(self.shop_frame)
+        self.upgrade_frame.hide()
+        self.business_frame.hide()
+
+        self.widgets.append(self.algorithm_frame)
+        self.widgets.append(self.upgrade_frame)
+        self.widgets.append(self.business_frame)
 
         self.title_frame.add_child(Label(config.SCREEN_WIDTH - 300, 0, 300, 60, None, "You Have",
                                          48, config.BLACK))
+        self.balance_label = Label(config.SCREEN_WIDTH - 300, 70, 300, 60, config.SCHEME2, "$" +
+                                   str(config.MONEY), 48, config.BLACK)
+        self.title_frame.add_child(self.balance_label)
 
         # This should be loaded from the config later, or somewhere
         self.purchases = {
-            'algorithms': [
+            'algorithm': [
                 {
                     'name': 'Logistic Regression',
                     'cost': 0,
@@ -54,7 +66,7 @@ class Shop(Screen):
                     'cost': 9999,
                     'blurb': 'Q Learning is a more advanced RL Algorithm'
                 }
-            ], 'upgrades': [
+            ], 'upgrade': [
                 {
                     'name': 'Degree 2',
                     'cost': 9999,
@@ -68,7 +80,7 @@ class Shop(Screen):
                     'cost': 9999,
                     'blurb': 'Allows logistic regression to create 4th degree functions'
                 }
-            ], 'businesses': [
+            ], 'businesse': [
 
             ]
         }
@@ -82,7 +94,12 @@ class Shop(Screen):
     def create_purchase_buttons(self):
         for type, items in self.purchases.items():
             for item in items:
-                self.shop_frame.add_child(self.create_shop_item(item))
+                if type == 'algorithm':
+                    self.algorithm_frame.add_child(self.create_shop_item(item))
+                elif type == 'upgrade':
+                    self.upgrade_frame.add_child(self.create_shop_item(item))
+                else:
+                    self.business_frame.add_child(self.create_shop_item(item))
 
     def create_shop_item(self, item):
         size = 300
@@ -102,16 +119,33 @@ class Shop(Screen):
     def create_title_buttons(self):
         self.widgets.append(Button(0, 150, config.SCREEN_WIDTH / 3, 50, "Algorithms", 24,
                                    config.BLACK, config.SCHEME4, config.SCHEME4, 0,
-                                   lambda: print("Checking out algorithms"), shape='rect'))
+                                   lambda: self.show_algorithms(), shape='rect'))
         self.widgets.append(Button(config.SCREEN_WIDTH / 3, 150, config.SCREEN_WIDTH / 3, 50,
                                    "Upgrades", 24, config.BLACK, config.SCHEME4, config.SCHEME4, 0,
-                                   lambda: print("Checking out upgrades"), shape='rect'))
+                                   lambda: self.show_upgrades(), shape='rect'))
         self.widgets.append(Button(config.SCREEN_WIDTH / 3 * 2, 150, config.SCREEN_WIDTH / 3, 50,
                                    "Businesses", 24, config.BLACK, config.SCHEME4, config.SCHEME4,
-                                   0, lambda: print("Checking out businesses"), shape='rect'))
+                                   0, lambda: self.show_businesses(), shape='rect'))
+
+    def show_algorithms(self):
+        self.algorithm_frame.show()
+        self.upgrade_frame.hide()
+        self.business_frame.hide()
+
+    def show_upgrades(self):
+        self.algorithm_frame.hide()
+        self.upgrade_frame.show()
+        self.business_frame.hide()
+
+    def show_businesses(self):
+        self.algorithm_frame.hide()
+        self.upgrade_frame.hide()
+        self.business_frame.show()
 
     def on_update(self, elapsed):
         super().on_update(elapsed)
+
+        self.balance_label.change_text("$" + str(config.MONEY))
 
     def purchase(self, item):
         if item['name'] not in config.PURCHASES:

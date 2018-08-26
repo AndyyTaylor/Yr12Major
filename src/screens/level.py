@@ -8,6 +8,7 @@ from src.ml.environments.game import ColorEnv, DonutEnv, XOREnv
 from .screen import Screen
 from ..widgets import Frame, Label, Image, Button, Message
 from ..components import Input, Output, Connection, KNN, NBayes, LogisticRegression, NeuralNetwork
+from ..components import Trash
 
 
 class Level(Screen):
@@ -83,11 +84,19 @@ class Level(Screen):
 
     def is_game_over(self):
         for child in self.workspace_frame.children:
-            if isinstance(child, Button):
+            if isinstance(child, Button) or child.title == 'Trash':
                 continue
 
             total_data = 0
             for holder in child.inputs + child.outputs:
+                total_data += len(holder.samples)
+
+            if total_data > 0:
+                return False
+
+        if self.floating_component is not None:
+            total_data = 0
+            for holder in self.floating_component.inputs + self.floating_component.outputs:
                 total_data += len(holder.samples)
 
             if total_data > 0:
@@ -131,6 +140,9 @@ class Level(Screen):
             self.widgets.append(self.end_frame)
 
     def has_won(self):
+        if self.output.get_percentage() == '--%':
+            return False
+
         if self.play_time < self.max_time and self.output.get_raw_percentage() >= self.req_accuracy:
             return True
 
@@ -149,11 +161,23 @@ class Level(Screen):
             self.title_frame.changed = True
             self.widgets.remove(self.end_frame)
             if self.has_won():
+                if self.current_level == config.MAX_LEVEL:
+                    config.MONEY += 500
+                else:
+                    config.MONEY += 100
                 self.parent.change_state('Level', self.current_level + 1)
             else:
                 self.stop()
-        elif not self.create_connections(pos) and self.floating_component is None:
-            self.select_floating_component(pos)
+        else:
+            if event.button == 3:
+                for widget in self.workspace_frame.children:
+                    if widget.type == 'component':
+                        for holder in widget.inputs + widget.outputs:
+                            if holder.hover:
+                                self.remove_linked_connections(holder)
+                                break
+            elif not self.create_connections(pos) and self.floating_component is None:
+                self.select_floating_component(pos)
 
     def on_mouse_motion(self, event, pos):
         super().on_mouse_motion(event, pos)
@@ -176,6 +200,16 @@ class Level(Screen):
         else:
             if not self.create_connections(pos, True):
                 self.clear_hanging_connection()
+
+    def remove_linked_connections(self, holder):
+        to_remove = []
+        for widget in self.widgets:
+            if widget.type == 'connection':
+                if widget.in_holder == holder or widget.out_holder == holder:
+                    to_remove.append(widget)
+
+        for widget in to_remove:
+            self.widgets.remove(widget)
 
     def setup_frames(self):
         self.component_frame = Frame(0, 220, 300, config.SCREEN_HEIGHT - 220,
@@ -402,40 +436,18 @@ class Level(Screen):
                         f.readline()
 
         if num == 1:
-            self.environment = ColorEnv(1, num_samples=10)
+            self.environment = ColorEnv(1, num_samples=3)
         elif num == 2:
-            """
-            But you will have to filter them using ALGORITHMS!
-
-            Here's your first (and only free) algorithm, logistic regression.
-            It's very flexible when used with higher degrees, which you can purchase in the shop.
-
-            + Fast training time
-            + Non-linear classifier
-            - Slower training time
-            - Can easily under or overfit with wrong degree
-            """
-            self.environment = ColorEnv(2, target_y=1, num_samples=30)
-            self.req_accuracy = 100
-            self.max_time = 10
+            self.environment = ColorEnv(2, target_y=0, num_samples=10)
+            if 'Logistic Regression' not in config.PURCHASES:
+                config.PURCHASES.append('Logistic Regression')
         elif num == 3:
-            """
-            Have a go at changing the algorithms output labels by clicking on the cog wheel.
-            """
-            self.environment = ColorEnv(3, target_y=2, num_samples=30)
-            self.req_accuracy = 100
-            self.max_time = 10
+            self.environment = ColorEnv(2, target_y=1, num_samples=30)
         elif num == 4:
-            """
-            The Donut Problem
-            Non-linear problem (you're 1st degree logistic regression will struggle here!)
-
-            Hint: Purchase a new algorithm or higher degrees at the shop
-            """
-            self.environment = DonutEnv(num_samples=30)
-            self.req_accuracy = 100
-            self.max_time = 10
+            self.environment = ColorEnv(3, target_y=2, num_samples=10)
         elif num == 5:
+            self.environment = DonutEnv(num_samples=30)
+        elif num == 6:
             """
             The XOR problem
             A more difficult non-linear problem
@@ -463,10 +475,19 @@ class Level(Screen):
         self.req_acc_label.change_text(str(self.req_accuracy) + '%')
         self.max_time_label.change_text(self.max_time)
 
-        self.output = Output(10, 300, self.environment)
         self.component_frame.add_child(Input(10, 10, self.environment))
+
+        self.output = Output(10, 300, self.environment)
         self.component_frame.add_child(self.output)
-        self.component_frame.add_child(NeuralNetwork(self.environment))
-        self.component_frame.add_child(KNN(self.environment))
-        self.component_frame.add_child(NBayes(self.environment))
-        self.component_frame.add_child(LogisticRegression(self.environment))
+        self.component_frame.add_child(Trash(10, 10))
+
+        algorithms = {
+            'Logistic Regression': LogisticRegression(self.environment),
+            'Neural Network': NeuralNetwork(self.environment),
+            'KNN': KNN(self.environment),
+            'Naive Bayes': NBayes(self.environment)
+        }
+
+        for name, algo in algorithms.items():
+            if name in config.PURCHASES:
+                self.component_frame.add_child(algo)

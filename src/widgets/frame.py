@@ -44,7 +44,7 @@ class Frame(Widget):
         for child in self.children:
             child.on_update(elapsed)
 
-        new_hash = hash((self.scroll_x, self.scroll_y))
+        new_hash = hash((self.scroll_x, self.scroll_y, self.hidden))
         if new_hash != self.prev_hash:
             self.prev_hash = new_hash
             self.scrolled = True
@@ -194,4 +194,6 @@ class Frame(Widget):
 
     def hide(self):
         self.hidden = True
-        self.changed = True
+
+    def show(self):
+        self.hidden = False

@@ -7,4 +7,19 @@ Your job is simple. You have to filter the data from the 'Input' component and p
 Red and Green Circles
 Now you have to filter between the green and red circles. <new> <new> I've given you access to the logistic regression algorithm to get you started.
 100
+5
+3
+Changing Output
+Have a go at pressing the cog wheel on an algorithm to change its output
+100
+5
+4
+3 Samples
+Your first degree logistic regression will struggle to distinguish between all three samples <new> Try buying a new algorithm or some upgrades from the shop
+100
 10
+5
+The Donut Problem
+The donut problem creates an inner ring with one sample, and an outer ring with another sample <new> <new> This non-linearity is hard for some classifiers to handle
+80
+30

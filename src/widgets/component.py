@@ -15,6 +15,7 @@ class Component(Frame):
 
         self.add_child(Label(0, 0, self.w, 40, config.SCHEME4, title, 32, config.SCHEME1))
 
+        self.title = title
         self.slot_width = 40
         self.slot_height = 30
 
