@@ -141,6 +141,16 @@ class KNN(Algorithm):
     def __init__(self, environment):
         super().__init__(ClassificationKNN, 'KNN', environment, w=250)
 
+        self.knn_button = Button(0, 0, self.slot_height, self.slot_height,
+                                 '', 0, config.BLACK, config.SCHEME3,
+                                 config.SCHEME3, 2,
+                                 lambda: print("KNN"),
+                                 shape='rect',
+                                 img=Image(0, 0, self.slot_height, self.slot_height,
+                                           'config.png'), bsfix=True)
+
+        self.add_child(self.knn_button)
+
 
 class NBayes(Algorithm):
 

@@ -47,7 +47,7 @@ class Shop(Screen):
                     'blurb': 'Lazy classifier that finds similar examples that it was shown during training'  # noqa
                 }, {
                     'name': 'Naive Bayes',
-                    'cost': 10000,
+                    'cost': 2000,
                     'blurb': 'Fast statistical classifier that models data using gaussian distributions'  # noqa
                 }, {
                     'name': 'Neural Network',

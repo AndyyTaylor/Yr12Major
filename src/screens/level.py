@@ -446,16 +446,10 @@ class Level(Screen):
         elif num == 4:
             self.environment = ColorEnv(3, target_y=2, num_samples=10)
         elif num == 5:
-            self.environment = DonutEnv(num_samples=30)
+            self.environment = DonutEnv(num_samples=25)
         elif num == 6:
-            """
-            The XOR problem
-            A more difficult non-linear problem
-            """
-            self.environment = XOREnv(num_samples=30)
-            self.req_accuracy = 100
-            self.max_time = 10
-        elif num == 6:
+            self.environment = XOREnv(num_samples=25)
+        elif num == 7:
             """
             Handwritten Digit Recognition (Easy)
             Slightly modified MNIST dataset
