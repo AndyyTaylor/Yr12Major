@@ -162,17 +162,10 @@ class Button(Widget):
                                       w - 2 * border_width, h - 2 * border_width,
                                       self.front_color, remould))
 
-# <<<<<<< HEAD
         if shape == 'rect':
             self.alpha_cover = ShapeClass(self.x, self.y, w, h, config.WHITE, remould, True)
         else:
             self.alpha_cover = ShapeClass(0, 0, w, h, config.WHITE, remould, True)
-# =======
-#         if not bsfix:
-#             self.alpha_cover = ShapeClass(0, 0, w, h, config.WHITE, True)
-#         else:
-#             self.alpha_cover = ShapeClass(self.x, self.y, w, h, config.WHITE, True)
-# >>>>>>> dev
 
         self.prev_hash = None
         self.animation = 0

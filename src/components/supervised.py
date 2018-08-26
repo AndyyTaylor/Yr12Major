@@ -292,7 +292,7 @@ class NeuralNetwork(Algorithm):
 
         # self.agent.add_layer(Dense(10, input_shape=environment.num_features))
         # self.agent.add_layer(Activation('sigmoid'))
-        self.agent.add_layer(Dense(environment.num_labels, input_shape=self.num_features))
+        self.agent.add_layer(Dense(environment.num_labels, input_shape=max(self.num_features, 20)))
         self.agent.add_layer(Activation('softmax'))
 
         self.setup_train_config()
@@ -336,9 +336,9 @@ class NeuralNetwork(Algorithm):
         self.agent.clear_layers()
 
         for i in range(self.layers - 1):
-            self.agent.add_layer(Dense(self.num_features, input_shape=self.num_features))
+            self.agent.add_layer(Dense(self.num_features, max(self.num_features, 20)))
             self.agent.add_layer(Activation('relu'))
-        self.agent.add_layer(Dense(self.num_labels, input_shape=self.num_features))
+        self.agent.add_layer(Dense(self.num_labels, max(self.num_features, 20)))
         self.agent.add_layer(Activation('softmax'))
 
         self.layer_display.change_text(str(len(self.agent.layers) // 2))

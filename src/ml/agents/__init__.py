@@ -1,4 +1,4 @@
-from .supervised import *
-from .reinforcement import *
+from .supervised import *  # noqa
+from .reinforcement import *  # noqa
 
-from .reinforcement.QLearn import QLearn
+from .reinforcement.QLearn import QLearn  # noqa
