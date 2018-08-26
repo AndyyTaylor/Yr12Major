@@ -11,7 +11,8 @@ from time import time
 class MainMenu(Screen):
 
     def __init__(self):
-        super().__init__("MainMenu", "MasterState", show_title=False, back_button=False)
+        super().__init__("MainMenu", "MasterState", show_title=False, back_button=False,
+                         back_color=config.BLACK)
 
         self.widgets.append(Button(50, config.SCREEN_HEIGHT - 270, 400, 100, "Play",
                             64, config.BLACK, config.BLACK, config.SCHEME2, 6,
@@ -57,7 +58,9 @@ class MainMenu(Screen):
         if self.moved:
             self.maze.render(screen)
 
-            pygame.draw.rect(screen, config.SCHEME5, (0, config.SCREEN_HEIGHT / 3 * 2, config.SCREEN_WIDTH / 3, config.SCREEN_HEIGHT / 3))
+            pygame.draw.rect(screen, config.BLACK, (0, config.SCREEN_HEIGHT / 3 * 2,
+                                                    config.SCREEN_WIDTH / 3,
+                                                    config.SCREEN_HEIGHT / 3))
 
             for widget in self.widgets:
                 widget.changed = True
