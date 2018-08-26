@@ -142,7 +142,7 @@ class Algorithm(Component):
             self.skip_predict = False
 
         pred_label = int(pred)
-
+        print(pred, sample.y)
         return pred_label
 
     def place_holders(self):
@@ -240,7 +240,7 @@ class KNN(Algorithm):
 
     def change_k(self, val):
         self.agent.k += val
-        self.agent.k = max(1, self.agent.k)
+        self.agent.k = min(max(1, self.agent.k), config.PURCHASES.count("KNN (Samples)") + 1)
         self.k_display.change_text(str(self.agent.k))
 
         # width = self.w - self.slot_width * 2.5 - self.slot_height
@@ -276,7 +276,8 @@ class LogisticRegression(Algorithm):
 
     def change_iters(self, val):
         self.agent.num_iters += val * 200
-        self.agent.num_iters = max(self.agent.num_iters, 200)
+        self.agent.num_iters = min(max(self.agent.num_iters, 200),
+                                   config.PURCHASES.count("Logistic Reg (Train)") * 200 + 200)
         self.iter_display.change_text(str(self.agent.num_iters // 200))
 
 
@@ -285,13 +286,13 @@ class NeuralNetwork(Algorithm):
     def __init__(self, environment):
         super().__init__(NeuralNetAlgo, 'Neural Net', environment, w=280)
 
-        self.layers = 2
+        self.layers = 1
         self.num_features = environment.num_features
         self.num_labels = environment.num_labels
 
-        self.agent.add_layer(Dense(10, input_shape=environment.num_features))
-        self.agent.add_layer(Activation('sigmoid'))
-        self.agent.add_layer(Dense(environment.num_labels))
+        # self.agent.add_layer(Dense(10, input_shape=environment.num_features))
+        # self.agent.add_layer(Activation('sigmoid'))
+        self.agent.add_layer(Dense(environment.num_labels, input_shape=self.num_features))
         self.agent.add_layer(Activation('softmax'))
 
         self.setup_train_config()
@@ -324,12 +325,13 @@ class NeuralNetwork(Algorithm):
 
     def change_iters(self, val):
         self.agent.num_iters += 200 * val
-        self.agent.num_iters = max(self.agent.num_iters, 200)
+        self.agent.num_iters = min(max(self.agent.num_iters, 200),
+                                   config.PURCHASES.count("Neural Net (Train)") * 200 + 200)
         self.iter_display.change_text(str(self.agent.num_iters // 200))
 
     def change_layer(self, val):
         self.layers = self.layers + val
-        self.layers = max(1, self.layers)
+        self.layers = min(max(1, self.layers), config.PURCHASES.count("Neural Net (Layers)") + 1)
 
         self.agent.clear_layers()
 

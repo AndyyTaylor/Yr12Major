@@ -218,7 +218,7 @@ class Level(Screen):
         self.component_frame = Frame(0, 220, 300, config.SCREEN_HEIGHT - 220,
                                      True, config.SCHEME2, grid_type='stack')
         self.workspace_frame = Frame(310, 160, config.SCREEN_WIDTH - 305,
-                                     config.SCREEN_HEIGHT - 160, True, config.SCHEME5)
+                                     config.SCREEN_HEIGHT - 160, False, config.SCHEME5)
         self.end_frame = Frame(0, self.workspace_frame.y, 200, 200, back_color=config.SCHEME2)
         self.end_frame.hide()
 
@@ -395,7 +395,7 @@ class Level(Screen):
 
     def play(self):
         self.playing = True
-        for widget in self.workspace_frame.children:
+        for widget in self.workspace_frame.children + self.component_frame.children:
             if widget.type == 'component':
                 widget.train(self.environment.trainX, self.environment.trainy)
 
@@ -447,8 +447,10 @@ class Level(Screen):
         elif num == 3:
             self.environment = ColorEnv(2, target_y=1, num_samples=30)
         elif num == 4:
-            self.environment = ColorEnv(3, target_y=2, num_samples=10)
+            self.environment = ColorEnv(2, target_y=1, num_samples=50)
         elif num == 5:
+            self.environment = ColorEnv(3, target_y=2, num_samples=25)
+        elif num == 6:
             self.environment = DonutEnv(num_samples=25)
         elif num == 6:
             self.environment = XOREnv(num_samples=25)

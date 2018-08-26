@@ -18,15 +18,12 @@ class Shop(Screen):
                                      config.SCHEME5, grid_type='grid', item_x_margin=80)
         self.upgrade_frame = Frame(0, 200, shop_width, config.SCREEN_HEIGHT - 200, True,
                                    config.SCHEME5, grid_type='grid', item_x_margin=80)
-        self.business_frame = Frame(0, 200, shop_width, config.SCREEN_HEIGHT - 200, True,
+        self.menu_frame = Frame(0, 200, shop_width, config.SCREEN_HEIGHT - 200, True,
                                     config.SCHEME5, grid_type='grid', item_x_margin=80)
-
-        self.upgrade_frame.hide()
-        self.business_frame.hide()
 
         self.widgets.append(self.algorithm_frame)
         self.widgets.append(self.upgrade_frame)
-        self.widgets.append(self.business_frame)
+        self.widgets.append(self.menu_frame)
 
         self.title_frame.add_child(Label(config.SCREEN_WIDTH - 300, 0, 300, 60, None, "You Have",
                                          48, config.BLACK))
@@ -51,16 +48,16 @@ class Shop(Screen):
                     'blurb': 'Lazy classifier that finds similar examples that it was shown during training'  # noqa
                 }, {
                     'name': 'Neural Network',
-                    'cost': 3000,
+                    'cost': 2000,
                     'blurb': 'Extremely versatile classifier built using layers'
                 }
             ], 'upgrade': [
                 {
-                    'name': 'KNN',
+                    'name': 'KNN (Samples)',
                     'cost': 100,
                     'blurb': 'Allows knn to compare against more samples'
                 }, {
-                    'name': 'Logistic Regression',
+                    'name': 'Logistic Reg (Train)',
                     'cost': 100,
                     'blurb': 'Allows logistic regression to be trained for more iterations'
                 }, {
@@ -72,13 +69,28 @@ class Shop(Screen):
                     'cost': 100,
                     'blurb': 'Allows neural networks to consist of more layers'
                 }
-            ], 'business': [
-
+            ], 'menu': [
+                {
+                    'name': 'Grid Width',
+                    'cost': 100,
+                    'blurb': 'Increases the width of the grid on the main menu'
+                }, {
+                    'name': 'Grid Height',
+                    'cost': 100,
+                    'blurb': 'Increases the height of the grid on the main menu'
+                }, {
+                    'name': 'Player Speed',
+                    'cost': 100,
+                    'blurb': 'Increases the speed of the player on the main menu'
+                }
             ]
         }
 
         self.create_purchase_buttons()
         self.create_title_buttons()
+
+        self.upgrade_frame.hide()
+        self.menu_frame.hide()
 
     def on_enter(self, data, screen):
         super().on_enter(data, screen)
@@ -91,7 +103,7 @@ class Shop(Screen):
                 elif type == 'upgrade':
                     self.upgrade_frame.add_child(self.create_shop_item(item))
                 else:
-                    self.business_frame.add_child(self.create_shop_item(item))
+                    self.menu_frame.add_child(self.create_shop_item(item))
 
     def create_shop_item(self, item):
         size = 300
@@ -122,17 +134,17 @@ class Shop(Screen):
     def show_algorithms(self):
         self.algorithm_frame.show()
         self.upgrade_frame.hide()
-        self.business_frame.hide()
+        self.menu_frame.hide()
 
     def show_upgrades(self):
         self.algorithm_frame.hide()
         self.upgrade_frame.show()
-        self.business_frame.hide()
+        self.menu_frame.hide()
 
     def show_businesses(self):
         self.algorithm_frame.hide()
         self.upgrade_frame.hide()
-        self.business_frame.show()
+        self.menu_frame.show()
 
     def on_update(self, elapsed):
         super().on_update(elapsed)
@@ -140,7 +152,15 @@ class Shop(Screen):
         self.balance_label.change_text("$" + str(config.MONEY))
 
     def purchase(self, item):
-        if item['name'] not in config.PURCHASES:
-            if item['cost'] < config.MONEY:
-                config.MONEY -= item['cost']
-                config.PURCHASES.append(item['name'])
+        if item['cost'] <= config.MONEY:
+            config.MONEY -= item['cost']
+            config.PURCHASES.append(item['name'])
+
+        config.MAZE_WIDTH = 3 + config.PURCHASES.count("Grid Width")
+        config.MAZE_HEIGHT = 3 + config.PURCHASES.count("Grid Height")
+
+        # Should also call on_enter
+        for child in self.algorithm_frame.children:
+            title = child.children[1].text
+            if title in config.PURCHASES:
+                child.children[0].disable()

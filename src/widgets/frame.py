@@ -16,7 +16,7 @@ class Frame(Widget):
         self.scroll_x = 0
 
         defaults = {
-            'min_scroll_y': -500,
+            'min_scroll_y': -700,
             'max_scroll_y': 0,
             'min_scroll_x': 0,
             'max_scroll_x': 500,
@@ -199,5 +199,17 @@ class Frame(Widget):
     def hide(self):
         self.hidden = True
 
+        for child in self.children:
+            if child.type == 'button':
+                child.disable()
+            elif child.type == 'frame':
+                child.hide()
+
     def show(self):
         self.hidden = False
+
+        for child in self.children:
+            if child.type == 'button':
+                child.enable()
+            elif child.type == 'frame':
+                child.show()

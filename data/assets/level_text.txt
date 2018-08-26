@@ -1,24 +1,29 @@
 1
 Red Circles
-Your job is simple. You have to filter the data from the 'Input' component and provide the correct samples to the 'Output' component. In this level, it's simply a case of connecting the two together and pressing play.
+Your job is simple. You have to filter the data from the 'Input' component and provide the correct samples to the 'Output' component. <new> <new> In this level, it's simply a case of connecting the two together and pressing play.
 100
 5
 2
 Red and Green Circles
-Now you have to filter between the green and red circles. <new> <new> I've given you access to the naive bayes algorithm to get you started.
+Now you have to filter between the green and red circles. <new> <new> I've given you access to the naive bayes algorithm to get you started. <new> <new> P.S Make sure any unwanted samples are sent into the trash in order to end the level!
 100
 5
 3
 Changing Output
 Have a go at pressing the cog wheel on an algorithm to change its output
 100
-5
+10
 4
-3 Samples
-Your first degree logistic regression will struggle to distinguish between all three samples <new> Try buying a new algorithm or some upgrades from the shop
+Let's Go Faster
+You're going to have to sort out this data very quickly if you want to pass, you may even wonder if it's in fact possible. <new> <new> <new> ... Check out the shop ;)
 100
 10
 5
+3 Samples
+Take note that some algorithms will struggle with more than 2 type of data
+100
+15
+6
 The Donut Problem
 The donut problem creates an inner ring with one sample, and an outer ring with another sample <new> <new> This non-linearity is hard for some classifiers to handle
 80

@@ -9,7 +9,7 @@ class Bayes():
     def train(self, X, y):
         N, D = X.shape  # Equiv to M, N from other ML
         self.distributions = {}
-
+        print("Training", X.shape, y.shape)
         labels = set(y)
         for c in labels:
             c = int(c)
