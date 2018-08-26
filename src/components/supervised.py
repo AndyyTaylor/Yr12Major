@@ -4,7 +4,7 @@ import datetime
 import pygame
 from src import config
 
-from ..widgets import Component, Button, Image
+from ..widgets import Component, Button, Image, Label
 from ..ml.agents.supervised import ClassificationKNN, NaiveBayes
 from ..ml.agents.supervised import LogisticRegression as LogRegAlgo
 from ..ml.agents.deeplearning import NeuralNetwork as NeuralNetAlgo
@@ -25,6 +25,8 @@ class Algorithm(Component):
         self.train_cooldown = 0
         self.max_train_cooldown = 0
 
+        self.display_shown = True
+
         self.skip_elapsed = False
 
         self.skip_predict = False
@@ -33,6 +35,16 @@ class Algorithm(Component):
 
         self.place_holders()
         self.setup_inputs_and_outputs()
+
+        self.config_button = Button(0, 0, self.slot_height, self.slot_height,
+                                    '', 0, config.BLACK, config.SCHEME3,
+                                    config.SCHEME3, 2,
+                                    lambda: self.toggle_display(),
+                                    shape='rect',
+                                    img=Image(0, 0, self.slot_height, self.slot_height,
+                                              'config.png'), bsfix=True)
+
+        self.add_child(self.config_button)
 
     def on_update(self, elapsed):
         super().on_update(elapsed)
@@ -50,17 +62,7 @@ class Algorithm(Component):
             if in_holder.has_samples():
                 sample = in_holder.take_sample()
 
-                start_time = datetime.datetime.now()
-                pred = self.agent.predict(np.array([sample.x]))
-                end_time = datetime.datetime.now()
-
-                if not self.skip_predict:
-                    self.max_predict_cooldown = (end_time - start_time).total_seconds()
-                    self.max_predict_cooldown *= 1000 * config.PREDICT_MULTIPLIER
-                    self.predict_cooldown = self.max_predict_cooldown
-                else:
-                    self.skip_predict = False
-                pred_label = int(pred)
+                pred_label = self.predict(sample)
 
                 if pred_label in self.holder_labels:
                     self.outputs[self.holder_labels.index(pred_label)].add_sample(sample)
@@ -84,6 +86,9 @@ class Algorithm(Component):
 
         self.changed = False
 
+    def toggle_display(self):
+        self.display_shown = not self.display_shown
+
     def render_train_bar(self, screen):
         perc = self.train_cooldown / self.max_train_cooldown
         width = int(self.w * perc)
@@ -104,6 +109,22 @@ class Algorithm(Component):
         self.max_train_cooldown = (end_time - start_time).total_seconds()
         self.max_train_cooldown *= 1000 * config.TRAIN_MULTIPLIER
         self.train_cooldown = self.max_train_cooldown
+
+    def predict(self, sample):
+        start_time = datetime.datetime.now()
+        pred = self.agent.predict(np.array([sample.x]))
+        end_time = datetime.datetime.now()
+
+        if not self.skip_predict:
+            self.max_predict_cooldown = (end_time - start_time).total_seconds()
+            self.max_predict_cooldown *= 1000 * config.PREDICT_MULTIPLIER
+            self.predict_cooldown = self.max_predict_cooldown
+        else:
+            self.skip_predict = False
+
+        pred_label = int(pred)
+
+        return pred_label
 
     def place_holders(self):
         title_height = 35
@@ -139,37 +160,85 @@ class Algorithm(Component):
 class KNN(Algorithm):
 
     def __init__(self, environment):
-        super().__init__(ClassificationKNN, 'KNN', environment, w=250)
+        super().__init__(ClassificationKNN, 'KNN', environment, w=280)
 
-        self.knn_button = Button(0, 0, self.slot_height, self.slot_height,
-                                 '', 0, config.BLACK, config.SCHEME3,
-                                 config.SCHEME3, 2,
-                                 lambda: print("KNN"),
-                                 shape='rect',
-                                 img=Image(0, 0, self.slot_height, self.slot_height,
-                                           'config.png'), bsfix=True)
+    def on_render(self, screen, back_fill=None):
+        super().on_render(screen, back_fill)
 
-        self.add_child(self.knn_button)
+        if self.display_shown:
+            self.render_display(screen)
+        # else:
+        #     self.render_config(screen)
+
+    def render_display(self, screen):
+        width = self.w - self.slot_width * 2.5 - self.slot_height
+        canvas = pygame.Surface((width, self.h - 50))
+        canvas.fill(config.WHITE)
+        pygame.draw.rect(canvas, config.BLACK, (10, 10, 30, 30))
+
+        screen.blit(canvas, (self.x + self.slot_width * 1.25, self.y + 40))
 
 
 class NBayes(Algorithm):
 
     def __init__(self, environment):
-        super().__init__(NaiveBayes, 'N Bayes', environment, w=150)
+        super().__init__(NaiveBayes, 'N Bayes', environment, w=280)
 
 
 class LogisticRegression(Algorithm):
 
     def __init__(self, environment):
-        super().__init__(LogRegAlgo, 'Log Reg', environment, w=200)
+        super().__init__(LogRegAlgo, 'Log Reg', environment, w=280)
 
 
 class NeuralNetwork(Algorithm):
 
     def __init__(self, environment):
-        super().__init__(NeuralNetAlgo, 'Neural Net', environment, w=200)
+        super().__init__(NeuralNetAlgo, 'Neural Net', environment, w=280)
 
         self.agent.add_layer(Dense(10, input_shape=environment.num_features))
         self.agent.add_layer(Activation('sigmoid'))
         self.agent.add_layer(Dense(environment.num_labels))
         self.agent.add_layer(Activation('softmax'))
+
+        self.output_rects = []
+        self.output_predictions = [0 for x in range(environment.num_labels)]
+        self.output_totals = [0 for x in range(environment.num_labels)]
+
+        width = (self.w - self.slot_width * 2.5 - self.slot_height) / environment.num_labels
+        for i in range(environment.num_labels):
+            self.output_rects.append(Label(self.slot_width * 1.25 + width * i, 60, width, 80,
+                                           None, '--%', 26, config.WHITE))
+
+        for rect in self.output_rects:
+            self.add_child(rect)
+
+    def on_update(self, elapsed):
+        super().on_update(elapsed)
+
+        for i, rect in enumerate(self.output_rects):
+            rect.change_text(self.get_perc_string(self.output_predictions[i],
+                             self.output_totals[i]))
+
+    def on_render(self, screen, back_fill=None):
+        super().on_render(screen, back_fill)
+
+        for i, rect in enumerate(self.output_rects):
+            self.render_data(screen, i,
+                             np.subtract(np.add(rect.get_center(True), self.get_pos(True)),
+                                         (0, 40)))
+
+    def predict(self, sample):
+        pred_label = super().predict(sample)  # Ahem Python
+
+        self.output_totals[int(sample.y)] += 1
+        if pred_label == int(sample.y):
+            self.output_predictions[pred_label] += 1
+
+        return pred_label
+
+    def get_perc_string(self, numerator, denominator):
+        if denominator == 0:
+            return '--%'
+        dp = int(numerator / denominator * 100)
+        return str(dp) + '%'
