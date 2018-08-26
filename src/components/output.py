@@ -7,11 +7,21 @@ from ..widgets import Component
 
 class Trash(Component):
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, output_component):
         super().__init__(x, y, 150, 150, 'Trash')
+
+        self.output_component = output_component
 
         self.input_pos.append((0, self.h / 2))
         self.setup_inputs_and_outputs()
+
+    def on_update(self, elapsed):
+        super().on_update(elapsed)
+
+        holder = self.inputs[0]
+        if holder.has_samples():
+            sample = holder.take_sample()
+            self.output_component.tally_sample(sample, True)
 
 
 class Output(Component):
@@ -33,8 +43,7 @@ class Output(Component):
         holder = self.inputs[0]
         if holder.has_samples():
             sample = holder.take_sample()
-            self.total += 1
-            self.correct += int(self.environment.sample_correct(sample))
+            self.tally_sample(sample)
 
     def on_render(self, screen, back_fill=None):
         super().on_render(screen, back_fill)
@@ -48,6 +57,13 @@ class Output(Component):
         self.environment.render_correct_data(screen, (self.x + l_x_margin + int(width / 2),
                                                       self.y + y_margin + int(height / 2)),
                                              int(min(width, height) / 2))
+
+    def tally_sample(self, sample, flip=False):
+        self.total += 1
+        is_correct = self.environment.sample_correct(sample)
+        if flip:
+            is_correct = not is_correct
+        self.correct += int(is_correct)
 
     def get_percentage(self):
         if self.total == 0:

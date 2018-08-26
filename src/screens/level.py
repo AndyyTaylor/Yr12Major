@@ -478,7 +478,7 @@ class Level(Screen):
 
         self.output = Output(10, 300, self.environment)
         self.component_frame.add_child(self.output)
-        self.component_frame.add_child(Trash(10, 10))
+        self.component_frame.add_child(Trash(10, 10, self.output))
 
         algorithms = {
             'Logistic Regression': LogisticRegression(self.environment),

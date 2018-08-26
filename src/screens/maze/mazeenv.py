@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+import random
 from enum import Enum
 from .config import *
 
@@ -22,7 +23,7 @@ class MazeEnv():
         BOX_WIDTH = SCREEN_WIDTH/GRID_WIDTH
         BOX_HEIGHT = SCREEN_HEIGHT/GRID_HEIGHT
 
-        WIN_STATE = GRID_WIDTH * GRID_HEIGHT - 2
+        WIN_STATE = random.randint(0, GRID_WIDTH * GRID_HEIGHT - 1)
         # Setup ML stuff
         self.pos = np.array(self.getPos(SPAWN_STATE))
         self.action_space = Actions
@@ -92,7 +93,7 @@ class MazeEnv():
                         pygame.draw.polygon(s, col, [[all_points[a][b][0]-x*BOX_WIDTH, all_points[a][b][1]-y*BOX_HEIGHT] for b in range(3)])
                         self.screen.blit(s, (x*BOX_WIDTH, y*BOX_HEIGHT))
 
-                        if self.getState((x, y)) != self.WIN_STATE and y != GRID_HEIGHT - 1 and [x, y] not in self.WALLS:
+                        if self.getState((x, y)) != self.WIN_STATE and [x, y] not in self.WALLS:
                             pygame.draw.polygon(self.screen, (255, 255, 255), all_points[a], 2)
 
                             #if BOX_WIDTH > 80:
