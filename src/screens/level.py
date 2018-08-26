@@ -195,6 +195,9 @@ class Level(Screen):
     def on_mouse_up(self, event, pos):
         super().on_mouse_up(event, pos)
 
+        if self.floating_component:
+            self.floating_component.on_mouse_up(pos)
+
         if self.floating_component is not None:
             self.drop_floating_component()
         else:

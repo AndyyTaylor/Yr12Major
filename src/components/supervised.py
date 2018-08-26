@@ -4,7 +4,7 @@ import datetime
 import pygame
 from src import config
 
-from ..widgets import Component, Button, Image, Label
+from ..widgets import Component, Button, Image, Label, Frame
 from ..ml.agents.supervised import ClassificationKNN, NaiveBayes
 from ..ml.agents.supervised import LogisticRegression as LogRegAlgo
 from ..ml.agents.deeplearning import NeuralNetwork as NeuralNetAlgo
@@ -26,6 +26,9 @@ class Algorithm(Component):
         self.max_train_cooldown = 0
 
         self.display_shown = True
+        self.config_frame = Frame(self.x + self.slot_width * 1.25, self.y + 40,
+                                  self.w - self.slot_width * 2.5 - self.slot_height, self.h - 50)
+        self.add_child(self.config_frame)
 
         self.skip_elapsed = False
 
@@ -88,6 +91,7 @@ class Algorithm(Component):
 
     def toggle_display(self):
         self.display_shown = not self.display_shown
+        self.changed = True
 
     def render_train_bar(self, screen):
         perc = self.train_cooldown / self.max_train_cooldown
@@ -162,13 +166,30 @@ class KNN(Algorithm):
     def __init__(self, environment):
         super().__init__(ClassificationKNN, 'KNN', environment, w=280)
 
+        self.config_frame.add_child(Label(20, 0, 100, 30, None, "Nearest", 22, config.BLACK))
+        self.k_display = Label(20, 40, 100, 60, None, str(self.agent.k), 72, config.BLACK)
+        self.config_frame.add_child(self.k_display)
+
+        self.config_frame.add_child(Button(110, 40, 30, 30, "/\\", 30, config.GREEN,
+                                           config.SCHEME4, config.SCHEME4, 0,
+                                           lambda: self.change_k(1), shape='rect', bsfix=True))
+        self.config_frame.add_child(Button(110, 70, 30, 30, "\\/", 30, config.BLUE,
+                                           config.SCHEME4, config.SCHEME4, 0,
+                                           lambda: self.change_k(-1), shape='rect', bsfix=True))
+
     def on_render(self, screen, back_fill=None):
         super().on_render(screen, back_fill)
 
         if self.display_shown:
+            self.config_frame.hide()
             self.render_display(screen)
-        # else:
-        #     self.render_config(screen)
+        else:
+            self.config_frame.show()
+
+    def change_k(self, val):
+        self.agent.k += val
+        self.agent.k = max(1, self.agent.k)
+        self.k_display.change_text(str(self.agent.k))
 
     def render_display(self, screen):
         width = self.w - self.slot_width * 2.5 - self.slot_height

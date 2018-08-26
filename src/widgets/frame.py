@@ -85,10 +85,14 @@ class Frame(Widget):
         self.scrolled = False
 
     def on_mouse_motion(self, pos):
+        super().on_mouse_motion(pos)
+
         for child in self.children:
             child.on_mouse_motion(self.adj_pos(pos))
 
     def on_mouse_down(self, pos):
+        super().on_mouse_down(pos)
+
         pos = self.adj_pos(pos)
         for child in self.children:
             if child.type == 'component' or child.type == 'frame':

@@ -180,13 +180,11 @@ class Button(Widget):
         self.hover = False
 
     def on_update(self, elapsed):
-        # <<<<<<< HEAD
         super().on_update(elapsed)
 
+        # if self.is_clicked or self.was_clicked:
+            # print(self.is_clicked, self.was_clicked)
         if not self.is_clicked and self.was_clicked and self.enabled:
-            # =======
-            #
-            # >>>>>>> dev
             self.callback()
 
         if self.enabled:
