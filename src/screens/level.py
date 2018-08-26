@@ -116,7 +116,8 @@ class Level(Screen):
             width = 250
             height = 450
             x = int(config.SCREEN_WIDTH / 2 - width / 2)
-            self.end_frame = Frame(x, self.workspace_frame.y, width, height,
+            y = self.workspace_frame.y + self.workspace_frame.h / 2 - height / 2
+            self.end_frame = Frame(x, y, width, height,
                                    back_color=config.SCHEME2)
             if won:
                 title = 'YOU WON!'
@@ -265,7 +266,8 @@ class Level(Screen):
         width = 600
         height = 600
         x = int(config.SCREEN_WIDTH / 2 - width / 2)
-        blurb_frame = Frame(x, self.workspace_frame.y, width, height, back_color=config.SCHEME2)
+        y = self.workspace_frame.y + self.workspace_frame.h / 2 - height / 2
+        blurb_frame = Frame(x, y, width, height, back_color=config.SCHEME2)
         blurb_frame.add_child(Label(10, 10, width - 20, 70, config.BLACK, self.level_title, 48,
                                     config.WHITE))
         blurb_frame.add_child(Message(10, 80, width - 20, height - 90, config.BLACK,
