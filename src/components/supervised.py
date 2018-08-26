@@ -28,7 +28,10 @@ class Algorithm(Component):
         self.display_shown = True
         self.config_frame = Frame(self.x + self.slot_width * 1.25, self.y + 40,
                                   self.w - self.slot_width * 2.5 - self.slot_height, self.h - 50)
+        self.display_frame = Frame(self.x + self.slot_width * 1.25, self.y + 40,
+                                   self.w - self.slot_width * 2.5 - self.slot_height, self.h - 50)
         self.add_child(self.config_frame)
+        self.add_child(self.display_frame)
 
         self.skip_elapsed = False
 
@@ -48,6 +51,8 @@ class Algorithm(Component):
                                               'config.png'), bsfix=True)
 
         self.add_child(self.config_button)
+
+        self.setup_percentage_display(environment)
 
     def on_update(self, elapsed):
         super().on_update(elapsed)
@@ -72,8 +77,18 @@ class Algorithm(Component):
                 else:
                     self.outputs[-1].add_sample(sample)
 
+        self.update_percentage_display()
+
     def on_render(self, screen, back_fill=None):
         super().on_render(screen, back_fill)
+
+        if self.display_shown:
+            self.config_frame.hide()
+            self.display_frame.show()
+            self.render_display(screen)  # Must be called every loop
+        else:
+            self.config_frame.show()
+            self.display_frame.hide()
 
         if self.train_cooldown > 0:
             self.render_train_bar(screen)
@@ -114,7 +129,7 @@ class Algorithm(Component):
         self.max_train_cooldown *= 1000 * config.TRAIN_MULTIPLIER
         self.train_cooldown = self.max_train_cooldown
 
-    def predict(self, sample):
+    def _predict(self, sample):
         start_time = datetime.datetime.now()
         pred = self.agent.predict(np.array([sample.x]))
         end_time = datetime.datetime.now()
@@ -160,6 +175,52 @@ class Algorithm(Component):
             self.holder_labels[i] = 0
         self.changed = True
 
+    def render_display(self, screen):
+        # Allows for different displays to be added in future
+        # Just turns out it's quite hard for 1 of 2 reasons
+        # Most data is not 2D
+        # Neural nets are basically black boxes
+        self.render_percentage_display(screen)
+
+    def setup_percentage_display(self, environment):
+        self.output_rects = []
+        self.output_predictions = [0 for x in range(environment.num_labels)]
+        self.output_totals = [0 for x in range(environment.num_labels)]
+
+        width = (self.w - self.slot_width * 2.5 - self.slot_height) / environment.num_labels
+        for i in range(environment.num_labels):
+            self.output_rects.append(Label(width * i, 60, width, 80,
+                                           None, '--%', 26, config.WHITE))
+
+        for rect in self.output_rects:
+            self.display_frame.add_child(rect)
+
+    def render_percentage_display(self, screen):
+        for i, rect in enumerate(self.output_rects):
+            self.render_data(screen, i,
+                             np.add(np.add(rect.get_center(True), self.get_pos(True)),
+                                    (int(self.display_frame.x), 0)))
+
+    def update_percentage_display(self):
+        for i, rect in enumerate(self.output_rects):
+            rect.change_text(self.get_perc_string(self.output_predictions[i],
+                             self.output_totals[i]))
+
+    def predict(self, sample):
+        pred_label = self._predict(sample)
+
+        self.output_totals[int(sample.y)] += 1
+        if pred_label == int(sample.y):
+            self.output_predictions[pred_label] += 1
+
+        return pred_label
+
+    def get_perc_string(self, numerator, denominator):
+        if denominator == 0:
+            return '--%'
+        dp = int(numerator / denominator * 100)
+        return str(dp) + '%'
+
 
 class KNN(Algorithm):
 
@@ -177,27 +238,17 @@ class KNN(Algorithm):
                                            config.SCHEME4, config.SCHEME4, 0,
                                            lambda: self.change_k(-1), shape='rect', bsfix=True))
 
-    def on_render(self, screen, back_fill=None):
-        super().on_render(screen, back_fill)
-
-        if self.display_shown:
-            self.config_frame.hide()
-            self.render_display(screen)
-        else:
-            self.config_frame.show()
-
     def change_k(self, val):
         self.agent.k += val
         self.agent.k = max(1, self.agent.k)
         self.k_display.change_text(str(self.agent.k))
 
-    def render_display(self, screen):
-        width = self.w - self.slot_width * 2.5 - self.slot_height
-        canvas = pygame.Surface((width, self.h - 50))
-        canvas.fill(config.WHITE)
-        pygame.draw.rect(canvas, config.BLACK, (10, 10, 30, 30))
-
-        screen.blit(canvas, (self.x + self.slot_width * 1.25, self.y + 40))
+        # width = self.w - self.slot_width * 2.5 - self.slot_height
+        # canvas = pygame.Surface((width, self.h - 50))
+        # canvas.fill(config.WHITE)
+        # pygame.draw.rect(canvas, config.BLACK, (10, 10, 30, 30))
+        #
+        # screen.blit(canvas, (self.x + self.slot_width * 1.25, self.y + 40))
 
 
 class NBayes(Algorithm):
@@ -211,55 +262,81 @@ class LogisticRegression(Algorithm):
     def __init__(self, environment):
         super().__init__(LogRegAlgo, 'Log Reg', environment, w=280)
 
+        self.config_frame.add_child(Label(20, 0, 100, 30, None, "Train Amt", 22, config.BLACK))
+        self.iter_display = Label(20, 40, 100, 60, None,
+                                  str(self.agent.num_iters // 200), 72, config.BLACK)
+        self.config_frame.add_child(self.iter_display)
+
+        self.config_frame.add_child(Button(110, 40, 30, 30, "/\\", 30, config.GREEN,
+                                           config.SCHEME4, config.SCHEME4, 0,
+                                           lambda: self.change_iters(1), shape='rect', bsfix=True))
+        self.config_frame.add_child(Button(110, 70, 30, 30, "\\/", 30, config.BLUE,
+                                           config.SCHEME4, config.SCHEME4, 0,
+                                           lambda: self.change_iters(-1), shape='rect', bsfix=True))
+
+    def change_iters(self, val):
+        self.agent.num_iters += val * 200
+        self.agent.num_iters = max(self.agent.num_iters, 200)
+        self.iter_display.change_text(str(self.agent.num_iters // 200))
+
 
 class NeuralNetwork(Algorithm):
 
     def __init__(self, environment):
         super().__init__(NeuralNetAlgo, 'Neural Net', environment, w=280)
 
+        self.layers = 2
+        self.num_features = environment.num_features
+        self.num_labels = environment.num_labels
+
         self.agent.add_layer(Dense(10, input_shape=environment.num_features))
         self.agent.add_layer(Activation('sigmoid'))
         self.agent.add_layer(Dense(environment.num_labels))
         self.agent.add_layer(Activation('softmax'))
 
-        self.output_rects = []
-        self.output_predictions = [0 for x in range(environment.num_labels)]
-        self.output_totals = [0 for x in range(environment.num_labels)]
+        self.setup_train_config()
 
-        width = (self.w - self.slot_width * 2.5 - self.slot_height) / environment.num_labels
-        for i in range(environment.num_labels):
-            self.output_rects.append(Label(self.slot_width * 1.25 + width * i, 60, width, 80,
-                                           None, '--%', 26, config.WHITE))
+    def setup_train_config(self):
+        self.config_frame.add_child(Label(0, 0, 65, 50, None, "Train", 18, config.BLACK))
+        self.iter_display = Label(75, 0, 30, 50, None,
+                                  str(self.agent.num_iters // 200), 26, config.BLACK)
+        self.config_frame.add_child(self.iter_display)
 
-        for rect in self.output_rects:
-            self.add_child(rect)
+        self.config_frame.add_child(Button(110, 0, 25, 25, "/\\", 18, config.GREEN,
+                                           config.SCHEME4, config.SCHEME4, 0,
+                                           lambda: self.change_iters(1), shape='rect', bsfix=True))
+        self.config_frame.add_child(Button(110, 25, 25, 25, "\\/", 18, config.BLUE,
+                                           config.SCHEME4, config.SCHEME4, 0,
+                                           lambda: self.change_iters(-1), shape='rect', bsfix=True))
 
-    def on_update(self, elapsed):
-        super().on_update(elapsed)
+        layer_y = 50
+        self.config_frame.add_child(Label(0, layer_y, 65, 50, None, "Layers", 18, config.BLACK))
+        self.layer_display = Label(75, layer_y, 30, 50, None,
+                                   str(len(self.agent.layers) // 2), 26, config.BLACK)
+        self.config_frame.add_child(self.layer_display)
 
-        for i, rect in enumerate(self.output_rects):
-            rect.change_text(self.get_perc_string(self.output_predictions[i],
-                             self.output_totals[i]))
+        self.config_frame.add_child(Button(110, layer_y, 25, 25, "/\\", 18, config.GREEN,
+                                           config.SCHEME4, config.SCHEME4, 0,
+                                           lambda: self.change_layer(1), shape='rect', bsfix=True))
+        self.config_frame.add_child(Button(110, layer_y + 25, 25, 25, "\\/", 18, config.BLUE,
+                                           config.SCHEME4, config.SCHEME4, 0,
+                                           lambda: self.change_layer(-1), shape='rect', bsfix=True))
 
-    def on_render(self, screen, back_fill=None):
-        super().on_render(screen, back_fill)
+    def change_iters(self, val):
+        self.agent.num_iters += 200 * val
+        self.agent.num_iters = max(self.agent.num_iters, 200)
+        self.iter_display.change_text(str(self.agent.num_iters // 200))
 
-        for i, rect in enumerate(self.output_rects):
-            self.render_data(screen, i,
-                             np.subtract(np.add(rect.get_center(True), self.get_pos(True)),
-                                         (0, 40)))
+    def change_layer(self, val):
+        self.layers = self.layers + val
+        self.layers = max(1, self.layers)
 
-    def predict(self, sample):
-        pred_label = super().predict(sample)  # Ahem Python
+        self.agent.clear_layers()
 
-        self.output_totals[int(sample.y)] += 1
-        if pred_label == int(sample.y):
-            self.output_predictions[pred_label] += 1
+        for i in range(self.layers - 1):
+            self.agent.add_layer(Dense(self.num_features, input_shape=self.num_features))
+            self.agent.add_layer(Activation('relu'))
+        self.agent.add_layer(Dense(self.num_labels, input_shape=self.num_features))
+        self.agent.add_layer(Activation('softmax'))
 
-        return pred_label
-
-    def get_perc_string(self, numerator, denominator):
-        if denominator == 0:
-            return '--%'
-        dp = int(numerator / denominator * 100)
-        return str(dp) + '%'
+        self.layer_display.change_text(str(len(self.agent.layers) // 2))

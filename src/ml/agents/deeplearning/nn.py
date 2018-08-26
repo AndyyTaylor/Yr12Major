@@ -5,12 +5,17 @@ class NeuralNetwork():
     def __init__(self, environment):
         self.layers = []
 
+        self.num_iters = 200
+
     def add_layer(self, layer):
         if self.layers:
             layer.set_input_shape(self.layers[-1].num_nodes)
 
         layer.init()
         self.layers.append(layer)
+
+    def clear_layers(self):
+        self.layers = []
 
     def predict(self, X):
         return np.argmax(self.feed_forward(X), axis=1)
@@ -22,7 +27,7 @@ class NeuralNetwork():
         return X
 
     def train(self, X, y, num_iters=1000):
-        for i in range(num_iters):
+        for i in range(self.num_iters):
             self.back_propagate(X, y)
 
     def back_propagate(self, X, y):

@@ -44,20 +44,21 @@ class KNN():
             self.k_determined = True
 
     def predict(self, X):
-        y = np.zeros(len(X))  # vector containing labels
-        for i, x in enumerate(X):  # test points
+        y = np.zeros(len(X))  # vector (array) containing labels (answers)
+        for i, x in enumerate(X):  # test points to create predictions for
             sl = SortedList()
-            for j, xt in enumerate(self.X):  # train points
-                # diff = x - xt
-                # dist = diff.dot(diff)  # squared difference
+            for j, xt in enumerate(self.X):  # training points
+                # Get the 'difference' between the two samples
                 dist = distance.euclidean(x, xt)
 
-                if len(sl) < self.k:
+                if len(sl) < self.k: # If don't have k points yet
                     sl.add((dist, self.y[j]))   # add tuple(distance, class)
                 else:
-                    if dist < sl[-1][0]:  # last element of sl is largest distance, first element of tuple is its distance
-                        del sl[-1]  # remove worst point as we only want k neighbours
-                        sl.add((dist, self.y[j]))  # add if this point is closer
+                    # last element of sl is largest 'difference',
+                    # first element of tuple is its distance
+                    if dist < sl[-1][0]:
+                        del sl[-1]  # remove worst point as we only want k best points
+                        sl.add((dist, self.y[j]))  # add as this point is closer
 
             y[i] = self._predict(sl)
 
@@ -66,17 +67,21 @@ class KNN():
 
 class ClassificationKNN(KNN):
     def _predict(self, sl):
+        # Takes in a list of tuples (distance, value)
+        # Returns the most commonly occuring value
+
         # Count votes by class to determine prediction
         votes = {}
-        for _, v in sl:  # we don't care about the distance anymore
-            votes[v] = votes.get(v, 0) + 1  # super nice function - if v doesn't exist it returns 0
+        for _, value in sl:  # we don't care about the distance anymore
+            votes[value] = votes.get(value, 0) + 1  # if value doesn't exist it returns 0
 
+        # Basically a findMax for a dictionary
         max_votes = 0
         best_class = 0
-        for v, count in votes.items():
+        for value, count in votes.items():
             if count > max_votes:
                 max_votes = count
-                best_class = v
+                best_class = value
 
         return best_class
 

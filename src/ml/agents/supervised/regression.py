@@ -16,6 +16,8 @@ class Regression():
         self.stddev = 1
         self.mean = 0
 
+        self.num_iters = 200
+
     def train(self, X, y, num_iters=5000):
         m = len(y)
         if m < 2:
@@ -23,7 +25,7 @@ class Regression():
 
         X = np.insert(self.scale_features(X), 0, 1, axis=1)
 
-        self.fit(X, y, num_iters)
+        self.fit(X, y, self.num_iters)
 
     def fit(self, X, y, num_iters):
         y = np.reshape(y, (len(y), 1))

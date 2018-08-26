@@ -33,5 +33,5 @@ TEST_PERC = 1 - TRAIN_PERC
 PREDICT_MULTIPLIER = 500
 TRAIN_MULTIPLIER = 10
 
-PURCHASES = ['KNN']
+PURCHASES = ['KNN', 'Neural Network', 'Logistic Regression', 'Naive Bayes']
 MONEY = 0
