@@ -5,7 +5,7 @@ Your job is simple. You have to filter the data from the 'Input' component and p
 5
 2
 Red and Green Circles
-Now you have to filter between the green and red circles. <new> <new> I've given you access to the logistic regression algorithm to get you started.
+Now you have to filter between the green and red circles. <new> <new> I've given you access to the naive bayes algorithm to get you started.
 100
 5
 3

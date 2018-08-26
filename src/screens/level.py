@@ -164,7 +164,7 @@ class Level(Screen):
                 if self.current_level == config.MAX_LEVEL:
                     config.MONEY += 500
                 else:
-                    config.MONEY += 100
+                    config.MONEY += 250
                 self.parent.change_state('Level', self.current_level + 1)
             else:
                 self.stop()
@@ -442,8 +442,8 @@ class Level(Screen):
             self.environment = ColorEnv(1, num_samples=3)
         elif num == 2:
             self.environment = ColorEnv(2, target_y=0, num_samples=10)
-            if 'Logistic Regression' not in config.PURCHASES:
-                config.PURCHASES.append('Logistic Regression')
+            if 'Naive Bayes' not in config.PURCHASES:
+                config.PURCHASES.append('Naive Bayes')
         elif num == 3:
             self.environment = ColorEnv(2, target_y=1, num_samples=30)
         elif num == 4:

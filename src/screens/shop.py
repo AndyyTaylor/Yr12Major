@@ -38,49 +38,41 @@ class Shop(Screen):
         self.purchases = {
             'algorithm': [
                 {
-                    'name': 'Logistic Regression',
+                    'name': 'Naive Bayes',
                     'cost': 0,
+                    'blurb': 'Fast statistical classifier that models data using gaussian distributions'  # noqa
+                }, {
+                    'name': 'Logistic Regression',
+                    'cost': 1000,
                     'blurb': 'Creates approximate functions to create estimates'
                 }, {
                     'name': 'KNN',
-                    'cost': 1000,
+                    'cost': 1500,
                     'blurb': 'Lazy classifier that finds similar examples that it was shown during training'  # noqa
                 }, {
-                    'name': 'Naive Bayes',
-                    'cost': 2000,
-                    'blurb': 'Fast statistical classifier that models data using gaussian distributions'  # noqa
-                }, {
                     'name': 'Neural Network',
-                    'cost': 999999,
+                    'cost': 3000,
                     'blurb': 'Extremely versatile classifier built using layers'
-                }, {
-                    'name': 'Policy Gradient',
-                    'cost': 99999,
-                    'blurb': 'Basic RL Algorithm'
-                }, {
-                    'name': 'Other RL',
-                    'cost': 99999,
-                    'blurb': 'Another basic RL algorithm'
-                }, {
-                    'name': 'Q Learning',
-                    'cost': 9999,
-                    'blurb': 'Q Learning is a more advanced RL Algorithm'
                 }
             ], 'upgrade': [
                 {
-                    'name': 'Degree 2',
-                    'cost': 9999,
-                    'blurb': 'Allows logistic regression to create 2nd degree functions'
+                    'name': 'KNN',
+                    'cost': 100,
+                    'blurb': 'Allows knn to compare against more samples'
                 }, {
-                    'name': 'Degree 3',
-                    'cost': 9999,
-                    'blurb': 'Allows logistic regression to create 3rd degree functions'
+                    'name': 'Logistic Regression',
+                    'cost': 100,
+                    'blurb': 'Allows logistic regression to be trained for more iterations'
                 }, {
-                    'name': 'Degree 4',
-                    'cost': 9999,
-                    'blurb': 'Allows logistic regression to create 4th degree functions'
+                    'name': 'Neural Net (Train)',
+                    'cost': 100,
+                    'blurb': 'Allows neural networks to be trained for more iterations'
+                }, {
+                    'name': 'Neural Net (Layers)',
+                    'cost': 100,
+                    'blurb': 'Allows neural networks to consist of more layers'
                 }
-            ], 'businesse': [
+            ], 'business': [
 
             ]
         }
@@ -124,7 +116,7 @@ class Shop(Screen):
                                    "Upgrades", 24, config.BLACK, config.SCHEME4, config.SCHEME4, 0,
                                    lambda: self.show_upgrades(), shape='rect'))
         self.widgets.append(Button(config.SCREEN_WIDTH / 3 * 2, 150, config.SCREEN_WIDTH / 3, 50,
-                                   "Businesses", 24, config.BLACK, config.SCHEME4, config.SCHEME4,
+                                   "Main Menu", 24, config.BLACK, config.SCHEME4, config.SCHEME4,
                                    0, lambda: self.show_businesses(), shape='rect'))
 
     def show_algorithms(self):
