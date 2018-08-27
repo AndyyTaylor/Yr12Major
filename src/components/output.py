@@ -61,8 +61,11 @@ class Output(Component):
     def tally_sample(self, sample, flip=False):
         self.total += 1
         is_correct = self.environment.sample_correct(sample)
+
+        # The Trash component has the opposite effect
         if flip:
             is_correct = not is_correct
+
         self.correct += int(is_correct)
 
     def get_percentage(self):

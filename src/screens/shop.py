@@ -19,7 +19,7 @@ class Shop(Screen):
         self.upgrade_frame = Frame(0, 200, shop_width, config.SCREEN_HEIGHT - 200, True,
                                    config.SCHEME5, grid_type='grid', item_x_margin=80)
         self.menu_frame = Frame(0, 200, shop_width, config.SCREEN_HEIGHT - 200, True,
-                                    config.SCHEME5, grid_type='grid', item_x_margin=80)
+                                config.SCHEME5, grid_type='grid', item_x_margin=80)
 
         self.widgets.append(self.algorithm_frame)
         self.widgets.append(self.upgrade_frame)
@@ -89,11 +89,14 @@ class Shop(Screen):
         self.create_purchase_buttons()
         self.create_title_buttons()
 
+        # Must be hidden after buttons added so 'hide' updates button state
         self.upgrade_frame.hide()
         self.menu_frame.hide()
 
     def on_enter(self, data, screen):
         super().on_enter(data, screen)
+
+        self.update_buttons()
 
     def create_purchase_buttons(self):
         for type, items in self.purchases.items():
@@ -159,7 +162,9 @@ class Shop(Screen):
         config.MAZE_WIDTH = 3 + config.PURCHASES.count("Grid Width")
         config.MAZE_HEIGHT = 3 + config.PURCHASES.count("Grid Height")
 
-        # Should also call on_enter
+        self.update_buttons()
+
+    def update_buttons(self):
         for child in self.algorithm_frame.children:
             title = child.children[1].text
             if title in config.PURCHASES:

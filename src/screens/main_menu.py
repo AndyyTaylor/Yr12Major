@@ -2,7 +2,7 @@
 import pygame
 from src import config
 from .screen import Screen
-from ..widgets import *
+from ..widgets import Button
 from .maze.mazeenv import MazeEnv
 from .maze.qlearn import QLearn
 from time import time
@@ -17,7 +17,6 @@ class MainMenu(Screen):
         self.widgets.append(Button(50, config.SCREEN_HEIGHT - 270, 400, 100, "Play",
                             64, config.BLACK, config.BLACK, config.SCHEME2, 6,
                             lambda: self.parent.change_state("LevelSelector")))
-
         self.widgets.append(Button(50, config.SCREEN_HEIGHT - 150, 400, 100, "Shop",
                             64, config.BLACK, config.BLACK, config.SCHEME2, 6,
                             lambda: self.parent.change_state("Shop")))
@@ -67,5 +66,5 @@ class MainMenu(Screen):
 
             self.moved = False
 
+        # Maze needs to render before everything else
         super().on_render(screen)
-

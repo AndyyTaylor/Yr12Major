@@ -24,14 +24,15 @@ class Connection(Widget):
     def on_update(self, elapsed):
         super().on_update(elapsed)
 
+        # Connection is fully connected
         if self.in_holder is not None and self.out_holder is not None:
             self.collect_samples()
             self.progress_samples(elapsed)
 
             if self.in_holder.parent.parent is not None:  # Component is being dragged
                 current_scroll = self.in_holder.parent.parent.get_scroll()
-                if current_scroll != self.prev_scroll:
-                    self.prev_scroll = current_scroll
+                if current_scroll != self.prev_scroll:  # Adjust for any scrolling as component
+                    self.prev_scroll = current_scroll   # leaves workspace_frame
                     self.rebuild_pos()
 
     def on_render(self, screen, back_fill=None):
@@ -41,13 +42,17 @@ class Connection(Widget):
 
         pygame.draw.line(screen, config.BLACK, start_pos, end_pos, 3)
 
+        self.render_samples(screen, start_pos, end_pos)
+
+        self.changed = True
+
+    def render_samples(self, screen, start_pos, end_pos):
         pos_diff = np.subtract(end_pos, start_pos)
+
         for sample in self.samples:
             diff = np.multiply(pos_diff, sample.progress)
             pos = np.add(start_pos, diff)
             self.render_data(screen, sample.y, tuple([int(x) for x in pos]))
-
-        self.changed = True
 
     def collect_samples(self):
         if self.in_holder.has_samples() and len(self.samples) < 1:
@@ -55,6 +60,8 @@ class Connection(Widget):
 
     def progress_samples(self, elapsed):
         for sample in self.samples:
+
+            # Determine the speed it should travel at
             out_parent = self.out_holder.parent
             in_parent = self.in_holder.parent
             if hasattr(out_parent, 'max_predict_cooldown'):
@@ -64,9 +71,10 @@ class Connection(Widget):
             else:
                 total = 1000
 
+            # Move the sample
             sample.progress += min(elapsed / total * self.speed, 1 - sample.progress)
 
-            if sample.progress == 1:
+            if sample.progress == 1:  # Has reached the end of the connection
                 self.out_holder.add_sample(sample)
                 self.samples.remove(sample)
 

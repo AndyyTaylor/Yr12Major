@@ -25,20 +25,7 @@ class Screen():
         self.widgets = []
 
         if self.show_title:
-            self.title_frame = Frame(0, 0, config.SCREEN_WIDTH, 150, False, config.SCHEME2)
-            self.widgets.append(self.title_frame)
-
-            self.title = Label(300, 0, config.SCREEN_WIDTH - 600, 150,
-                               config.SCHEME2, self.name, 118, config.BLACK)
-            self.title_frame.add_child(self.title)
-
-            if self.back_button:
-                back_button = Button(0, 0, 150, 150, "", 72,
-                                     config.BLACK, config.SCHEME2, config.SCHEME2, 0,
-                                     lambda: self.parent.change_state(self.back_screen),
-                                     shape='rect', img=Image(25, 25, 100, 100, "back_arrow.png"))
-
-                self.title_frame.add_child(back_button)
+            self.create_title()
 
     def on_init(self):
         for widget in self.widgets:
@@ -64,6 +51,7 @@ class Screen():
             widget.on_update(elapsed)
 
     def on_render(self, screen):
+        # Anything touching a moved connection needs to be updated
         moving_rects = []
         for widget in self.widgets:
             if widget.type == 'connection' and widget.has_changed():
@@ -115,3 +103,22 @@ class Screen():
         for widget in self.widgets:
             if pygame.Rect(widget.get_rect()).collidepoint(pos):
                 widget.on_scroll(is_down)
+
+    def create_title(self):
+        self.title_frame = Frame(0, 0, config.SCREEN_WIDTH, 150, False, config.SCHEME2)
+        self.widgets.append(self.title_frame)
+
+        self.title = Label(300, 0, config.SCREEN_WIDTH - 600, 150,
+                           config.SCHEME2, self.name, 118, config.BLACK)
+        self.title_frame.add_child(self.title)
+
+        if self.back_button:  # To have back_button, must have title
+            self.create_back_button()
+
+    def create_back_button(self):
+        back_button = Button(0, 0, 150, 150, "", 72,
+                             config.BLACK, config.SCHEME2, config.SCHEME2, 0,
+                             lambda: self.parent.change_state(self.back_screen),
+                             shape='rect', img=Image(25, 25, 100, 100, "back_arrow.png"))
+
+        self.title_frame.add_child(back_button)

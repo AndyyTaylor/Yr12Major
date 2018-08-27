@@ -10,6 +10,8 @@ class UIElement():
         self.prev_x = x
         self.prev_y = y
 
+    # Lots of useful utility functions
+
     def get_pos(self, cast=False):
         if cast:
             return (int(self.x), int(self.y))

@@ -19,6 +19,7 @@ class DonutEnv(Environment):
         self.x_origin = 1.5
         self.y_origin = 1.5
 
+        # Generate all the points
         for point in range(self.num_samples // 2):
             dist = (np.random.random() - 0.5) * 2 * (self.radius / 2)
             theta = 2 * np.pi * np.random.random()

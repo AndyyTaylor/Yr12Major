@@ -18,7 +18,7 @@ class StateGroup(Screen):
         if parent:
             self.parent = StateRegistry.instance().get_group(parent)
             self.parent.add_child(self)
-        elif name != "MasterState":
+        elif name != "MasterState":  # If it's a top-level state
             self.parent = StateRegistry.instance().get_group("MasterState")
             self.parent.add_child(self)
 

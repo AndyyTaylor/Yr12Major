@@ -34,7 +34,6 @@ class Algorithm(Component):
         self.add_child(self.display_frame)
 
         self.skip_elapsed = False
-
         self.skip_predict = False
         self.predict_cooldown = 0
         self.max_predict_cooldown = 0
@@ -49,7 +48,6 @@ class Algorithm(Component):
                                     shape='rect',
                                     img=Image(0, 0, self.slot_height, self.slot_height,
                                               'config.png'), bsfix=True)
-
         self.add_child(self.config_button)
 
         self.setup_percentage_display(environment)
@@ -57,6 +55,7 @@ class Algorithm(Component):
     def on_update(self, elapsed):
         super().on_update(elapsed)
 
+        # Check all the timers
         if self.skip_elapsed:
             self.skip_elapsed = False  # don't count toward timers
         elif self.train_cooldown > 0:
@@ -66,16 +65,7 @@ class Algorithm(Component):
             self.predict_cooldown -= elapsed
             self.changed = True
         else:
-            in_holder = self.inputs[0]
-            if in_holder.has_samples():
-                sample = in_holder.take_sample()
-
-                pred_label = self.predict(sample)
-
-                if pred_label in self.holder_labels:
-                    self.outputs[self.holder_labels.index(pred_label)].add_sample(sample)
-                else:
-                    self.outputs[-1].add_sample(sample)
+            self.process_sample()
 
         self.update_percentage_display()
 
@@ -103,6 +93,18 @@ class Algorithm(Component):
                              np.add(holder.parent.get_pos(True), holder.get_center(True)))
 
         self.changed = False
+
+    def process_sample(self):
+        in_holder = self.inputs[0]
+        if in_holder.has_samples():
+            sample = in_holder.take_sample()
+
+            pred_label = self.predict(sample)
+
+            if pred_label in self.holder_labels:
+                self.outputs[self.holder_labels.index(pred_label)].add_sample(sample)
+            else:
+                self.outputs[-1].add_sample(sample)
 
     def toggle_display(self):
         self.display_shown = not self.display_shown
@@ -134,6 +136,9 @@ class Algorithm(Component):
         pred = self.agent.predict(np.array([sample.x]))
         end_time = datetime.datetime.now()
 
+        # The first predict cooldown always takes longer
+        # I think its a complex python thing, so we skip the timer
+        # so that it doesn't affect the user
         if not self.skip_predict:
             self.max_predict_cooldown = (end_time - start_time).total_seconds()
             self.max_predict_cooldown *= 1000 * config.PREDICT_MULTIPLIER
@@ -142,7 +147,7 @@ class Algorithm(Component):
             self.skip_predict = False
 
         pred_label = int(pred)
-        print(pred, sample.y)
+
         return pred_label
 
     def place_holders(self):
@@ -155,9 +160,9 @@ class Algorithm(Component):
             self.output_pos.append((self.w - self.slot_width, (top + bottom) / 2 + title_height))
 
             if i >= len(self.holder_labels):
-                continue  # Don't want a config button
+                continue  # Don't want a config button for the 'else' holder
 
-            index = i
+            index = i  # Everything in Python is an Instance, this removes the reference
             self.output_button = Button(self.w - self.slot_width - self.slot_height,
                                         (top + bottom) / 2 + title_height - self.slot_height / 2,
                                         self.slot_height,
@@ -228,6 +233,7 @@ class KNN(Algorithm):
         super().__init__(ClassificationKNN, 'KNN', environment, w=280)
 
         self.config_frame.add_child(Label(20, 0, 100, 30, None, "Nearest", 22, config.BLACK))
+
         self.k_display = Label(20, 40, 100, 60, None, str(self.agent.k), 72, config.BLACK)
         self.config_frame.add_child(self.k_display)
 
@@ -243,13 +249,6 @@ class KNN(Algorithm):
         self.agent.k = min(max(1, self.agent.k), config.PURCHASES.count("KNN (Samples)") + 1)
         self.k_display.change_text(str(self.agent.k))
 
-        # width = self.w - self.slot_width * 2.5 - self.slot_height
-        # canvas = pygame.Surface((width, self.h - 50))
-        # canvas.fill(config.WHITE)
-        # pygame.draw.rect(canvas, config.BLACK, (10, 10, 30, 30))
-        #
-        # screen.blit(canvas, (self.x + self.slot_width * 1.25, self.y + 40))
-
 
 class NBayes(Algorithm):
 
@@ -263,6 +262,7 @@ class LogisticRegression(Algorithm):
         super().__init__(LogRegAlgo, 'Log Reg', environment, w=280)
 
         self.config_frame.add_child(Label(20, 0, 100, 30, None, "Train Amt", 22, config.BLACK))
+
         self.iter_display = Label(20, 40, 100, 60, None,
                                   str(self.agent.num_iters // 200), 72, config.BLACK)
         self.config_frame.add_child(self.iter_display)
@@ -270,6 +270,7 @@ class LogisticRegression(Algorithm):
         self.config_frame.add_child(Button(110, 40, 30, 30, "/\\", 30, config.GREEN,
                                            config.SCHEME4, config.SCHEME4, 0,
                                            lambda: self.change_iters(1), shape='rect', bsfix=True))
+
         self.config_frame.add_child(Button(110, 70, 30, 30, "\\/", 30, config.BLUE,
                                            config.SCHEME4, config.SCHEME4, 0,
                                            lambda: self.change_iters(-1), shape='rect', bsfix=True))
@@ -290,8 +291,6 @@ class NeuralNetwork(Algorithm):
         self.num_features = environment.num_features
         self.num_labels = environment.num_labels
 
-        # self.agent.add_layer(Dense(10, input_shape=environment.num_features))
-        # self.agent.add_layer(Activation('sigmoid'))
         self.agent.add_layer(Dense(environment.num_labels, input_shape=max(self.num_features, 20)))
         self.agent.add_layer(Activation('softmax'))
 
@@ -299,6 +298,7 @@ class NeuralNetwork(Algorithm):
 
     def setup_train_config(self):
         self.config_frame.add_child(Label(0, 0, 65, 50, None, "Train", 18, config.BLACK))
+
         self.iter_display = Label(75, 0, 30, 50, None,
                                   str(self.agent.num_iters // 200), 26, config.BLACK)
         self.config_frame.add_child(self.iter_display)
@@ -306,12 +306,14 @@ class NeuralNetwork(Algorithm):
         self.config_frame.add_child(Button(110, 0, 25, 25, "/\\", 18, config.GREEN,
                                            config.SCHEME4, config.SCHEME4, 0,
                                            lambda: self.change_iters(1), shape='rect', bsfix=True))
+
         self.config_frame.add_child(Button(110, 25, 25, 25, "\\/", 18, config.BLUE,
                                            config.SCHEME4, config.SCHEME4, 0,
                                            lambda: self.change_iters(-1), shape='rect', bsfix=True))
 
         layer_y = 50
         self.config_frame.add_child(Label(0, layer_y, 65, 50, None, "Layers", 18, config.BLACK))
+
         self.layer_display = Label(75, layer_y, 30, 50, None,
                                    str(len(self.agent.layers) // 2), 26, config.BLACK)
         self.config_frame.add_child(self.layer_display)
@@ -319,6 +321,7 @@ class NeuralNetwork(Algorithm):
         self.config_frame.add_child(Button(110, layer_y, 25, 25, "/\\", 18, config.GREEN,
                                            config.SCHEME4, config.SCHEME4, 0,
                                            lambda: self.change_layer(1), shape='rect', bsfix=True))
+
         self.config_frame.add_child(Button(110, layer_y + 25, 25, 25, "\\/", 18, config.BLUE,
                                            config.SCHEME4, config.SCHEME4, 0,
                                            lambda: self.change_layer(-1), shape='rect', bsfix=True))

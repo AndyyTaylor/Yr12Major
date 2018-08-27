@@ -28,12 +28,12 @@ class Rect(Shape):
         rect = self.get_rect()
         adj_rect = (rect[0] + x_off, rect[1] + y_off, rect[2], rect[3])
 
-        if not enabled:
+        if not enabled:  # Transparent gray cover
             s = pygame.Surface(self.get_size())
             s.set_alpha(config.DISABLED_ALPHA)
             s.fill(config.BLACK)
             screen.blit(s, self.get_pos())
-        elif self.alpha_enabled:
+        elif self.alpha_enabled:  # White highlight
             s = pygame.Surface(self.get_size())
             s.set_alpha(255 * animation * 0.5)
             s.fill(config.WHITE)
@@ -72,6 +72,7 @@ class RoundedRect(Shape):
 
     def draw_rounded_rect(self, surface, rect, color, radius=0.4, use_cache=True):
         """
+        Modified from StackOverflow
         AAfilledRoundedRect(surface,rect,color,radius=0.4)
 
         surface : destination
@@ -175,18 +176,11 @@ class Button(Widget):
     def on_update(self, elapsed):
         super().on_update(elapsed)
 
-        # if self.is_clicked or self.was_clicked:
-            # print(self.is_clicked, self.was_clicked)
         if not self.is_clicked and self.was_clicked and self.enabled:
             self.callback()
 
         if self.enabled:
-            if self.hover and self.animation < self.animation_time:
-                dt = min(elapsed, self.animation_time - self.animation)
-                self.animation += dt
-            elif not self.hover and self.animation > 0:
-                dt = min(elapsed, self.animation)
-                self.animation -= dt
+            self.update_animation(elapsed)
 
         new_hash = hash((self.hover, self.animation, self.enabled))
 
@@ -216,6 +210,14 @@ class Button(Widget):
             self.img.on_render(screen, back_fill)
 
         self.changed = False
+
+    def update_animation(self, elapsed):
+        if self.hover and self.animation < self.animation_time:
+            dt = min(elapsed, self.animation_time - self.animation)
+            self.animation += dt
+        elif not self.hover and self.animation > 0:
+            dt = min(elapsed, self.animation)
+            self.animation -= dt
 
     def on_mouse_motion(self, pos):
         self.hover = pygame.Rect(self.get_rect()).collidepoint(pos)

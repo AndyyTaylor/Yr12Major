@@ -42,8 +42,6 @@ class Level(Screen):
         self.clear_connections()
         self.add_control_buttons()
         self.title.change_text('Level ' + str(data))
-        # self.component_frame.add_child(Input(10, 10, 3))
-        # self.component_frame.add_child(Output(10, 300))
 
         self.load_level(data)
         self.show_level_blurb()
@@ -87,22 +85,23 @@ class Level(Screen):
             if isinstance(child, Button) or child.title == 'Trash':
                 continue
 
+            # child is a component
             total_data = 0
             for holder in child.inputs + child.outputs:
                 total_data += len(holder.samples)
 
             if total_data > 0:
-                return False
+                return False  # If it's not empty, the game is not over
 
-        if self.floating_component is not None:
-            total_data = 0
+        if self.floating_component is not None:  # Must also check the floating
+            total_data = 0                       # component, if it exists
             for holder in self.floating_component.inputs + self.floating_component.outputs:
                 total_data += len(holder.samples)
 
             if total_data > 0:
                 return False
 
-        for widget in self.widgets:
+        for widget in self.widgets:  # Connections should also be empty
             if widget.type == 'connection':
                 if len(widget.samples) > 0:
                     return False
@@ -119,25 +118,24 @@ class Level(Screen):
             y = self.workspace_frame.y + self.workspace_frame.h / 2 - height / 2
             self.end_frame = Frame(x, y, width, height,
                                    back_color=config.SCHEME2)
+
             if won:
                 title = 'YOU WON!'
+                file = 'trophy.png'
+                desc = 'Click anywhere to continue'
             else:
                 title = 'YOU LOST'
+                file = 'spoon.png'
+                desc = 'Click anywhere to retry'
+
             self.end_frame.add_child(Label(10, 10, width - 20, 70, config.BLACK, title, 48,
                                            config.WHITE))
 
-            if won:
-                file = 'trophy.png'
-            else:
-                file = 'spoon.png'
             self.end_frame.add_child(Image(10, 90, width - 20, height - 50 - 90, file))
 
-            if won:
-                desc = 'Click anywhere to continue'
-            else:
-                desc = 'Click anywhere to retry'
             self.end_frame.add_child(Label(10, height - 40, width - 20, 30, config.BLACK,
                                            desc, 16, config.WHITE))
+
             self.widgets.append(self.end_frame)
 
     def has_won(self):
@@ -152,33 +150,35 @@ class Level(Screen):
     def on_mouse_down(self, event, pos):
         super().on_mouse_down(event, pos)
 
-        if not self.blurb_frame.hidden:
+        if not self.blurb_frame.hidden:  # Should hide the level blurb
             self.blurb_frame.hide()
             self.workspace_frame.changed = True
             self.title_frame.changed = True
-        elif not self.end_frame.hidden:
+        elif not self.end_frame.hidden:  # Should hide the win/loss frame blurb
             self.end_frame.hide()
             self.workspace_frame.changed = True
             self.title_frame.changed = True
             self.widgets.remove(self.end_frame)
+
             if self.has_won():
-                if self.current_level == config.MAX_LEVEL:
+                if self.current_level == config.MAX_LEVEL:  # First time completed
                     config.MONEY += 500
                 else:
                     config.MONEY += 250
-                self.parent.change_state('Level', self.current_level + 1)
+
+                self.parent.change_state('Level', self.current_level + 1)  # Next level
             else:
-                self.stop()
-        else:
-            if event.button == 3:
-                for widget in self.workspace_frame.children:
-                    if widget.type == 'component':
-                        for holder in widget.inputs + widget.outputs:
-                            if holder.hover:
-                                self.remove_linked_connections(holder)
-                                break
-            elif not self.create_connections(pos) and self.floating_component is None:
-                self.select_floating_component(pos)
+                self.stop()  # Restart current level
+        elif event.button == 3:
+            for widget in self.workspace_frame.children:
+                if widget.type == 'component':
+                    for holder in widget.inputs + widget.outputs:
+                        if holder.hover:
+                            self.remove_linked_connections(holder)
+                            break
+
+        elif not self.create_connections(pos) and self.floating_component is None:
+            self.select_floating_component(pos)
 
     def on_mouse_motion(self, event, pos):
         super().on_mouse_motion(event, pos)
@@ -268,18 +268,20 @@ class Level(Screen):
         x = int(config.SCREEN_WIDTH / 2 - width / 2)
         y = self.workspace_frame.y + self.workspace_frame.h / 2 - height / 2
         blurb_frame = Frame(x, y, width, height, back_color=config.SCHEME2)
+
         blurb_frame.add_child(Label(10, 10, width - 20, 70, config.BLACK, self.level_title, 48,
                                     config.WHITE))
         blurb_frame.add_child(Message(10, 80, width - 20, height - 90, config.BLACK,
                                       self.level_description, 24, config.WHITE, align='ll'))
         blurb_frame.add_child(Label(10, 560, width - 20, 30, config.BLACK,
                                     'Click anywhere to continue...', 16, config.WHITE))
+
         self.blurb_frame = blurb_frame
         self.widgets.append(blurb_frame)
 
     def create_connections(self, pos, mouse_up=False):
         holders = []
-        for widget in self.workspace_frame.children:
+        for widget in self.workspace_frame.children:  # Get all the holders
             if widget.type == 'component':
                 for child in widget.children:
                     if child.type == 'holder':
@@ -295,7 +297,7 @@ class Level(Screen):
             return False
 
         connected = False
-        for widget in self.widgets:
+        for widget in self.widgets:  # See connection can be connected to holder
             if widget.type == 'connection':
                 if widget.in_holder is None and touching_holder.holder_type == 'output':
                     widget.in_holder = touching_holder
@@ -306,7 +308,7 @@ class Level(Screen):
                     connected = True
                     break
 
-        if not connected and not mouse_up:  # TODO must check type of holder
+        if not connected and not mouse_up:  # Place floating connection
             if holder.holder_type == 'output':
                 self.widgets.append(Connection(holder, None, self.environment.render_data))
             else:
@@ -323,6 +325,7 @@ class Level(Screen):
                     break
 
     def select_floating_component(self, pos):
+        # First check the component frame
         for widget in self.component_frame.children:
             if widget.is_clicked and widget.type == 'component':
                 widget.add_pos(*self.component_frame.get_pos())
@@ -331,6 +334,7 @@ class Level(Screen):
                 self.floating_component = widget
                 self.floating_component.parent = None
                 self.component_frame.children.remove(widget)
+                return
 
         # If not in the component frame
         for widget in self.workspace_frame.children:
@@ -353,13 +357,13 @@ class Level(Screen):
 
         self.update_components(pygame.Rect(self.floating_component.get_global_rect()))
 
-        if c_frame_intersect.size + w_frame_intersect.size == 0:
+        if c_frame_intersect.size + w_frame_intersect.size == 0:  # doesn't intersect
             pass
-        elif c_frame_intersect.size > w_frame_intersect.size:
+        elif c_frame_intersect.size > w_frame_intersect.size:  # Mostly over component frame
             self.floating_component.sub_pos(*self.component_frame.get_pos())
             self.floating_component.sub_pos(*self.component_frame.get_scroll())
             self.component_frame.add_child(self.floating_component)
-        else:
+        else:  # Mostly over workspace_frame
             self.floating_component.sub_pos(*self.workspace_frame.get_pos())
             self.floating_component.sub_pos(*self.workspace_frame.get_scroll())
             self.workspace_frame.add_child(self.floating_component)
@@ -436,12 +440,12 @@ class Level(Screen):
 
                     break
                 else:
-                    # Skip over the current title and desc etc
+                    # Skip over the current title, desc etc
                     for i in range(4):
                         f.readline()
 
         if num == 1:
-            self.environment = ColorEnv(1, num_samples=3)
+            self.environment = ColorEnv(1, num_samples=3)  # Can't easily load these from file
         elif num == 2:
             self.environment = ColorEnv(2, target_y=0, num_samples=10)
             if 'Naive Bayes' not in config.PURCHASES:
@@ -454,7 +458,7 @@ class Level(Screen):
             self.environment = ColorEnv(3, target_y=2, num_samples=25)
         elif num == 6:
             self.environment = DonutEnv(num_samples=25)
-        elif num == 6:
+        elif num == 7:
             self.environment = XOREnv(num_samples=25)
         elif num == 7:
             """
@@ -482,6 +486,7 @@ class Level(Screen):
         self.component_frame.add_child(self.output)
         self.component_frame.add_child(Trash(10, 10, self.output))
 
+        # Add unlocked algorithms
         algorithms = {
             'Logistic Regression': LogisticRegression(self.environment),
             'Neural Network': NeuralNetwork(self.environment),

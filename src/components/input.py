@@ -26,11 +26,11 @@ class Input(Component):
         super().on_render(screen, back_fill)
 
         y_m = 35  # top_margin
-        l_x_m = 10
+        l_x_m = 10  # left_x_margin
         r_x_m = 50
         labels = self.environment.get_labels()
         num_labels = len(labels)
-        for i, label in enumerate(labels):  # Figure this shit out
+        for i, label in enumerate(labels):
             label_w = (self.w - l_x_m - r_x_m) / num_labels
             label_w = min(self.h - y_m, label_w)
             self.environment.render_data(screen, label,

@@ -60,6 +60,8 @@ class Frame(Widget):
                 self.surf.fill(back_fill)
                 self.has_filled = True
 
+            # Horrible nested loop to update widgets that
+            # could be affected by other widgets updating
             for child in self.children:
                 if child.has_changed():
                     for other_child in self.children:
@@ -68,7 +70,7 @@ class Frame(Widget):
                         ):
                             other_child.changed = True
 
-            for child in self.children:  # Crop things that are out of the Frame
+            for child in self.children:
                 if child.has_changed() or self.changed:
                     child.on_render(self.surf, back_fill)
 
