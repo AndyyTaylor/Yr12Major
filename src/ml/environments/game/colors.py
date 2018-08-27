@@ -11,7 +11,7 @@ class ColorEnv(Environment):
     def __init__(self, num_colors, target_y=0, num_samples=100):
         super().__init__(target_y, num_samples)
 
-        self.colors = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0], [1, 1, 1]]
+        self.colors = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0], [1, 1, 1], [0, 0, 0]]
 
         self.X = np.zeros((self.num_samples, 3))
         self.y = np.zeros(self.num_samples)

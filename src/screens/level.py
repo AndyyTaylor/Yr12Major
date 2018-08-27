@@ -166,7 +166,10 @@ class Level(Screen):
                 else:
                     config.MONEY += 250
 
-                self.parent.change_state('Level', self.current_level + 1)  # Next level
+                if self.current_level < 8:
+                    self.parent.change_state('Level', self.current_level + 1)  # Next level
+                else:
+                    self.parent.change_state('LevelSelector')
             else:
                 self.stop()  # Restart current level
         elif event.button == 3:
@@ -424,7 +427,7 @@ class Level(Screen):
                 widget.clear_samples()
 
     def load_level(self, num):
-        config.MAX_LEVEL = max(config.MAX_LEVEL, num)
+        config.MAX_LEVEL = min(max(config.MAX_LEVEL, num), 8)
         self.current_level = num
         self.level_title = ''
         self.level_description = ''
@@ -460,20 +463,8 @@ class Level(Screen):
             self.environment = DonutEnv(num_samples=25)
         elif num == 7:
             self.environment = XOREnv(num_samples=25)
-        elif num == 7:
-            """
-            Handwritten Digit Recognition (Easy)
-            Slightly modified MNIST dataset
-            """
-        elif num == 7:
-            """
-            - Fashion MNIST
-            - World cup man of the match
-            - Fruit recognition
-            - Soccer match prediction with post-game stats (excluding scores)
-            - Soccer match prediction with post-game stats (excluding scores & attempts)
-            - Soccer match prediction without post-game stats
-            """
+        elif num == 8:
+            self.environment = ColorEnv(5, target_y=4, num_samples=100)
         else:
             raise NotImplementedError("Can't find level", num)
 

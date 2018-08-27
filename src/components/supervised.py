@@ -192,10 +192,11 @@ class Algorithm(Component):
         self.output_predictions = [0 for x in range(environment.num_labels)]
         self.output_totals = [0 for x in range(environment.num_labels)]
 
-        width = (self.w - self.slot_width * 2.5 - self.slot_height) / environment.num_labels
-        for i in range(environment.num_labels):
-            self.output_rects.append(Label(width * i, 60, width, 80,
-                                           None, '--%', 26, config.WHITE))
+        if environment.num_labels < 4:
+            width = (self.w - self.slot_width * 2.5 - self.slot_height) / environment.num_labels
+            for i in range(environment.num_labels):
+                self.output_rects.append(Label(width * i, 60, width, 80,
+                                               None, '--%', 26, config.WHITE))
 
         for rect in self.output_rects:
             self.display_frame.add_child(rect)
@@ -291,7 +292,7 @@ class NeuralNetwork(Algorithm):
         self.num_features = environment.num_features
         self.num_labels = environment.num_labels
 
-        self.agent.add_layer(Dense(environment.num_labels, input_shape=max(self.num_features, 20)))
+        self.agent.add_layer(Dense(environment.num_labels, input_shape=self.num_features))
         self.agent.add_layer(Activation('softmax'))
 
         self.setup_train_config()
@@ -339,9 +340,9 @@ class NeuralNetwork(Algorithm):
         self.agent.clear_layers()
 
         for i in range(self.layers - 1):
-            self.agent.add_layer(Dense(self.num_features, max(self.num_features, 20)))
+            self.agent.add_layer(Dense(self.num_features, input_shape=self.num_features))
             self.agent.add_layer(Activation('relu'))
-        self.agent.add_layer(Dense(self.num_labels, max(self.num_features, 20)))
+        self.agent.add_layer(Dense(self.num_labels, input_shape=self.num_features))
         self.agent.add_layer(Activation('softmax'))
 
         self.layer_display.change_text(str(len(self.agent.layers) // 2))

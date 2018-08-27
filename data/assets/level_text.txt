@@ -28,3 +28,13 @@ The Donut Problem
 The donut problem creates an inner ring with one sample, and an outer ring with another sample <new> <new> This non-linearity is hard for some classifiers to handle
 80
 30
+7
+The XOR Problem
+The XOR problem is another non-linear problem that lots of algorithms struggle to deal with. <new> <new> On the bright side, there's a big reward for completing this one :D
+80
+30
+8
+Party Time
+Lots of colours, see how well you can do! <new> <new> In this level, everyone's a winner! <new> <new> Also it's the last one :(
+0
+30
