@@ -1,3 +1,6 @@
-# ML Major
+# ML Major - Andy Taylor
 
-My major work for Software Design and Development 2018
+## Part B Theory
+[See Here](https://docs.google.com/document/d/1_TgkXT4iKXPOM6qUKo2jiotFuXdQ0EFmPfr9MDSgBpo/edit?usp=sharing)
+
+A pdf is also included
